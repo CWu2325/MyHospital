@@ -7,22 +7,62 @@
 //
 
 #import "AppDelegate.h"
+#import "TabBarVC.h"
+#import "NewfeatureVC.h"
+#import "AFNetworking.h"
 
 @interface AppDelegate ()
+
+@property(nonatomic)UITabBarController *tabC;
 
 @end
 
 @implementation AppDelegate
 
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    if (IS_IOS7)
+    {
+        [application setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
+    }
+
+    self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.backgroundColor = [UIColor whiteColor];
+ 
+    NSString *versionKey = @"CFBundleVersion";
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSString *lastVersion = [ud objectForKey:versionKey];
+    NSString *currentVersion = [NSBundle mainBundle].infoDictionary[versionKey];
+    
+    if ([currentVersion isEqualToString:lastVersion])
+    {
+        self.window.rootViewController = [[TabBarVC alloc]init];
+        
+    }
+    else
+    {
+        self.window.rootViewController = [[NewfeatureVC alloc]init];
+        [ud setObject:currentVersion forKey:versionKey];
+        [ud synchronize];
+    }
+    [self.window makeKeyAndVisible];
+    
+    //判断网络情况
+    //AFNetworkReachabilityManager *manage = [AFNetworkReachabilityManager sharedManager];
+    
+    
+    
+    
     return YES;
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
-    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+
+
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {

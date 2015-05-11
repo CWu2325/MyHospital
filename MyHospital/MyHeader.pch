@@ -1,0 +1,40 @@
+//
+//  MyHeader.pch
+//  MyHospital
+//
+//  Created by XYQS on 15/3/25.
+//  Copyright (c) 2015年 XYQS. All rights reserved.
+//
+
+#ifndef MyHospital_MyHeader_pch
+#define MyHospital_MyHeader_pch
+
+#define WIDTH [UIScreen mainScreen].bounds.size.width
+#define HEIGHT [UIScreen mainScreen].bounds.size.height
+#define SCALEFACTOR [UIScreen mainScreen].bounds.size.width/320
+
+#import "UIView+Extension.h"
+#import "RSA.h"
+#import "NSDate+LCW.h"
+#import "UIBarButtonItem+Extension.h"
+#import "MBProgressHUD+MJ.h"
+#import "UIImageView+AFNetworking.h"
+#import "XyqsTools.h"
+#import "UIImage+Extension.h"
+
+// 颜色
+#define LCWColor(r, g, b) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1.0]
+#define LCWColorRGBA(r, g, b, a) [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:a]
+#define LCWBackgroundColor [UIColor colorWithRed:240.0/255 green:240.0/255 blue:240.0/255 alpha:1]              //背景颜色（灰）
+#define LCWDivisionLineColor [UIColor colorWithRed:220.0/255 green:220.0/255 blue:220.0/255 alpha:1]            //分割线颜色
+#define LCWBottomColor [UIColor colorWithRed:36.0/255 green:177.0/255 blue:58.0/255 alpha:1]                    //分割线颜色（绿）
+#define LCWSelBtnBackgroundColor [UIColor colorWithRed:20.0/255 green:102.0/255 blue:33.0/255 alpha:1]                    //绿色按钮按下去得效果（绿）
+// 随机色
+#define LCWRandomColor LCWColor(arc4random_uniform(256), arc4random_uniform(256), arc4random_uniform(256))
+
+#define IS_IOS7 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7)
+#define IS_IOS8 ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8)
+
+
+
+#endif

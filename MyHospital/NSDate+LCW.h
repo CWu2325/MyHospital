@@ -1,0 +1,41 @@
+//
+//  NSDate+LCW.h
+//  MyHospital
+//
+//  Created by XYQS on 15/3/31.
+//  Copyright (c) 2015年 XYQS. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface NSDate (LCW)
+
+///**
+// *  是否为今天
+// */
+//- (BOOL)isToday;
+///**
+// *  是否为昨天
+// */
+//- (BOOL)isYesterday;
+///**
+// *  是否为今年
+// */
+//- (BOOL)isThisYear;
+//
+///**
+// *  返回一个只有年月日的时间
+// */
+//- (NSDate *)dateWithYMD;
+//
+///**
+// *  获得与当前时间的差距
+// */
+//- (NSDateComponents *)deltaWithNow;
+//
+///**
+// *  获得当前日期的对应的周几
+// */
+////+ (NSString*)weekdayStringFromDate:(NSDate*)inputDate;
+
+@end
