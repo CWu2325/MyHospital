@@ -15,7 +15,6 @@
 @property(nonatomic,strong)NSTimer *timer;
 @property(nonatomic)int sec;        //剩余秒数
 @property(nonatomic)int min;        //剩余分钟
-@property(nonatomic,strong)UILabel *promptLabel;    //提示标签
 @property(nonatomic,strong)UIButton *payButton;     //支付按钮
 @property(nonatomic,strong)UILabel *appointStatusLabel;     //预约状态
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
@@ -30,20 +29,20 @@
 
     [self initUI];
     
-    
-    
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(left)];;
+
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];;
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(doneAction)];
   
 }
 
--(void)left
-{
-}
-
 -(void)initUI
 {
+    UIScrollView *baseSv = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+    baseSv.backgroundColor = LCWBackgroundColor;
+    [self.view addSubview:baseSv];
+    
+    
     //预约号
     UILabel *appointNumLabel = [[UILabel alloc]init];
     appointNumLabel.font = MYFONT;
@@ -51,7 +50,7 @@
     appointNumLabel.size = [XyqsTools getSizeByText:appointNumLabel.text andFont:MYFONT andWidth:WIDTH/2-20];
     appointNumLabel.x = 10;
     appointNumLabel.y = 44/2 - appointNumLabel.height/2;
-    [self.view addSubview:appointNumLabel];
+    [baseSv addSubview:appointNumLabel];
     
     UILabel *appointLabel = [[UILabel alloc]init];
     appointLabel.text = @"预约状态:";
@@ -59,7 +58,7 @@
     appointLabel.size = [XyqsTools getSizeWithText:appointLabel.text andFont:appointLabel.font];
     appointLabel.y = appointNumLabel.y;
     appointLabel.x = WIDTH - 10 - appointLabel.width * 2;
-    [self.view addSubview:appointLabel];
+    [baseSv addSubview:appointLabel];
     
     //预约状态
     UILabel *appointStatusLabel = [[UILabel alloc]init];
@@ -70,7 +69,7 @@
     self.appointStatusLabel.x = WIDTH - appointLabel.width - 8;
     self.appointStatusLabel.y = appointNumLabel.y;
     
-    [self.view addSubview:appointStatusLabel];
+    [baseSv addSubview:appointStatusLabel];
     
     //预约状态
     if (self.leftTime > 0)
@@ -81,12 +80,12 @@
     
     //分割线1
     UIImageView *diviLine1 = [[UIImageView alloc]init];
-    diviLine1.backgroundColor = [UIColor lightGrayColor];
+    diviLine1.backgroundColor = LCWDivisionLineColor;
     diviLine1.height = 1;
     diviLine1.width = WIDTH;
     diviLine1.x = 0;
     diviLine1.y = 43;
-    [self.view addSubview:diviLine1];
+    [baseSv addSubview:diviLine1];
     
     //医院名称
     UILabel *hospNameLabel = [[UILabel alloc]init];
@@ -95,7 +94,7 @@
     hospNameLabel.size = [XyqsTools getSizeWithText:hospNameLabel.text andFont:hospNameLabel.font];
     hospNameLabel.x = 10;
     hospNameLabel.y = diviLine1.maxY + 15;
-    [self.view addSubview:hospNameLabel];
+    [baseSv addSubview:hospNameLabel];
     
     //科室
     UILabel *deptsNameLabel = [[UILabel alloc]init];
@@ -104,7 +103,7 @@
     deptsNameLabel.size = [XyqsTools getSizeWithText:deptsNameLabel.text andFont:deptsNameLabel.font];
     deptsNameLabel.x = hospNameLabel.x;
     deptsNameLabel.y = hospNameLabel.maxY + 10;
-    [self.view addSubview:deptsNameLabel];
+    [baseSv addSubview:deptsNameLabel];
     
     //医生
     UILabel *doctorNameLabel = [[UILabel alloc]init];
@@ -113,7 +112,7 @@
     doctorNameLabel.size = [XyqsTools getSizeWithText:doctorNameLabel.text andFont:doctorNameLabel.font];
     doctorNameLabel.x = hospNameLabel.x;
     doctorNameLabel.y = deptsNameLabel.maxY + 10;
-    [self.view addSubview:doctorNameLabel];
+    [baseSv addSubview:doctorNameLabel];
     
     //等级
     UILabel *levelNameLabel = [[UILabel alloc]init];
@@ -122,7 +121,7 @@
     levelNameLabel.size = [XyqsTools getSizeWithText:levelNameLabel.text andFont:levelNameLabel.font];
     levelNameLabel.x = hospNameLabel.x;
     levelNameLabel.y = doctorNameLabel.maxY + 10;
-    [self.view addSubview:levelNameLabel];
+    [baseSv addSubview:levelNameLabel];
     
     //就诊时间
     UILabel *dateLabel = [[UILabel alloc]init];
@@ -132,20 +131,20 @@
     dateLabel.width = WIDTH;
     dateLabel.x = hospNameLabel.x;
     dateLabel.y = levelNameLabel.maxY + 10;
-    [self.view addSubview:dateLabel];
+    [baseSv addSubview:dateLabel];
     
     //挂号费用
     UILabel *priceLabel = [[UILabel alloc]init];
     priceLabel.font = MYFONT;
     NSString *editStr = [XyqsTools stringDisposeWithFloat:self.doctor.fee];
-    NSString *allStr = [NSString stringWithFormat:@"挂号费用:%@元",editStr];
+    NSString *allStr = [NSString stringWithFormat:@"挂号费用: %@元",editStr];
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:allStr];
     [str addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
     priceLabel.attributedText = str;
     priceLabel.size = [XyqsTools getSizeWithText:priceLabel.text andFont:priceLabel.font];
     priceLabel.x = hospNameLabel.x;
     priceLabel.y = dateLabel.maxY + 10;
-    [self.view addSubview:priceLabel];
+    [baseSv addSubview:priceLabel];
     
     //支付方式
     UILabel *payWayLabel = [[UILabel alloc]init];
@@ -161,25 +160,25 @@
     payWayLabel.size = [XyqsTools getSizeWithText:payWayLabel.text andFont:payWayLabel.font];
     payWayLabel.x = priceLabel.x;
     payWayLabel.y = priceLabel.maxY + 10;
-    [self.view addSubview:payWayLabel];
+    [baseSv addSubview:payWayLabel];
     
     //分割线2
     UIImageView *diviLine2 = [[UIImageView alloc]init];
-    diviLine2.backgroundColor = [UIColor lightGrayColor];
+    diviLine2.backgroundColor = LCWDivisionLineColor;
     diviLine2.height = 1;
     diviLine2.width = WIDTH;
     diviLine2.x = 0;
     diviLine2.y = payWayLabel.maxY + 15;
-    [self.view addSubview:diviLine2];
+    [baseSv addSubview:diviLine2];
     
     //就诊人
     UILabel *sickNameLabel = [[UILabel alloc]init];
     sickNameLabel.font = MYFONT;
-    sickNameLabel.text = [NSString stringWithFormat:@"就诊人: %@",self.member.name];
+    sickNameLabel.text = [NSString stringWithFormat:@"就  诊  人: %@",self.member.name];
     sickNameLabel.size = [XyqsTools getSizeWithText:sickNameLabel.text andFont:sickNameLabel.font];
     sickNameLabel.x = payWayLabel.x;
     sickNameLabel.y = diviLine2.maxY + 15;
-    [self.view addSubview:sickNameLabel];
+    [baseSv addSubview:sickNameLabel];
     
     //就诊时间
     UILabel *sickIDLabel = [[UILabel alloc]init];
@@ -190,7 +189,7 @@
     sickIDLabel.width = WIDTH;
     sickIDLabel.x = sickNameLabel.x;
     sickIDLabel.y = sickNameLabel.maxY + 10;
-    [self.view addSubview:sickIDLabel];
+    [baseSv addSubview:sickIDLabel];
     
     //电话号码
     UILabel *sickTelLabel = [[UILabel alloc]init];
@@ -200,16 +199,16 @@
     sickTelLabel.size = [XyqsTools getSizeWithText:sickTelLabel.text andFont:sickTelLabel.font];
     sickTelLabel.x = sickIDLabel.x;
     sickTelLabel.y = sickIDLabel.maxY + 10;
-    [self.view addSubview:sickTelLabel];
+    [baseSv addSubview:sickTelLabel];
     
     //分割线3
     UIImageView *diviLine3 = [[UIImageView alloc]init];
-    diviLine3.backgroundColor = [UIColor lightGrayColor];
+    diviLine3.backgroundColor = LCWDivisionLineColor;
     diviLine3.height = 1;
     diviLine3.width = WIDTH;
     diviLine3.x = 0;
     diviLine3.y = sickTelLabel.maxY + 15;
-    [self.view addSubview:diviLine3];
+    [baseSv addSubview:diviLine3];
     
     if (self.radioBtn == 2)
     {
@@ -221,9 +220,11 @@
         button.centerX = self.view.centerX;
         [button setTitle:@"支        付" forState:UIControlStateNormal];
         button.layer.cornerRadius = 8;
-        button.layer.backgroundColor = LCWBottomColor.CGColor;
+        [button setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+        [button setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
         [button addTarget:self action:@selector(aliPayAction:) forControlEvents:UIControlEventTouchUpInside];
-        [self.view addSubview:button];
+        self.payButton = button;
+        [baseSv addSubview:button];
         
         //提示标签
         UILabel *timeLabel = [[UILabel alloc]init];
@@ -243,10 +244,14 @@
         timeLabel.numberOfLines = 0;
         timeLabel.centerX = self.view.centerX;
         self.timeLabel = timeLabel;
-        [self.view addSubview:timeLabel];
+        [baseSv addSubview:timeLabel];
         
         self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:timeLabel repeats:YES];
     }
+    
+    
+    baseSv.contentSize = CGSizeMake(WIDTH, HEIGHT*1.1);
+    
 }
 
 //倒计时
@@ -259,9 +264,10 @@
     if (self.leftTime <= 0)
     {
         [timer invalidate];
-        [label removeFromSuperview];
-        [self.promptLabel removeFromSuperview];
-        [self.payButton removeFromSuperview];
+        self.payButton.enabled = NO;
+        [self.payButton setBackgroundImage:[UIImage imageNamed:@"outtimePay.png"] forState:UIControlStateNormal];
+         label.text = @"您的预约未按时支付,已经被取消";
+        label.textAlignment = NSTextAlignmentCenter;
         self.appointStatusLabel.text = @"已取消";
         return;
     }
@@ -276,19 +282,15 @@
 
 - (void)aliPayAction:(id)sender
 {
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
-    [params setValue:token forKey:@"token"];
-    [params setValue:@"" forKey:@"oid"];
-    
-    
     [MBProgressHUD showError:@"待完善"];
     
 }
 
+
+
 -(void)doneAction
 {
-    [self.navigationController popToRootViewControllerAnimated:YES];
+    [self.navigationController popToRootViewControllerAnimated:NO];
 }
 
 

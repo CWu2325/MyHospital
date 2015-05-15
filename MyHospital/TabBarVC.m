@@ -7,9 +7,9 @@
 //
 
 #import "TabBarVC.h"
-#import "GuideVC.h"
 #import "PersonalVC.h"
 #import "MyNavigationController.h"
+#import "FirstPageVC.h"
 
 @interface TabBarVC ()
 
@@ -21,8 +21,8 @@
     [super viewDidLoad];
     
     [self.tabBar setSelectedImageTintColor:LCWBottomColor];
-    
-    GuideVC *gvc = [[GuideVC alloc]init];
+
+    FirstPageVC *gvc = [[FirstPageVC alloc]init];
     [self addChildVC:gvc title:@"就医" imageName:@"jiuyi2.png" selImageName:@"jiuyi.png"];
     
 

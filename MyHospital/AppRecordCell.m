@@ -164,7 +164,7 @@
             break;
         case 2:
         {
-            self.orderStatelabel.text = @"已就诊";
+            self.orderStatelabel.text = @"待就诊";
         }
             break;
         case 3:
@@ -179,7 +179,7 @@
             break;
         case 5:
         {
-            self.orderStatelabel.text = @"已取消";
+            self.orderStatelabel.text = @"已就诊";
         }
             break;
         default:
@@ -219,7 +219,7 @@
     self.sickNameLabel.y = 100 + diviHeight;
     
     //就诊日期
-    self.dateLabel.text = [NSString stringWithFormat:@"就诊日期: %@  %@-%@",self.orderList.orderDate,[self getTimeByDate:self.orderList.orderStartTime],[self getTimeByDate:self.orderList.orderEndTime]];
+    self.dateLabel.text = [NSString stringWithFormat:@"就诊时间: %@  %@-%@",self.orderList.orderDate,[self getTimeByDate:self.orderList.orderStartTime],[self getTimeByDate:self.orderList.orderEndTime]];
     self.dateLabel.size = [XyqsTools getSizeWithText:self.dateLabel.text andFont:self.dateLabel.font];
     self.dateLabel.y = self.sickNameLabel.maxY + diviHeight;
     

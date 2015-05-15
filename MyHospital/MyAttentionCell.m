@@ -108,7 +108,11 @@
     self.doctorHosDeptLabel.centerY = self.doctorIV.centerY;
     
     //评分
-    self.commMarkLabel.text = [NSString stringWithFormat:@"评分: %.1f",(float)self.att.commMark];
+    NSString *editStr = [NSString stringWithFormat:@"%.1f",(float)self.att.commMark];
+    NSString *allStr = [NSString stringWithFormat:@"评分: %@",editStr];
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:allStr];
+    [str addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
+    self.commMarkLabel.attributedText = str;
     self.commMarkLabel.size = [XyqsTools getSizeWithText:self.commMarkLabel.text andFont:self.commMarkLabel.font];
     self.commMarkLabel.x = self.doctorNameLabel.x;
     self.commMarkLabel.y = self.doctorIV.maxY -3-self.commMarkLabel.height;

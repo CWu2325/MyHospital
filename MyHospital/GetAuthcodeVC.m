@@ -31,18 +31,17 @@
     self.title = @"用户注册";
     [self initUI];
     self.isSelProtocol = YES;
+    
+    self.view.backgroundColor = LCWBackgroundColor;
+    
+    self.navigationItem.rightBarButtonItem = nil;
 }
 
 -(void)initUI
 {
-//    //分割线1
-//    UIView *view1 = [[UIView alloc]init];
-//    view1.x = 0;
-//    view1.y = 84;
-//    view1.width = WIDTH;
-//    view1.height = 1.5;
-//    view1.backgroundColor = [UIColor lightGrayColor];
-//    [self.view addSubview:view1];
+    UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 50)];
+    [self.view addSubview:downView];
+    downView.backgroundColor = [UIColor whiteColor];
     
     //验证码
     UILabel *telLabel = [[UILabel alloc]init];
@@ -52,7 +51,7 @@
     telLabel.x = 10;
     telLabel.centerY = 25;
     telLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:telLabel];
+    [downView addSubview:telLabel];
     
     //获取验证码按钮
     UIButton *getAuthcodeBtn = [[UIButton alloc]init];
@@ -62,13 +61,14 @@
     getAuthcodeBtn.height = 32;
     getAuthcodeBtn.centerY = 25;
     getAuthcodeBtn.x = WIDTH - getAuthcodeBtn.width-10;
-    getAuthcodeBtn.layer.backgroundColor = LCWBottomColor.CGColor;
-    getAuthcodeBtn.layer.cornerRadius = 5;
+    [getAuthcodeBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [getAuthcodeBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
+    getAuthcodeBtn.layer.cornerRadius = 6;
     getAuthcodeBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
     [getAuthcodeBtn setTitle:@"获取验证码" forState:UIControlStateNormal];
     [getAuthcodeBtn addTarget:self action:@selector(getAuthcode:) forControlEvents:UIControlEventTouchUpInside];
     self.getAuthcodeBtn = getAuthcodeBtn;
-    [self.view addSubview:getAuthcodeBtn];
+    [downView addSubview:getAuthcodeBtn];
     
     //验证码输入框
     if (!self.AuthcodeTF)
@@ -84,25 +84,18 @@
     self.AuthcodeTF.borderStyle = UITextBorderStyleNone;
     [self.AuthcodeTF becomeFirstResponder];
     self.AuthcodeTF.clearButtonMode = UITextFieldViewModeWhileEditing;
-    [self.view addSubview:self.AuthcodeTF];
+    [downView addSubview:self.AuthcodeTF];
     
-    //分割线2
-    UIView *view2 = [[UIView alloc]init];
-    view2.x = 0;
-    view2.y = 50;
-    view2.width = WIDTH;
-    view2.height = 1;
-    view2.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view2];
   
     //注册按钮
     UIButton *registerBtn = [[UIButton alloc]init];
     registerBtn.width = 260;
     registerBtn.height = 40;
-    registerBtn.y = view2.maxY + 30;
+    registerBtn.y = downView.maxY + 30;
     registerBtn.centerX = self.view.centerX;
-    registerBtn.layer.backgroundColor = LCWBottomColor.CGColor;
-    registerBtn.layer.cornerRadius = 10;
+    [registerBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [registerBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
+    registerBtn.layer.cornerRadius = 5;
     [registerBtn setTitle:@"注        册" forState:UIControlStateNormal];
     [registerBtn addTarget:self action:@selector(registerAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:registerBtn];
@@ -122,16 +115,31 @@
     [self.view addSubview:proSelBtn];
     
     //条款明细按钮
-    UIButton *protocolBtn = [[UIButton alloc]init];
-    protocolBtn.tag = 2;
-    [protocolBtn setTitle:@"我同意掌上医疗《用户协议和隐私条款》" forState:UIControlStateNormal];
-    [protocolBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    protocolBtn.titleLabel.font = [UIFont systemFontOfSize:12];
-    protocolBtn.size = [XyqsTools getSizeWithText:protocolBtn.titleLabel.text andFont:protocolBtn.titleLabel.font];
-    protocolBtn.y = registerBtn.maxY + 20;
-    protocolBtn.x = proSelBtn.maxX + 10;
-    [protocolBtn addTarget:self action:@selector(proSelBtnAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:protocolBtn];
+//    UIButton *protocolBtn = [[UIButton alloc]init];
+//    protocolBtn.tag = 2;
+//    [protocolBtn setTitle:@"我同意就医无忧医疗《用户协议和隐私条款》" forState:UIControlStateNormal];
+//    [protocolBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+//    protocolBtn.titleLabel.font = [UIFont systemFontOfSize:12];
+//    protocolBtn.size = [XyqsTools getSizeWithText:protocolBtn.titleLabel.text andFont:protocolBtn.titleLabel.font];
+//    protocolBtn.y = registerBtn.maxY + 20;
+//    protocolBtn.x = proSelBtn.maxX + 10;
+//    [protocolBtn addTarget:self action:@selector(proSelBtnAction:) forControlEvents:UIControlEventTouchUpInside];
+//    [self.view addSubview:protocolBtn];
+    UILabel *protocolLabel = [[UILabel alloc]init];
+    
+    NSString *editStr = @"我同意就医无忧医疗";
+    NSString *allStr = @"我同意就医无忧医疗《用户协议和隐私条款》";
+    NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:allStr];
+    [str addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:[allStr rangeOfString:editStr]];
+    protocolLabel.attributedText = str;
+    protocolLabel.font = [UIFont systemFontOfSize:10];
+    protocolLabel.size = [XyqsTools getSizeWithText:protocolLabel.text andFont:protocolLabel.font];
+    protocolLabel.x = proSelBtn.maxX + 10;
+    protocolLabel.y = registerBtn.maxY + 20;
+    [self.view addSubview:protocolLabel];
+    
+    
+    
     
     
 }
@@ -159,7 +167,7 @@
     {
         //跳转协议和隐私的界面
         ProtocolVC *vc = [[ProtocolVC alloc]init];
-        [self.navigationController pushViewController:vc animated:YES];
+        [self.navigationController pushViewController:vc animated:NO];
     }
 }
 
@@ -187,14 +195,15 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:self.person.mobile forKey:@"mobile"];
     [params setObject:@(1) forKey:@"type"];     //注册的类型
+    [params setObject:@"true" forKey:@"test"];
     
-    [self performSelector:@selector(sendAuth) withObject:nil afterDelay:1.5];
+    [XyqsApi getVerifycodeWithparams:params andCallBack:^(id obj) {
+        if (obj)
+        {
+            [MBProgressHUD showSuccess:obj];
+        }
+    }];
     
-}
-
--(void)sendAuth
-{
-    [MBProgressHUD showSuccess:@"验证码已发送"];
 }
 
 //倒计时
@@ -240,7 +249,7 @@
         {
             if ([controller isKindOfClass:[LoginViewController class]])
             {
-                [self.navigationController popToViewController:controller animated:YES];
+                [self.navigationController popToViewController:controller animated:NO];
             }
         }
        

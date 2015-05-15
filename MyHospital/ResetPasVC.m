@@ -28,6 +28,8 @@
     [super viewDidLoad];
     
     self.title = @"重置密码";
+    self.view.backgroundColor = LCWBackgroundColor;
+    self.navigationItem.rightBarButtonItem = nil;
     
     [self initUI];
 
@@ -35,14 +37,9 @@
 
 -(void)initUI
 {
-//    //分割线1
-//    UIView *view1 = [[UIView alloc]init];
-//    view1.x = 0;
-//    view1.y = 84;
-//    view1.width = WIDTH;
-//    view1.height = 1.5;
-//    view1.backgroundColor = [UIColor lightGrayColor];
-//    [self.view addSubview:view1];
+    UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 100)];
+    [self.view addSubview:downView];
+    downView.backgroundColor = [UIColor whiteColor];
     
     //账号栏
     UILabel *telLabel = [[UILabel alloc]init];
@@ -52,7 +49,7 @@
     telLabel.x = 10;
     telLabel.centerY = 25;
     telLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:telLabel];
+    [downView addSubview:telLabel];
     
     self.useTelTF = [[UITextField alloc]init];
     self.useTelTF.x = telLabel.maxX +5;
@@ -63,7 +60,7 @@
     self.useTelTF.placeholder = @"请输入手机号码";
     self.useTelTF.borderStyle = UITextBorderStyleNone;
     self.useTelTF.clearButtonMode = UITextFieldViewModeWhileEditing;
-    [self.view addSubview:self.useTelTF];
+    [downView addSubview:self.useTelTF];
     
     //分割线2
     UIView *view2 = [[UIView alloc]init];
@@ -71,8 +68,8 @@
     view2.y = 50;
     view2.width = WIDTH;
     view2.height = 1;
-    view2.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view2];
+    view2.backgroundColor = LCWBackgroundColor;
+    [downView addSubview:view2];
     
     //密码栏
     UILabel *pasLabel = [[UILabel alloc]init];
@@ -82,7 +79,7 @@
     pasLabel.x = 10;
     pasLabel.centerY = view2.y+25;
     pasLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:pasLabel];
+    [downView addSubview:pasLabel];
     
     
     //获取验证码按钮
@@ -92,14 +89,15 @@
     getAuthcodeBtn.height = 32;
     getAuthcodeBtn.centerY = view2.maxY + 25;
     getAuthcodeBtn.x = WIDTH - getAuthcodeBtn.width-10;
-    getAuthcodeBtn.layer.backgroundColor = LCWBottomColor.CGColor;
-    getAuthcodeBtn.layer.cornerRadius = 10;
+    [getAuthcodeBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [getAuthcodeBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
+    getAuthcodeBtn.layer.cornerRadius = 5;
     getAuthcodeBtn.titleLabel.adjustsFontSizeToFitWidth = YES;
     [getAuthcodeBtn setTitle:@"获取验证码" forState:UIControlStateNormal];
     getAuthcodeBtn.tag = 1;
     self.getAuthcodeBtn = getAuthcodeBtn;
     [getAuthcodeBtn addTarget:self action:@selector(getAuthcode:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:getAuthcodeBtn];
+    [downView addSubview:getAuthcodeBtn];
     
     self.rsgisterTF = [[UITextField alloc]init];
     self.rsgisterTF.x = pasLabel.maxX +5;
@@ -111,25 +109,18 @@
     self.rsgisterTF.borderStyle = UITextBorderStyleNone;
     self.rsgisterTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [self.rsgisterTF setSecureTextEntry:YES];
-    [self.view addSubview:self.rsgisterTF];
+    [downView addSubview:self.rsgisterTF];
     
-    //分割线3
-    UIView *view3 = [[UIView alloc]init];
-    view3.x = 0;
-    view3.y = view2.y + 50;
-    view3.width = WIDTH;
-    view3.height = 1;
-    view3.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view3];
-    
+  
     //下一步按钮
     UIButton *nextBtn = [[UIButton alloc]init];
     nextBtn.width = 260;
     nextBtn.height = 40;
-    nextBtn.y = view3.maxY + 30;
+    nextBtn.y = downView.maxY + 30;
     nextBtn.centerX = self.view.centerX;
-    nextBtn.layer.backgroundColor = LCWBottomColor.CGColor;
-    nextBtn.layer.cornerRadius = 10;
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
+    nextBtn.layer.cornerRadius = 5;
     [nextBtn setTitle:@"下    一    步" forState:UIControlStateNormal];
     [nextBtn addTarget:self action:@selector(next) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:nextBtn];
@@ -166,8 +157,20 @@
             sender.enabled = NO;
             self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:label repeats:YES];
             
-#pragma mark - 请求服务器给验证码
-            [self performSelector:@selector(sendAuth) withObject:nil afterDelay:1.5];
+            
+            NSMutableDictionary *params = [NSMutableDictionary dictionary];
+            [params setObject:self.useTelTF.text forKey:@"mobile"];
+            [params setObject:@(2) forKey:@"type"];
+            [params setObject:@"true" forKey:@"test"];
+            
+            [XyqsApi getVerifycodeWithparams:params andCallBack:^(id obj) {
+                
+                if (obj)
+                {
+                    [MBProgressHUD showSuccess:obj];
+                }
+            }];
+            
         }
         else
         {
@@ -176,11 +179,6 @@
         }
     }];
 
-}
-
--(void)sendAuth
-{
-    [MBProgressHUD showSuccess:@"验证码已发送"];
 }
 
 //倒计时
@@ -245,7 +243,7 @@
                 //跳转
                 ResetPasConfirmVC *vc = [[ResetPasConfirmVC alloc]init];
                 vc.resetToken = resetToken;
-                [self.navigationController pushViewController:vc animated:YES];
+                [self.navigationController pushViewController:vc animated:NO];
             }];
         }
         else

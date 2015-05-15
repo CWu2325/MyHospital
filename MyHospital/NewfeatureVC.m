@@ -48,7 +48,7 @@
 -(void)btnAction
 {
     TabBarVC *vc =[[TabBarVC alloc]init];
-    [self presentViewController:vc animated:YES completion:nil];
+    [self presentViewController:vc animated:NO completion:nil];
 }
 
 

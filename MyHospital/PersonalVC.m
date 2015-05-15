@@ -8,15 +8,13 @@
 
 #import "PersonalVC.h"
 #import "LoginViewController.h"
-#import "LCWSettingItem.h"
-#import "LCWSettingGroup.h"
-#import "LCWSettingArrowItem.h"
 #import "PersonInfoCell.h"
 #import "XyqsApi.h"
 #import "CommonAppointmentVC.h"
 #import "AppointmentRecordVC.h"
 #import "MyAttentionVC.h"
 #import "SetUseInfoVC.h"
+#import "AppSettingVC.h"
 
 
 @interface PersonalVC ()<Passvalue>
@@ -63,7 +61,7 @@
         //如果没有登录，就跳转到登录界面
         LoginViewController *loginVc = [[LoginViewController alloc]init];
         loginVc.formWhere = @"perInfo";
-        [self.navigationController pushViewController:loginVc animated:YES];
+        [self.navigationController pushViewController:loginVc animated:NO];
     }
     else
     {
@@ -147,18 +145,18 @@
                     break;
                 case 4:
                     cell.imageView.image = [UIImage imageNamed:@"预约人"];
-                    cell.textLabel.text = @"预约人";
+                    cell.textLabel.text = @"常用预约人";
                     break;
             }
         }
         else if(indexPath.section == 2)
         {
             cell.imageView.image = [UIImage imageNamed:@"设置"];
-            cell.textLabel.text = @"APP设置(暂时为退出账号功能)";
+            cell.textLabel.text = @"APP设置";
         }
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
-        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 43, WIDTH, 1)];
+        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 49, WIDTH, 1)];
         view.backgroundColor = LCWDivisionLineColor;
         [cell.contentView addSubview:view];
         return cell;
@@ -169,9 +167,9 @@
 {
     if (indexPath.section == 0 && indexPath.row == 0)
     {
-        return 91;
+        return 130;
     }
-    return 44;
+    return 50;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
@@ -204,7 +202,7 @@
         }
         else
         {
-            setVC.title = @"完善个人资料";
+            setVC.title = @"个人资料";
             setVC.formWhere = @"set";
         }
         vc = setVC;
@@ -212,35 +210,50 @@
     }
     else if (indexPath.section == 2)
     {
-        //app设置
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        
-        [self viewWillAppear:YES];
-        
+        vc = [[AppSettingVC alloc]init];  
     }
-    else if(indexPath.section ==1 && indexPath.row == 4)
+    else
     {
-        //常用预约人
-        CommonAppointmentVC *ComVC = [[CommonAppointmentVC alloc]init];
-        ComVC.title = @"常用预约人";
-        ComVC.fromWhere = @"B";
-        vc = ComVC;
+        switch (indexPath.row)
+        {
+            case 0:
+            {
+                //预约记录
+                vc = [[AppointmentRecordVC alloc]init];
+            }
+                break;
+            case 1:
+            {
+                [MBProgressHUD showError:@"功能待完善"];
+            }
+                break;
+            case 2:
+            {
+                [MBProgressHUD showError:@"功能待完善"];
+            }
+                break;
+            case 3:
+            {
+                //我的关注
+                vc = [[MyAttentionVC alloc]init];
+            }
+                break;
+            case 4:
+            {
+                //常用预约人
+                CommonAppointmentVC *ComVC = [[CommonAppointmentVC alloc]init];
+                ComVC.title = @"常用预约人";
+                ComVC.fromWhere = @"B";
+                vc = ComVC;
+            }
+                break;
+                
+            default:
+                break;
+        }
     }
-    else if(indexPath.section ==1 && indexPath.row == 0)
-    {
-        //预约记录
-        vc = [[AppointmentRecordVC alloc]init];
-        
-    }
-    else if(indexPath.section ==1 && indexPath.row == 3)
-    {
-        //我的关注
-        vc = [[MyAttentionVC alloc]init];
-        
-    }
-    
-    [self.navigationController pushViewController:vc animated:YES];
+
+    [self.navigationController pushViewController:vc animated:NO];
     
 }
 

@@ -19,6 +19,8 @@
 @property(nonatomic)int limit;
 @property(nonatomic)int offset;
 
+@property(nonatomic,strong)UIRefreshControl *refreshControl;
+
 @end
 
 @implementation AppointmentRecordVC
@@ -39,23 +41,80 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = LCWBackgroundColor;
     
+    self.navigationItem.rightBarButtonItem = nil;
+    
     self.limit = 0;
     self.offset = 0;
+    
+    /**
+     *  集成下拉刷新
+     */
+   // [self setupRefresh];
+    
+    
+}
+
+/**
+ *  集成下拉刷新
+ */
+-(void)setupRefresh
+{
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc]init];
+    self.refreshControl = refreshControl;
+    [self.tableView addSubview:refreshControl];
+    
+    [refreshControl addTarget:self action:@selector(refreshControl:) forControlEvents:UIControlEventValueChanged];
+    
+    [refreshControl beginRefreshing];
+    
+    [self refreshControl:refreshControl];
+}
+
+/**
+ *  下拉刷新事件
+ */
+-(void)refreshControl:(UIRefreshControl *)refreshControl
+{
+    [self loadNewRecoder];
+}
+
+
+-(void)loadNewRecoder
+{
+//    self.limit += 10;
+//    self.offset = 0;
 //    NSMutableDictionary *params = [NSMutableDictionary dictionary];
 //    [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
 //    [params setObject:@(self.limit) forKey:@"limit"];
 //    [params setObject:@(self.offset) forKey:@"offset"];
 //    
 //    [XyqsApi requestOrderRecordListWithParams:params andCallBack:^(id obj) {
-//        self.recordDatas = obj;
+//        NSArray *newArr = obj;
+//        
+////        NSRange range = NSMakeRange(0, newArr.count);
+////        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
+////        
+////        [self.recordDatas insertObjects:newArr atIndexes:indexSet];
+//        for (OrderRecord *orderR in newArr)
+//        {
+//            if (![self.recordDatas containsObject:orderR])
+//            {
+//                [self.recordDatas insertObject:orderR atIndex:0];
+//            }
+//        }
+//        
+//
 //        [self.tableView reloadData];
+//        
+//        [self.refreshControl endRefreshing];
 //    }];
-    
-    
 }
+
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     self.limit += 10;
     self.offset = 0;
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
@@ -103,7 +162,7 @@
     OrderDetailVC *vc = [[OrderDetailVC alloc]init];
     vc.orderList = orderList;
     vc.title = @"预约记录详情";
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:NO];
 }
 
 

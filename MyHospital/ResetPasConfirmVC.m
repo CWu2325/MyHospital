@@ -23,20 +23,19 @@
     [super viewDidLoad];
     self.title = @"重置密码";
     
+    self.navigationItem.rightBarButtonItem = nil;
+    
+    self.view.backgroundColor = LCWBackgroundColor;
+    
     [self initUI];
-    // Do any additional setup after loading the view.
+    
 }
 
 -(void)initUI
 {
-    //    //分割线1
-    //    UIView *view1 = [[UIView alloc]init];
-    //    view1.x = 0;
-    //    view1.y = 84;
-    //    view1.width = WIDTH;
-    //    view1.height = 1.5;
-    //    view1.backgroundColor = [UIColor lightGrayColor];
-    //    [self.view addSubview:view1];
+    UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 100)];
+    [self.view addSubview:downView];
+    downView.backgroundColor = [UIColor whiteColor];
     
     //账号栏
     UILabel *telLabel = [[UILabel alloc]init];
@@ -46,7 +45,7 @@
     telLabel.x = 10;
     telLabel.centerY = 25;
     telLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:telLabel];
+    [downView addSubview:telLabel];
     
     self.usePasTF = [[UITextField alloc]init];
     self.usePasTF.x = telLabel.maxX +5;
@@ -58,7 +57,7 @@
     self.usePasTF.secureTextEntry = YES;
     self.usePasTF.borderStyle = UITextBorderStyleNone;
     self.usePasTF.clearButtonMode = UITextFieldViewModeWhileEditing;
-    [self.view addSubview:self.usePasTF];
+    [downView addSubview:self.usePasTF];
     
     //分割线2
     UIView *view2 = [[UIView alloc]init];
@@ -67,7 +66,7 @@
     view2.width = WIDTH;
     view2.height = 1;
     view2.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view2];
+    [downView addSubview:view2];
     
     //密码栏
     UILabel *pasLabel = [[UILabel alloc]init];
@@ -77,7 +76,7 @@
     pasLabel.x = 10;
     pasLabel.centerY = view2.y+25;
     pasLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:pasLabel];
+    [downView addSubview:pasLabel];
     
     self.usePasConfTF = [[UITextField alloc]init];
     self.usePasConfTF.x = pasLabel.maxX +5;
@@ -89,24 +88,16 @@
     self.usePasConfTF.borderStyle = UITextBorderStyleNone;
     self.usePasConfTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [self.usePasConfTF setSecureTextEntry:YES];
-    [self.view addSubview:self.usePasConfTF];
-    
-    //分割线3
-    UIView *view3 = [[UIView alloc]init];
-    view3.x = 0;
-    view3.y = view2.y + 50;
-    view3.width = WIDTH;
-    view3.height = 1;
-    view3.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view3];
+    [downView addSubview:self.usePasConfTF];
     
     //下一步按钮
     UIButton *nextBtn = [[UIButton alloc]init];
     nextBtn.width = 260;
     nextBtn.height = 40;
-    nextBtn.y = view3.maxY + 30;
+    nextBtn.y = downView.maxY + 30;
     nextBtn.centerX = self.view.centerX;
-    nextBtn.layer.backgroundColor = LCWBottomColor.CGColor;
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
     nextBtn.layer.cornerRadius = 10;
     [nextBtn setTitle:@"提        交" forState:UIControlStateNormal];
     [nextBtn addTarget:self action:@selector(next) forControlEvents:UIControlEventTouchUpInside];
@@ -148,7 +139,7 @@
     
     [XyqsApi resetPwdFirstWithparams:params andCallBack:^(id obj) {
         [MBProgressHUD showSuccess:[obj objectForKey:@"message"]];
-        [self.navigationController popToRootViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:NO];
     }];
   
 }

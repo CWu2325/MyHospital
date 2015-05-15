@@ -35,6 +35,9 @@
     
     self.title = @"我的关注";
     
+    self.view.backgroundColor = LCWBackgroundColor;
+    self.navigationItem.rightBarButtonItem = nil;
+    
     //初始化界面
     [self initUI];
 }
@@ -57,7 +60,7 @@
 -(void)initUI
 {
     //
-    UISegmentedControl *segmentC = [[UISegmentedControl alloc]initWithItems:@[@"我关注的医生",@"我关注的医院"]];
+    UISegmentedControl *segmentC = [[UISegmentedControl alloc]initWithItems:@[@"关注的医生",@"关注的医院"]];
     segmentC.frame = CGRectMake(0, 15, 240, 30);
     segmentC.centerX = self.view.centerX;
     segmentC.selectedSegmentIndex = 0;
@@ -81,6 +84,7 @@
     self.tableView.width = WIDTH;
     self.tableView.height = HEIGHT - self.tableView.y;
     [self.view addSubview:self.tableView];
+    self.tableView.backgroundColor = LCWBackgroundColor;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -135,7 +139,7 @@
     SelTimeVC *vc = [[SelTimeVC alloc]init];
     vc.att = att;
     vc.formWhere = @"attention";
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:NO];
 }
 
 

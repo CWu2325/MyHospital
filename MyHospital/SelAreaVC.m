@@ -168,7 +168,7 @@
             a.areaName = self.locationCityName;
             a.areaID = [obj longValue];
             [self.delegate passValue:a];
-            [self.navigationController popViewControllerAnimated:YES];
+            [self.navigationController popViewControllerAnimated:NO];
         }];
     }
     else
@@ -277,7 +277,7 @@
         [ud setInteger:a.areaID forKey:@"right"];
         [ud synchronize];
         
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:NO];
     }
 }
 

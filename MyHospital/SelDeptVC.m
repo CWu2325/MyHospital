@@ -220,7 +220,7 @@
         SelDoctorVC *vc = [[SelDoctorVC alloc]init];
         vc.hospital = self.hospital;
         vc.depts = self.rightDepts[indexPath.row];
-        [self.navigationController pushViewController:vc animated:YES];
+        [self.navigationController pushViewController:vc animated:NO];
     }
 }
 

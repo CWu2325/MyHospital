@@ -48,11 +48,31 @@
     }
     [self.window makeKeyAndVisible];
     
-    //判断网络情况
-    //AFNetworkReachabilityManager *manage = [AFNetworkReachabilityManager sharedManager];
+    /**
+     *  监控网络情况
+     */
+    AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
     
+    [manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        switch (status)
+        {
+            case AFNetworkReachabilityStatusUnknown:
+            case AFNetworkReachabilityStatusNotReachable:
+                [MBProgressHUD showError:@"亲~请检查您的网络连接"];
+                break;
+            case AFNetworkReachabilityStatusReachableViaWiFi:
+                [MBProgressHUD showSuccess:@"WIFI连接成功"];
+                break;
+            case AFNetworkReachabilityStatusReachableViaWWAN:
+                [MBProgressHUD showSuccess:@"手机网络连接成功"];
+                break;
+                
+            default:
+                break;
+        }
+    }];
     
-    
+    [manager startMonitoring];
     
     return YES;
 }

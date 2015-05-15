@@ -90,6 +90,10 @@
 
 -(void)initUI
 {
+    UIScrollView *baseSv = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+    baseSv.backgroundColor = LCWBackgroundColor;
+    [self.view addSubview:baseSv];
+    
     //医院名称
     UILabel *hospNameLabel = [[UILabel alloc]init];
     hospNameLabel.font = MYFONT;
@@ -97,7 +101,7 @@
     hospNameLabel.size = [XyqsTools getSizeWithText:hospNameLabel.text andFont:hospNameLabel.font];
     hospNameLabel.x = 10;
     hospNameLabel.y = 15;
-    [self.view addSubview:hospNameLabel];
+    [baseSv addSubview:hospNameLabel];
     
     //科室
     UILabel *deptsNameLabel = [[UILabel alloc]init];
@@ -106,7 +110,7 @@
     deptsNameLabel.size = [XyqsTools getSizeWithText:deptsNameLabel.text andFont:deptsNameLabel.font];
     deptsNameLabel.x = hospNameLabel.x;
     deptsNameLabel.y = hospNameLabel.maxY + 10;
-    [self.view addSubview:deptsNameLabel];
+    [baseSv addSubview:deptsNameLabel];
     
     //医生
     UILabel *doctorNameLabel = [[UILabel alloc]init];
@@ -115,7 +119,7 @@
     doctorNameLabel.size = [XyqsTools getSizeWithText:doctorNameLabel.text andFont:doctorNameLabel.font];
     doctorNameLabel.x = hospNameLabel.x;
     doctorNameLabel.y = deptsNameLabel.maxY + 10;
-    [self.view addSubview:doctorNameLabel];
+    [baseSv addSubview:doctorNameLabel];
     
     //等级
     UILabel *levelNameLabel = [[UILabel alloc]init];
@@ -124,7 +128,7 @@
     levelNameLabel.size = [XyqsTools getSizeWithText:levelNameLabel.text andFont:levelNameLabel.font];
     levelNameLabel.x = hospNameLabel.x;
     levelNameLabel.y = doctorNameLabel.maxY + 10;
-    [self.view addSubview:levelNameLabel];
+    [baseSv addSubview:levelNameLabel];
     
     //就诊时间
     UILabel *dateLabel = [[UILabel alloc]init];
@@ -135,7 +139,7 @@
     dateLabel.x = hospNameLabel.x;
     dateLabel.y = levelNameLabel.maxY + 10;
     self.dateLabel = dateLabel;
-    [self.view addSubview:dateLabel];
+    [baseSv addSubview:dateLabel];
     
     //挂号费用
     UILabel *priceLabel = [[UILabel alloc]init];
@@ -149,7 +153,7 @@
     priceLabel.size = [XyqsTools getSizeWithText:priceLabel.text andFont:priceLabel.font];
     priceLabel.x = hospNameLabel.x;
     priceLabel.y = dateLabel.maxY + 10;
-    [self.view addSubview:priceLabel];
+    [baseSv addSubview:priceLabel];
     
     //分割线1
     UIView *diviLine = [[UIView alloc]init];
@@ -158,7 +162,7 @@
     diviLine.width = WIDTH;
     diviLine.height = 1;
     diviLine.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine];
+    [baseSv addSubview:diviLine];
     
     //就诊人标签
     UILabel *Label1 = [[UILabel alloc]init];
@@ -167,7 +171,7 @@
     Label1.size = [XyqsTools getSizeWithText:Label1.text andFont:Label1.font];
     Label1.x = hospNameLabel.x;
     Label1.centerY = diviLine.y + 22;
-    [self.view addSubview:Label1];
+    [baseSv addSubview:Label1];
     
     //分割线2
     UIView *diviLine1 = [[UIView alloc]init];
@@ -176,7 +180,7 @@
     diviLine1.width = WIDTH;
     diviLine1.height = 1;
     diviLine1.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine1];
+    [baseSv addSubview:diviLine1];
     
     //****************-------------------就诊人选择
     if (self.member.name != (NSString *)[NSNull null])
@@ -196,9 +200,9 @@
     selSickBtn.y = diviLine1.y;
     [selSickBtn setTitle:self.sickName forState:UIControlStateNormal];
     [selSickBtn setImage:[UIImage imageNamed:@"arrow_up.png"] forState:UIControlStateNormal];
-    [selSickBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBackgroundColor] forState:UIControlStateHighlighted];
+    [selSickBtn setBackgroundImage:[UIImage imageWithColor:LCWBackgroundColor] forState:UIControlStateHighlighted];
     [selSickBtn addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:selSickBtn];
+    [baseSv addSubview:selSickBtn];
     
     //分割线3
     UIView *diviLine2 = [[UIView alloc]init];
@@ -207,7 +211,7 @@
     diviLine2.width = WIDTH;
     diviLine2.height = 1;
     diviLine2.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine2];
+    [baseSv addSubview:diviLine2];
     
     //选择支付方式
     UILabel *Label2 = [[UILabel alloc]init];
@@ -216,7 +220,7 @@
     Label2.size = [XyqsTools getSizeWithText:Label2.text andFont:Label2.font];
     Label2.x = hospNameLabel.x;
     Label2.centerY = diviLine2.y + 22;
-    [self.view addSubview:Label2];
+    [baseSv addSubview:Label2];
     
     //分割线4
     UIView *diviLine3 = [[UIView alloc]init];
@@ -225,7 +229,7 @@
     diviLine3.width = WIDTH;
     diviLine3.height = 1;
     diviLine3.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine3];
+    [baseSv addSubview:diviLine3];
     
     //--------------------选择支付宝
     UIImageView *iv1 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"unselect.png"]];
@@ -234,7 +238,7 @@
     iv1.x = 10;
     iv1.centerY = diviLine3.y + 22;
     self.iv1 = iv1;
-    [self.view addSubview:iv1];
+    [baseSv addSubview:iv1];
     
     UILabel *Label3 = [[UILabel alloc]init];
     Label3.font = MYFONT;
@@ -242,7 +246,7 @@
     Label3.size = [XyqsTools getSizeWithText:Label2.text andFont:Label2.font];
     Label3.x = iv1.maxX + 10;
     Label3.centerY = diviLine3.y + 22;
-    [self.view addSubview:Label3];
+    [baseSv addSubview:Label3];
     
     //支付宝支付按钮
     UIButton *alipayBtn = [[UIButton alloc]init];
@@ -252,7 +256,7 @@
     alipayBtn.x = 0;
     alipayBtn.y = diviLine3.y;
     [alipayBtn addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:alipayBtn];
+    [baseSv addSubview:alipayBtn];
     
     
     //分割线5
@@ -262,7 +266,7 @@
     diviLine4.width = WIDTH;
     diviLine4.height = 1;
     diviLine4.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine4];
+    [baseSv addSubview:diviLine4];
     
     //----------------------选择现场支付
     UIImageView *iv2 = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"unselect.png"]];
@@ -270,7 +274,7 @@
     iv2.size = iv1.size;
     iv2.x = 10;
     iv2.centerY = diviLine4.y + 22;
-    [self.view addSubview:iv2];
+    [baseSv addSubview:iv2];
     
     UILabel *Label4 = [[UILabel alloc]init];
     Label4.font = MYFONT;
@@ -278,7 +282,7 @@
     Label4.size = [XyqsTools getSizeWithText:Label2.text andFont:Label2.font];
     Label4.x = Label3.x;
     Label4.centerY = diviLine4.y + 22;
-    [self.view addSubview:Label4];
+    [baseSv addSubview:Label4];
     
     //现场支付按钮
     UIButton *payToHosBtn = [[UIButton alloc]init];
@@ -288,7 +292,7 @@
     payToHosBtn.x = 0;
     payToHosBtn.y = diviLine4.y;
     [payToHosBtn addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:payToHosBtn];
+    [baseSv addSubview:payToHosBtn];
     
     //分割线6
     UIView *diviLine5 = [[UIView alloc]init];
@@ -297,7 +301,7 @@
     diviLine5.width = WIDTH;
     diviLine5.height = 1;
     diviLine5.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:diviLine5];
+    [baseSv addSubview:diviLine5];
     
     //确认按钮
     UIButton *confirmBtn = [[UIButton alloc]init];
@@ -306,11 +310,14 @@
     confirmBtn.height = 30;
     confirmBtn.y = diviLine5.y + 20;
     confirmBtn.centerX = self.view.centerX;
-    confirmBtn.backgroundColor = LCWBottomColor;
+    [confirmBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [confirmBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
     confirmBtn.layer.cornerRadius = 8;
-    [confirmBtn setTitle:@"确认挂号信息" forState:UIControlStateNormal];
+    [confirmBtn setTitle:@"确  认  挂  号" forState:UIControlStateNormal];
     [confirmBtn addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:confirmBtn];
+    [baseSv addSubview:confirmBtn];
+    
+    baseSv.contentSize = CGSizeMake(WIDTH, confirmBtn.maxY + 200);
 }
 
 /**
@@ -327,7 +334,7 @@
             vc.fromWhere = @"A";
             vc.delegate = self;
             vc.title = @"选择就诊人";
-            [self.navigationController pushViewController:vc animated:YES];
+            [self.navigationController pushViewController:vc animated:NO];
         }
             break;
         case 2:
@@ -362,7 +369,7 @@
             else if(self.radioBtn == 2)
             {
                 [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
-                UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"支付提醒" message:@"社保卡的用户请使用去医院支付选项,后续的就诊费用方能使用社保卡支付" delegate:self cancelButtonTitle:@"继续挂号" otherButtonTitles:@"返回", nil];
+                UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"支付提醒" message:@"社保卡的用户请使用去医院支付选项,后续的就诊费用方能使用社保卡支付!" delegate:self cancelButtonTitle:@"继续挂号" otherButtonTitles:@"返回", nil];
                 av.tag = 1;
                 [av show];
             }
@@ -378,10 +385,63 @@
                 [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
                 
                 [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
-                UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"支付提醒" message:@"您好，请于就诊当日,在医院挂号窗口凭预约号用现金或相应的社保卡缴费" delegate:self cancelButtonTitle:@"继续挂号" otherButtonTitles:@"返回", nil];
-                av.tag = 2;
-                [av show];
-            } 
+                
+                [XyqsApi requestOrderNumWithParams: self.params andCallBack:^(id obj) {
+                    //判断obj是否为空,也就是预约是否成功，成功就跳转页面，不成功就返回
+                    NSDictionary *dic = obj;
+                    if (dic)
+                    {
+                        AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
+                        vc.orderNum = [dic objectForKey:@"orderId"];
+                        vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
+                        vc.doctor = self.doctor;
+                        if (self.member)
+                        {
+                            vc.member = self.member;        //就诊人
+                        }
+                        else
+                        {
+                            comMember *member = [[comMember alloc]init];
+                            if (self.user.name != (NSString *)[NSNull null])
+                            {
+                                member.name = self.user.name;
+                            }
+                            
+                            member.comID = @"0";        //就诊人ID，0代表自己
+                            
+                            if (self.user.mobile != (NSString *)[NSNull null])
+                            {
+                                member.mobile = self.user.mobile;
+                            }
+                            
+                            if (self.user.idCard != (NSString *)[NSNull null])
+                            {
+                                member.idCard = self.user.idCard;
+                            }
+                            
+                            if (self.user.sscard != (NSString *)[NSNull null])
+                            {
+                                member.sscard = self.user.sscard;
+                            }
+                            vc.member = member;
+                        }
+                        
+                        vc.schedules = self.schedules;
+                        vc.time = self.time;
+                        vc.radioBtn = self.radioBtn;
+                        [self.navigationController pushViewController:vc animated:NO];
+                    }
+                    else
+                    {
+                        return ;
+                    }
+                    
+                }];
+                
+//                UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"支付提醒" message:@"您好，请于就诊当日,在医院挂号窗口凭预约号用现金或相应的社保卡缴费!" delegate:self cancelButtonTitle:@"继续挂号" otherButtonTitles:@"返回", nil];
+//                av.tag = 2;
+//                [av show];
+            }
         }
             break;
     }
@@ -442,7 +502,7 @@
                         vc.schedules = self.schedules;
                         vc.time = self.time;
                         vc.radioBtn = self.radioBtn;
-                        [self.navigationController pushViewController:vc animated:YES];
+                        [self.navigationController pushViewController:vc animated:NO];
                     }
                     else
                     {
@@ -468,57 +528,7 @@
             case 0:
             {
                 
-                [XyqsApi requestOrderNumWithParams: self.params andCallBack:^(id obj) {
-                    //判断obj是否为空,也就是预约是否成功，成功就跳转页面，不成功就返回
-                    NSDictionary *dic = obj;
-                    if (dic)
-                    {
-                        AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
-                        vc.orderNum = [dic objectForKey:@"orderId"];
-                        vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
-                        vc.doctor = self.doctor;
-                        if (self.member)
-                        {
-                            vc.member = self.member;        //就诊人
-                        }
-                        else
-                        {
-                            comMember *member = [[comMember alloc]init];
-                            if (self.user.name != (NSString *)[NSNull null])
-                            {
-                                member.name = self.user.name;
-                            }
-                            
-                            member.comID = @"0";        //就诊人ID，0代表自己
-                            
-                            if (self.user.mobile != (NSString *)[NSNull null])
-                            {
-                                member.mobile = self.user.mobile;
-                            }
-                            
-                            if (self.user.idCard != (NSString *)[NSNull null])
-                            {
-                                member.idCard = self.user.idCard;
-                            }
-                            
-                            if (self.user.sscard != (NSString *)[NSNull null])
-                            {
-                                member.sscard = self.user.sscard;
-                            }
-                            vc.member = member;
-                        }
-                        
-                        vc.schedules = self.schedules;
-                        vc.time = self.time;
-                        vc.radioBtn = self.radioBtn;
-                        [self.navigationController pushViewController:vc animated:YES];
-                    }
-                    else
-                    {
-                        return ;
-                    }
-                    
-                }];
+                /////
             }
                 break;
             case 1:

@@ -76,6 +76,7 @@
     
     //挂号费
     self.priceLabel = [[UILabel alloc]init];
+    self.priceLabel.textColor = self.expertLabel.textColor;
     self.priceLabel.font = self.levelNameLabel.font;
     self.priceLabel.backgroundColor = [UIColor clearColor];
     [self.contentView addSubview:self.priceLabel];

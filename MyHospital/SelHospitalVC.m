@@ -76,11 +76,18 @@
         }
         
     }
+    
+    
+    
+    
     [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
+
+        
         long areaId = [obj longValue];
         [XyqsApi requestHospitalParentld:areaId andCallBack:^(id obj) {
-            self.hospitals = obj;
             
+            self.hospitals = obj;
+      
             if (self.hospitals.count > 0)
             {
                 self.tableView.hidden = NO;

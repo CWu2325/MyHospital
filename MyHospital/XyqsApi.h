@@ -106,5 +106,15 @@ typedef void (^Callback)(id obj);
  */
 +(void)payWithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback;
 
+/**
+ *  发送验证码
+ */
++(void)getVerifycodeWithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback;
+
+/**
+ *  更改密码
+ */
++(void)changePasswordWithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback;
+
 
 @end

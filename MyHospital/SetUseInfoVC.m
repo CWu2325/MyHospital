@@ -10,6 +10,7 @@
 #import "XyqsApi.h"
 #import "AFNetworking.h"
 #import "UIImageView+WebCache.h"
+#import "AppDelegate.h"
 
 #define HMEncode(str) [str dataUsingEncoding:NSUTF8StringEncoding]
 
@@ -100,10 +101,14 @@
         }
         
         
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"修改"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"保存"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified)];
     }
     else
     {
+        if (self.user.coverUrl != (NSString *)[NSNull null])
+        {
+            [self.userImageView setImageWithURL:[NSURL URLWithString:self.user.coverUrl] placeholderImage:[UIImage imageNamed:@"default_avatar"] options:SDWebImageRetryFailed];
+        }
         [self.nameTF becomeFirstResponder];
         self.useTelTF.userInteractionEnabled = NO;
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"保存"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarSave)];
@@ -129,7 +134,7 @@
     headerIV.center = headerView.center;
     headerIV.layer.cornerRadius = headerIV.width/2;
     headerIV.layer.borderWidth = 1.5;
-    headerIV.layer.borderColor = [UIColor redColor].CGColor;
+    headerIV.layer.borderColor = [UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:0.5].CGColor;
     headerIV.layer.masksToBounds = YES;
     [headerView addSubview:headerIV];
     self.userImageView = headerIV;
@@ -351,7 +356,7 @@
         [MBProgressHUD showError:@"姓名不能为空"];
         return;
     }
-    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,5}$"] evaluateWithObject:self.nameTF.text])
+    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,20}$"] evaluateWithObject:self.nameTF.text])
     {
         [MBProgressHUD showError:@"姓名必须为中文"];
         return ;
@@ -419,7 +424,7 @@
     
     [XyqsApi updateUserInfoWithParams:params andCallBack:^(id obj) {
         [MBProgressHUD showSuccess:obj];
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:NO];
         
     }];
     
@@ -437,7 +442,7 @@
         [MBProgressHUD showError:@"姓名不能为空"];
         return;
     }
-    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,5}$"] evaluateWithObject:self.nameTF.text])
+    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,20}$"] evaluateWithObject:self.nameTF.text])
     {
         [MBProgressHUD showError:@"姓名必须为中文"];
         return ;
@@ -506,7 +511,7 @@
     [XyqsApi updateUserInfoWithParams:params andCallBack:^(id obj) {
         [MBProgressHUD showSuccess:obj];
         
-        [self.navigationController popToRootViewControllerAnimated:YES];
+        [self.navigationController popToRootViewControllerAnimated:NO];
         
     }];
 }
@@ -547,7 +552,9 @@
 {
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"亲~请选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"手机相册",nil];
     
-    [as showInView:self.view];
+   // [as showInView:self.view];
+    
+    [as showInView:[UIApplication sharedApplication].keyWindow];
     
     
 }
@@ -567,30 +574,35 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    UIImagePickerController *ipc = [[UIImagePickerController alloc]init];
     switch (buttonIndex)
     {
         case 0:
         {
             //照相
+            UIImagePickerController *ipc = [[UIImagePickerController alloc]init];
             [ipc setSourceType:UIImagePickerControllerSourceTypeCamera];
+            ipc.allowsEditing = YES;
+            ipc.delegate = self;
+            [self presentViewController:ipc animated:NO completion:nil];
         }
             break;
         case 1:
         {
             //相册中存取
+            UIImagePickerController *ipc = [[UIImagePickerController alloc]init];
             [ipc setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
+            ipc.allowsEditing = YES;
+            ipc.delegate = self;
+            [self presentViewController:ipc animated:NO completion:nil];
         }
             break;
+
             
         default:
             break;
     }
-    //ipc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-    ipc.allowsEditing = YES;
-    ipc.delegate = self;
-    [self presentViewController:ipc animated:YES completion:nil];
 }
+
 
 
 
@@ -599,7 +611,7 @@
 #pragma mark - 选择图片的代理方法
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    [picker dismissViewControllerAnimated:YES completion:nil];
+    [picker dismissViewControllerAnimated:NO completion:nil];
     
     UIImage *image = [info objectForKey:UIImagePickerControllerOriginalImage];
     CGSize imageSize = image.size;
@@ -782,7 +794,7 @@
         {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableLeaves error:nil];
             
-            [self dismissViewControllerAnimated:YES completion:nil];
+            [self dismissViewControllerAnimated:NO completion:nil];
             if ([[dict objectForKey:@"returnCode"] isEqual: @(1001)])
             {
                 

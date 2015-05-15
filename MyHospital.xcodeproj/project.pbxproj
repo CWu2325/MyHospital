@@ -75,13 +75,14 @@
 		2E5BE3181AC8E66E006E3F22 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3171AC8E66E006E3F22 /* LoginViewController.m */; };
 		2E5BE31B1AC8F502006E3F22 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE31A1AC8F502006E3F22 /* Person.m */; };
 		2E5BE3221AC8F9FB006E3F22 /* PersonalVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3211AC8F9FB006E3F22 /* PersonalVC.m */; };
-		2E5BE3251AC8FC27006E3F22 /* LCWSettingItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3241AC8FC27006E3F22 /* LCWSettingItem.m */; };
-		2E5BE3281AC8FDA3006E3F22 /* LCWSettingGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3271AC8FDA3006E3F22 /* LCWSettingGroup.m */; };
-		2E5BE32B1AC8FE7A006E3F22 /* LCWSettingArrowItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE32A1AC8FE7A006E3F22 /* LCWSettingArrowItem.m */; };
 		2E5BE3311AC91BBC006E3F22 /* PersonInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE32F1AC91BBC006E3F22 /* PersonInfoCell.m */; };
 		2E5BE33B1AC92EB0006E3F22 /* XyqsApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE33A1AC92EB0006E3F22 /* XyqsApi.m */; };
 		2E5BE3401AC94CC1006E3F22 /* RegisterVc.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE33F1AC94CC1006E3F22 /* RegisterVc.m */; };
 		2E5BE3431AC94E8E006E3F22 /* GetAuthcodeVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3421AC94E8E006E3F22 /* GetAuthcodeVC.m */; };
+		2E60D89B1B01F85C00CA564E /* heighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E60D8991B01F85C00CA564E /* heighted.png */; };
+		2E60D89C1B01F85C00CA564E /* normal.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E60D89A1B01F85C00CA564E /* normal.png */; };
+		2E60D89F1B01FD2800CA564E /* selHeight.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E60D89D1B01FD2800CA564E /* selHeight.png */; };
+		2E60D8A01B01FD2800CA564E /* selTimer.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E60D89E1B01FD2800CA564E /* selTimer.png */; };
 		2E6688611ACA6B5000D5AA7A /* NSDate+LCW.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E6688601ACA6B5000D5AA7A /* NSDate+LCW.m */; };
 		2E6688651ACA9D5600D5AA7A /* RSA.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E6688641ACA9D5600D5AA7A /* RSA.m */; };
 		2E68952D1ACB85E600E0CA32 /* default_avatar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E68952C1ACB85E600E0CA32 /* default_avatar@2x.png */; };
@@ -104,7 +105,6 @@
 		2E8A4A051AC2AC7800D37B1B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2E8A4A031AC2AC7800D37B1B /* LaunchScreen.xib */; };
 		2E8A4A111AC2AC7800D37B1B /* MyHospitalTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E8A4A101AC2AC7800D37B1B /* MyHospitalTests.m */; };
 		2E8A4A1B1AC2AC9A00D37B1B /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E8A4A1A1AC2AC9A00D37B1B /* MapKit.framework */; };
-		2E8A4A231AC2AF4F00D37B1B /* GuideVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E8A4A221AC2AF4F00D37B1B /* GuideVC.m */; };
 		2E8A4A331AC2AF7D00D37B1B /* AppointmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E8A4A301AC2AF7D00D37B1B /* AppointmentCell.m */; };
 		2E8A4A3C1AC2AF9200D37B1B /* sz_huaqiao.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2E8A4A351AC2AF9200D37B1B /* sz_huaqiao.jpg */; };
 		2E8A4A3D1AC2AF9200D37B1B /* ic_guide_1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E8A4A361AC2AF9200D37B1B /* ic_guide_1.png */; };
@@ -180,10 +180,12 @@
 		2ED4C0111AE10DDA00F9A425 /* goback_homepage@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4C0101AE10DD900F9A425 /* goback_homepage@2x.png */; };
 		2ED4C0131AE110A500F9A425 /* 椭圆2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4C0121AE110A500F9A425 /* 椭圆2@2x.png */; };
 		2ED4C0151AE110C600F9A425 /* 椭圆1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4C0141AE110C600F9A425 /* 椭圆1@2x.png */; };
+		2ED712D51B04A46700F78B88 /* FirstPageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED712D41B04A46700F78B88 /* FirstPageVC.m */; };
 		2ED827071AF85E40006E1EFF /* SelDoctorVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED827061AF85E40006E1EFF /* SelDoctorVC.m */; };
-		2ED8270A1AF89593006E1EFF /* PersonalCenterVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED827091AF89593006E1EFF /* PersonalCenterVC.m */; };
 		2ED8270C1AF899FD006E1EFF /* navBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED8270B1AF899FD006E1EFF /* navBackground.png */; };
 		2ED8270E1AF89B34006E1EFF /* navBackground1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED8270D1AF89B34006E1EFF /* navBackground1.png */; };
+		2EDB5A4F1B02E51000B5C4FB /* outtimePay.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EDB5A4E1B02E51000B5C4FB /* outtimePay.png */; };
+		2EDB5A521B02FF4B00B5C4FB /* ChangePasswordVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDB5A511B02FF4B00B5C4FB /* ChangePasswordVC.m */; };
 		2EDD03781AD8B493005F78FC /* DoctorIntroduceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD03771AD8B493005F78FC /* DoctorIntroduceView.m */; };
 		2EDD037C1AD8F4A5005F78FC /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD037B1AD8F4A5005F78FC /* Foundation+Log.m */; };
 		2EDD9BFB1AEF1D6D0085A34C /* SelAreaVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD9BFA1AEF1D6D0085A34C /* SelAreaVC.m */; };
@@ -326,12 +328,6 @@
 		2E5BE31A1AC8F502006E3F22 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		2E5BE3201AC8F9FB006E3F22 /* PersonalVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonalVC.h; sourceTree = "<group>"; };
 		2E5BE3211AC8F9FB006E3F22 /* PersonalVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PersonalVC.m; sourceTree = "<group>"; };
-		2E5BE3231AC8FC27006E3F22 /* LCWSettingItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCWSettingItem.h; sourceTree = "<group>"; };
-		2E5BE3241AC8FC27006E3F22 /* LCWSettingItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCWSettingItem.m; sourceTree = "<group>"; };
-		2E5BE3261AC8FDA3006E3F22 /* LCWSettingGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCWSettingGroup.h; sourceTree = "<group>"; };
-		2E5BE3271AC8FDA3006E3F22 /* LCWSettingGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCWSettingGroup.m; sourceTree = "<group>"; };
-		2E5BE3291AC8FE7A006E3F22 /* LCWSettingArrowItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LCWSettingArrowItem.h; sourceTree = "<group>"; };
-		2E5BE32A1AC8FE7A006E3F22 /* LCWSettingArrowItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LCWSettingArrowItem.m; sourceTree = "<group>"; };
 		2E5BE32E1AC91BBC006E3F22 /* PersonInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonInfoCell.h; sourceTree = "<group>"; };
 		2E5BE32F1AC91BBC006E3F22 /* PersonInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PersonInfoCell.m; sourceTree = "<group>"; };
 		2E5BE3391AC92EB0006E3F22 /* XyqsApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XyqsApi.h; sourceTree = "<group>"; };
@@ -340,6 +336,10 @@
 		2E5BE33F1AC94CC1006E3F22 /* RegisterVc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegisterVc.m; sourceTree = "<group>"; };
 		2E5BE3411AC94E8E006E3F22 /* GetAuthcodeVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetAuthcodeVC.h; sourceTree = "<group>"; };
 		2E5BE3421AC94E8E006E3F22 /* GetAuthcodeVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetAuthcodeVC.m; sourceTree = "<group>"; };
+		2E60D8991B01F85C00CA564E /* heighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = heighted.png; sourceTree = "<group>"; };
+		2E60D89A1B01F85C00CA564E /* normal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = normal.png; sourceTree = "<group>"; };
+		2E60D89D1B01FD2800CA564E /* selHeight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selHeight.png; sourceTree = "<group>"; };
+		2E60D89E1B01FD2800CA564E /* selTimer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selTimer.png; sourceTree = "<group>"; };
 		2E66885F1ACA6B5000D5AA7A /* NSDate+LCW.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+LCW.h"; sourceTree = "<group>"; };
 		2E6688601ACA6B5000D5AA7A /* NSDate+LCW.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+LCW.m"; sourceTree = "<group>"; };
 		2E6688631ACA9D5600D5AA7A /* RSA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSA.h; sourceTree = "<group>"; };
@@ -373,8 +373,6 @@
 		2E8A4A101AC2AC7800D37B1B /* MyHospitalTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyHospitalTests.m; sourceTree = "<group>"; };
 		2E8A4A1A1AC2AC9A00D37B1B /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		2E8A4A201AC2AE1A00D37B1B /* MyHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyHeader.pch; sourceTree = "<group>"; };
-		2E8A4A211AC2AF4F00D37B1B /* GuideVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuideVC.h; sourceTree = "<group>"; };
-		2E8A4A221AC2AF4F00D37B1B /* GuideVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GuideVC.m; sourceTree = "<group>"; };
 		2E8A4A2F1AC2AF7D00D37B1B /* AppointmentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppointmentCell.h; sourceTree = "<group>"; };
 		2E8A4A301AC2AF7D00D37B1B /* AppointmentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppointmentCell.m; sourceTree = "<group>"; };
 		2E8A4A351AC2AF9200D37B1B /* sz_huaqiao.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sz_huaqiao.jpg; sourceTree = "<group>"; };
@@ -479,12 +477,15 @@
 		2ED4C0101AE10DD900F9A425 /* goback_homepage@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "goback_homepage@2x.png"; sourceTree = "<group>"; };
 		2ED4C0121AE110A500F9A425 /* 椭圆2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "椭圆2@2x.png"; sourceTree = "<group>"; };
 		2ED4C0141AE110C600F9A425 /* 椭圆1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "椭圆1@2x.png"; sourceTree = "<group>"; };
+		2ED712D31B04A46700F78B88 /* FirstPageVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirstPageVC.h; sourceTree = "<group>"; };
+		2ED712D41B04A46700F78B88 /* FirstPageVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirstPageVC.m; sourceTree = "<group>"; };
 		2ED827051AF85E40006E1EFF /* SelDoctorVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelDoctorVC.h; sourceTree = "<group>"; };
 		2ED827061AF85E40006E1EFF /* SelDoctorVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelDoctorVC.m; sourceTree = "<group>"; };
-		2ED827081AF89593006E1EFF /* PersonalCenterVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonalCenterVC.h; sourceTree = "<group>"; };
-		2ED827091AF89593006E1EFF /* PersonalCenterVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PersonalCenterVC.m; sourceTree = "<group>"; };
 		2ED8270B1AF899FD006E1EFF /* navBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navBackground.png; sourceTree = "<group>"; };
 		2ED8270D1AF89B34006E1EFF /* navBackground1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navBackground1.png; sourceTree = "<group>"; };
+		2EDB5A4E1B02E51000B5C4FB /* outtimePay.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = outtimePay.png; sourceTree = "<group>"; };
+		2EDB5A501B02FF4B00B5C4FB /* ChangePasswordVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangePasswordVC.h; sourceTree = "<group>"; };
+		2EDB5A511B02FF4B00B5C4FB /* ChangePasswordVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangePasswordVC.m; sourceTree = "<group>"; };
 		2EDD03761AD8B493005F78FC /* DoctorIntroduceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DoctorIntroduceView.h; sourceTree = "<group>"; };
 		2EDD03771AD8B493005F78FC /* DoctorIntroduceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DoctorIntroduceView.m; sourceTree = "<group>"; };
 		2EDD037B1AD8F4A5005F78FC /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
@@ -715,12 +716,6 @@
 			children = (
 				2E5BE3191AC8F502006E3F22 /* Person.h */,
 				2E5BE31A1AC8F502006E3F22 /* Person.m */,
-				2E5BE3231AC8FC27006E3F22 /* LCWSettingItem.h */,
-				2E5BE3241AC8FC27006E3F22 /* LCWSettingItem.m */,
-				2E5BE3261AC8FDA3006E3F22 /* LCWSettingGroup.h */,
-				2E5BE3271AC8FDA3006E3F22 /* LCWSettingGroup.m */,
-				2E5BE3291AC8FE7A006E3F22 /* LCWSettingArrowItem.h */,
-				2E5BE32A1AC8FE7A006E3F22 /* LCWSettingArrowItem.m */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -729,8 +724,6 @@
 			isa = PBXGroup;
 			children = (
 				2ED8270F1AF89F94006E1EFF /* 注册登录 */,
-				2ED827081AF89593006E1EFF /* PersonalCenterVC.h */,
-				2ED827091AF89593006E1EFF /* PersonalCenterVC.m */,
 				2ED0CFD81ADE657C0068132E /* SetUseInfoVC.h */,
 				2ED0CFD91ADE657C0068132E /* SetUseInfoVC.m */,
 				2EFE66CC1ACBC67400446DE6 /* CommonAppointmentVC.h */,
@@ -745,8 +738,6 @@
 				2E8115A81AFCB6F100700B3C /* PayWebVC.m */,
 				2E8F7FF11ACBE1F4003CFA09 /* MyAttentionVC.h */,
 				2E8F7FF21ACBE1F4003CFA09 /* MyAttentionVC.m */,
-				2E53C4DB1ADFAC560078898A /* AppSettingVC.h */,
-				2E53C4DC1ADFAC560078898A /* AppSettingVC.m */,
 			);
 			name = controller;
 			sourceTree = "<group>";
@@ -838,8 +829,8 @@
 		2E8A4A1C1AC2ACB700D37B1B /* HomePage(主页) */ = {
 			isa = PBXGroup;
 			children = (
-				2E8A4A211AC2AF4F00D37B1B /* GuideVC.h */,
-				2E8A4A221AC2AF4F00D37B1B /* GuideVC.m */,
+				2ED712D31B04A46700F78B88 /* FirstPageVC.h */,
+				2ED712D41B04A46700F78B88 /* FirstPageVC.m */,
 				2E8A4ABE1AC2BBA000D37B1B /* 预约 */,
 			);
 			name = "HomePage(主页)";
@@ -885,6 +876,11 @@
 		2E8A4ABA1AC2BAF200D37B1B /* pic */ = {
 			isa = PBXGroup;
 			children = (
+				2EDB5A4E1B02E51000B5C4FB /* outtimePay.png */,
+				2E60D89D1B01FD2800CA564E /* selHeight.png */,
+				2E60D89E1B01FD2800CA564E /* selTimer.png */,
+				2E60D8991B01F85C00CA564E /* heighted.png */,
+				2E60D89A1B01F85C00CA564E /* normal.png */,
 				2E81156F1AFC76C600700B3C /* jiuyi2.png */,
 				2E8115701AFC76C600700B3C /* wo2.png */,
 				2ED25AC81AFC4F530035196C /* select.png */,
@@ -1008,6 +1004,10 @@
 		2ED8270F1AF89F94006E1EFF /* 注册登录 */ = {
 			isa = PBXGroup;
 			children = (
+				2E53C4DB1ADFAC560078898A /* AppSettingVC.h */,
+				2E53C4DC1ADFAC560078898A /* AppSettingVC.m */,
+				2EDB5A501B02FF4B00B5C4FB /* ChangePasswordVC.h */,
+				2EDB5A511B02FF4B00B5C4FB /* ChangePasswordVC.m */,
 				2E5BE3161AC8E66E006E3F22 /* LoginViewController.h */,
 				2E5BE3171AC8E66E006E3F22 /* LoginViewController.m */,
 				2E5BE33E1AC94CC1006E3F22 /* RegisterVc.h */,
@@ -1120,6 +1120,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E3F237D1AC39D9200F5BB5D /* 深圳第二中医院.jpg in Resources */,
+				2E60D89B1B01F85C00CA564E /* heighted.png in Resources */,
 				2ECF940A1AF7181400CC02AD /* firstPageBtn03.png in Resources */,
 				2EBA0F031AC53112001FBFBC /* arrow_up.png in Resources */,
 				2E908F791AC4F7B6008513F3 /* sv03.jpg in Resources */,
@@ -1127,6 +1128,7 @@
 				2E7FFFCE1AE62C1A008D0FB2 /* 检验报告@2x.png in Resources */,
 				2E7FFFCD1AE62C1A008D0FB2 /* 病历资料@2x.png in Resources */,
 				2E3F237F1AC39D9200F5BB5D /* 深圳人民医院.jpg in Resources */,
+				2E60D89C1B01F85C00CA564E /* normal.png in Resources */,
 				18C8D8D91AFBA18800ED5F07 /* LICENSE in Resources */,
 				2EBA0F061AC533D9001FBFBC /* alarm_time_selected.png in Resources */,
 				2E908F7A1AC4F7B6008513F3 /* sv04.jpg in Resources */,
@@ -1148,6 +1150,7 @@
 				2ECF94171AF722AE00CC02AD /* wo@2x.png in Resources */,
 				2E8A4A3F1AC2AF9200D37B1B /* ic_guide_3.png in Resources */,
 				18319E731ACFE843004F3520 /* splash_img1.png in Resources */,
+				2E60D8A01B01FD2800CA564E /* selTimer.png in Resources */,
 				2ED8270E1AF89B34006E1EFF /* navBackground1.png in Resources */,
 				2E3F23A61AC3EC4800F5BB5D /* 002_医生.jpg in Resources */,
 				2ECF941A1AF722DE00CC02AD /* jiuyi2@2x.png in Resources */,
@@ -1160,6 +1163,7 @@
 				184BFBC91AD2B99900AC075D /* MBProgressHUD.bundle in Resources */,
 				18319E761ACFE843004F3520 /* splash_img4.png in Resources */,
 				2ED25AC31AFC4A440035196C /* dingwei2.png in Resources */,
+				2E60D89F1B01FD2800CA564E /* selHeight.png in Resources */,
 				2ED423C11AD67B7C00E1B959 /* background_login.jpg in Resources */,
 				2E3F237E1AC39D9200F5BB5D /* 深圳南山人民医院.jpg in Resources */,
 				2E8A4A411AC2AF9200D37B1B /* ic_guide_5.png in Resources */,
@@ -1173,6 +1177,7 @@
 				2EBA0F121AC542CB001FBFBC /* wlc.png in Resources */,
 				2E8A4A021AC2AC7800D37B1B /* Images.xcassets in Resources */,
 				2E68952D1ACB85E600E0CA32 /* default_avatar@2x.png in Resources */,
+				2EDB5A4F1B02E51000B5C4FB /* outtimePay.png in Resources */,
 				2E908F7B1AC4F7B6008513F3 /* sv05.jpg in Resources */,
 				2E908F781AC4F7B6008513F3 /* sv02.jpg in Resources */,
 				18319E751ACFE843004F3520 /* splash_img3.png in Resources */,
@@ -1221,12 +1226,12 @@
 				2EC6FB931AEF6C5700A8D2EA /* SelHospitalVC.m in Sources */,
 				2EDD037C1AD8F4A5005F78FC /* Foundation+Log.m in Sources */,
 				2E5B71191ACD32E50049E291 /* Hospital.m in Sources */,
-				2ED8270A1AF89593006E1EFF /* PersonalCenterVC.m in Sources */,
 				18C8D8DB1AFBA18800ED5F07 /* SDImageCache.m in Sources */,
 				2ECF94021AF715DF00CC02AD /* MyFBtn2.m in Sources */,
+				2EDB5A521B02FF4B00B5C4FB /* ChangePasswordVC.m in Sources */,
 				2E3F23731AC39C5500F5BB5D /* UIProgressView+AFNetworking.m in Sources */,
+				2ED712D51B04A46700F78B88 /* FirstPageVC.m in Sources */,
 				2E5B711F1ACD4DB90049E291 /* Doctor.m in Sources */,
-				2E5BE32B1AC8FE7A006E3F22 /* LCWSettingArrowItem.m in Sources */,
 				2ECF90301AEDCF740026D0D4 /* GTMBase64.m in Sources */,
 				2ECF93FD1AF7084300CC02AD /* MyFirstPageBtn.m in Sources */,
 				18C8D8DD1AFBA18800ED5F07 /* SDWebImageDownloader.m in Sources */,
@@ -1245,7 +1250,6 @@
 				2E3F23661AC39C5500F5BB5D /* AFHTTPRequestOperationManager.m in Sources */,
 				2E8A49FA1AC2AC7800D37B1B /* MyHospital.xcdatamodeld in Sources */,
 				2EDD9BFB1AEF1D6D0085A34C /* SelAreaVC.m in Sources */,
-				2E5BE3251AC8FC27006E3F22 /* LCWSettingItem.m in Sources */,
 				2ED29ACC1AE4D9AE00889BE8 /* OrderDetailVC.m in Sources */,
 				2ED423BE1AD66BDC00E1B959 /* SelTimeVC.m in Sources */,
 				18319E831AD012DD004F3520 /* UIBarButtonItem+Extension.m in Sources */,
@@ -1285,7 +1289,6 @@
 				2EA7881C1AD3BB150050B6E0 /* comMember.m in Sources */,
 				2EBA0F0B1AC537EA001FBFBC /* AlipayConfirmVC.m in Sources */,
 				2ED0C78E1ADCBF4E006C74F8 /* SettingInfoView.m in Sources */,
-				2E5BE3281AC8FDA3006E3F22 /* LCWSettingGroup.m in Sources */,
 				2EFE66CE1ACBC67400446DE6 /* CommonAppointmentVC.m in Sources */,
 				2E5B710F1ACD1D180049E291 /* JsonParser.m in Sources */,
 				2EFE66D51ACBD02200446DE6 /* AppRecordCell.m in Sources */,
@@ -1302,7 +1305,6 @@
 				184BFBCA1AD2B99900AC075D /* MBProgressHUD.m in Sources */,
 				2ED0CFDA1ADE657C0068132E /* SetUseInfoVC.m in Sources */,
 				18C8D8E21AFBA18800ED5F07 /* VCPhotoScrollShow.m in Sources */,
-				2E8A4A231AC2AF4F00D37B1B /* GuideVC.m in Sources */,
 				2ED827071AF85E40006E1EFF /* SelDoctorVC.m in Sources */,
 				2E5B71131ACD1DAD0049E291 /* Area.m in Sources */,
 				2E5BE3431AC94E8E006E3F22 /* GetAuthcodeVC.m in Sources */,

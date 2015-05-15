@@ -85,7 +85,7 @@
 +(NSString *)stringDisposeWithFloat:(float)floatValue
 {
     NSString *str = [NSString stringWithFormat:@"%f",floatValue];
-    int len = str.length;
+    NSUInteger len = str.length;
     for (int i = 0; i < len; i++)
     {
         if (![str  hasSuffix:@"0"])

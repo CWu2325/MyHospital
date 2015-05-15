@@ -25,11 +25,20 @@
     [super viewDidLoad];
     
     self.title = @"用户注册";
+    
+    self.view.backgroundColor = LCWBackgroundColor;
+    
+    self.navigationItem.rightBarButtonItem = nil;
+    
     [self initUI];
 }
 
 -(void)initUI
 {
+    
+    UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 150)];
+    [self.view addSubview:downView];
+    downView.backgroundColor = [UIColor whiteColor];
 
     //账号栏
     UILabel *telLabel = [[UILabel alloc]init];
@@ -39,7 +48,7 @@
     telLabel.size = [telLabel.text boundingRectWithSize:CGSizeMake(WIDTH, 999) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:telLabel.font} context:nil].size;
     telLabel.centerY = 25;
     telLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:telLabel];
+    [downView addSubview:telLabel];
     
     UITextField *useTelTF = [[UITextField alloc]init];
     self.useTelTF = useTelTF;
@@ -50,9 +59,10 @@
     self.useTelTF.height = telLabel.height;
     self.useTelTF.placeholder = @"请输入您的手机号码";
     self.useTelTF.borderStyle = UITextBorderStyleNone;
+    self.useTelTF.keyboardType = UIKeyboardTypeNumberPad;
     [self.useTelTF becomeFirstResponder];
     self.useTelTF.clearButtonMode = UITextFieldViewModeWhileEditing;
-    [self.view addSubview:self.useTelTF];
+    [downView addSubview:self.useTelTF];
     
     //分割线2
     UIView *view2 = [[UIView alloc]init];
@@ -60,8 +70,8 @@
     view2.y = 50;
     view2.width = WIDTH;
     view2.height = 1;
-    view2.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view2];
+    view2.backgroundColor = LCWBackgroundColor;
+    [downView addSubview:view2];
     
     //密码栏
     UILabel *pasLabel = [[UILabel alloc]init];
@@ -71,7 +81,7 @@
     pasLabel.x = telLabel.x;
     pasLabel.centerY = view2.maxY + 25;
     pasLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:pasLabel];
+    [downView addSubview:pasLabel];
     
     self.usePasTF = [[UITextField alloc]init];
     self.usePasTF.x = pasLabel.maxX +5;
@@ -83,7 +93,7 @@
     self.usePasTF.borderStyle = UITextBorderStyleNone;
     self.usePasTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [self.usePasTF setSecureTextEntry:YES];
-    [self.view addSubview:self.usePasTF];
+    [downView addSubview:self.usePasTF];
     
     //分割线3
     UIView *view3 = [[UIView alloc]init];
@@ -91,8 +101,8 @@
     view3.y = view2.maxY + 50;
     view3.width = WIDTH;
     view3.height = 1;
-    view3.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view3];
+    view3.backgroundColor = view2.backgroundColor;
+    [downView addSubview:view3];
     
     //再一次输入密码栏
     UILabel *pasAgainLabel = [[UILabel alloc]init];
@@ -102,7 +112,7 @@
     pasAgainLabel.x = telLabel.x;
     pasAgainLabel.centerY = view3.maxY + 25;
     pasAgainLabel.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:pasAgainLabel];
+    [downView addSubview:pasAgainLabel];
     
     self.useAgainPasTF = [[UITextField alloc]init];
     self.useAgainPasTF.x = pasAgainLabel.maxX +5;
@@ -114,24 +124,17 @@
     self.useAgainPasTF.borderStyle = UITextBorderStyleNone;
     self.useAgainPasTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [self.useAgainPasTF setSecureTextEntry:YES];
-    [self.view addSubview:self.useAgainPasTF];
+    [downView addSubview:self.useAgainPasTF];
     
-    //分割线3
-    UIView *view4 = [[UIView alloc]init];
-    view4.x = 0;
-    view4.y = view3.maxY + 50;
-    view4.width = WIDTH;
-    view4.height = 1;
-    view4.backgroundColor = [UIColor lightGrayColor];
-    [self.view addSubview:view4];
-    
+ 
     //下一步按钮
     UIButton *nextBtn = [[UIButton alloc]init];
     nextBtn.width = 260;
     nextBtn.height = 40;
-    nextBtn.y = view4.maxY + 30;
+    nextBtn.y = downView.maxY + 30;
     nextBtn.centerX = self.view.centerX;
-    nextBtn.layer.backgroundColor = LCWBottomColor.CGColor;
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"normal.png"] forState:UIControlStateNormal];
+    [nextBtn setBackgroundImage:[UIImage imageNamed:@"heighted.png"] forState:UIControlStateHighlighted];
     nextBtn.layer.cornerRadius = 10;
     [nextBtn setTitle:@"下    一    步" forState:UIControlStateNormal];
     [nextBtn addTarget:self action:@selector(next) forControlEvents:UIControlEventTouchUpInside];
@@ -186,7 +189,7 @@
             person.mobile = self.useTelTF.text;
             person.password = self.usePasTF.text;
             vc.person = person;
-            [self.navigationController pushViewController:vc animated:YES];
+            [self.navigationController pushViewController:vc animated:NO];
         }
         else
         {
@@ -196,10 +199,7 @@
     }];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
+
 
 
 @end

@@ -23,6 +23,6 @@
 +(NSString *)stringDisposeWithFloat:(float)floatValue;
 
 //获得一定范围的颜色
-+ (UIImage *)imageWithColor:(UIColor *)color;
+//+ (UIImage *)imageWithColor:(UIColor *)color;
 
 @end

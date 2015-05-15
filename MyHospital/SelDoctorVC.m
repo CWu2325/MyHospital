@@ -111,7 +111,7 @@
     vc.doctor = doctor;                         //传递医生
     vc.depts = self.depts;                      //传递科室
     vc.hospital = self.hospital;                //传递医院
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:NO];
 }
 
 

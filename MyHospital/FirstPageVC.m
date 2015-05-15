@@ -1,99 +1,74 @@
 //
-//  GuideVC.m
-//  掌上医疗（纯代码）
+//  FirstPageVC.m
+//  MyHospital
 //
-//  Created by XYQS on 15/3/24.
+//  Created by XYQS on 15/5/14.
 //  Copyright (c) 2015年 XYQS. All rights reserved.
 //
 
-#import "GuideVC.h"
-#import "SelHospitalVC.h"
+#import "FirstPageVC.h"
 #import <CoreLocation/CoreLocation.h>
 #import "SelAreaVC.h"
+#import "SelHospitalVC.h"
 #import "Area.h"
+#import "MyLeftBtn.h"
 #import "MyFirstPageBtn.h"
 #import "MyFBtn2.h"
-#import "MyLeftBtn.h"
 
-@interface GuideVC ()<CLLocationManagerDelegate,MyProtocol,UIScrollViewDelegate>
-
-@property(nonatomic)UIScrollView *sv;
-@property(nonatomic,strong)NSArray *svImages;
+@interface FirstPageVC ()<CLLocationManagerDelegate,MyProtocol,UIScrollViewDelegate>
 
 @property(nonatomic,strong)CLLocationManager *locMgr;       //自动定位管理器
-@property(retain,nonatomic)NSString *intString;
 
-@property(nonatomic,copy)NSString *locationCityName;                //自动定位的城市名称
 @property(nonatomic,copy)NSString *selCityName;         //用户选择的城市名称
-
+@property(nonatomic,copy)NSString *locationCityName;                //自动定位的城市名称
 
 @property(nonatomic,strong)UIPageControl *pageControl;
+
+@property(nonatomic,strong)NSArray *svImages;
+
 @end
 
-@implementation GuideVC
+@implementation FirstPageVC
+
 -(void)passValue:(Area *)area
 {
     self.selCityName = area.areaName;
 }
 
--(CLLocationManager *)locMgr        //定位管理区
+- (void)viewDidLoad
 {
-    if (!_locMgr)
-    {
-        _locMgr = [[CLLocationManager alloc]init];
-        _locMgr.desiredAccuracy = kCLLocationAccuracyBest;
-        _locMgr.distanceFilter = 10;
-        [_locMgr requestAlwaysAuthorization];
-        _locMgr.delegate = self;
-    }
-    return _locMgr;
-}
-
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-    CLLocation *loc = [locations lastObject];
-    // NSLog(@"纬度=%f，经度=%f",loc.coordinate.latitude,loc.coordinate.longitude);
+    [super viewDidLoad];
     
-    CLGeocoder *revGeo = [[CLGeocoder alloc]init];
-    [revGeo reverseGeocodeLocation:loc completionHandler:^(NSArray *placemarks, NSError *error) {
-        if (!error && [placemarks count]>0)
-        {
-            NSDictionary *dic = [[placemarks objectAtIndex:0] addressDictionary];
-            NSString *city = [dic objectForKey:@"City"];
-            self.locationCityName =  [[city componentsSeparatedByString:@"市"] firstObject];
-        }
-        else
-        {
-            [MBProgressHUD showError:(NSString *)error];
-        }
-    }];
-}
-
-//定位失败
--(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
-{
-    if ([error code] == kCLErrorDenied)
-    {
-        //访问被拒绝
-        NSLog(@"访问被拒绝");
-    }
-    if ([error code] == kCLErrorLocationUnknown)
-    {
-        //无法获取位置信息
-        NSLog(@"无法获取位置信息");
-    }
-}
-
--(void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    //在本页面关闭后,关闭自动定位
-    [self.locMgr stopUpdatingLocation];
+    self.svImages = @[@"sv01.jpg",@"sv02.jpg",@"sv03.jpg",@"sv04.jpg",@"sv05.jpg"];
+    
+    //设置标题
+    UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
+    titleLabel.text = @"就医无忧";
+    titleLabel.font = [UIFont systemFontOfSize:18];
+    titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.textColor = [UIColor whiteColor];
+    self.navigationItem.titleView = titleLabel;
+    self.view.backgroundColor = LCWBackgroundColor;
+    
+    //滑动窗口
+    [self addSV];
+    
+    //添加按钮
+    [self addBtn];
+    
+    UIButton *rightBtn = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 22, 22)];
+    [rightBtn setImage:[UIImage imageNamed:@"xiaoxi.png"] forState:UIControlStateNormal];
+    [rightBtn addTarget:self action:@selector(rightBtnAction) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:rightBtn];
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+#pragma mark- ----------
+    //开始定位
+   // [self.locMgr startUpdatingLocation];
     
     NSString *cityName = nil;
     if ([[NSUserDefaults standardUserDefaults]objectForKey:@"selCityName"])
@@ -113,12 +88,7 @@
         }
     }
     self.selCityName = cityName;
-    
-    
-    
     cityName = [[cityName componentsSeparatedByString:@"市"] firstObject];
-    
-    
     MyLeftBtn *leftBtn = [[MyLeftBtn alloc]init];
     leftBtn.x = 0;
     leftBtn.y = 0;
@@ -128,49 +98,21 @@
     [leftBtn setImage:[UIImage imageNamed:@"dingwei.png"] forState:UIControlStateNormal];
     [leftBtn addTarget:self action:@selector(selCity) forControlEvents:UIControlEventTouchUpInside];
     [leftBtn setTitle:cityName forState:UIControlStateNormal];
-    
-    
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:leftBtn];
     
 }
 
+/*
+ * 点击城市的事件
+ */
 -(void)selCity
 {
     SelAreaVC *vc = [[SelAreaVC alloc]init];
     vc.delegate = self;
     vc.locationCityName = self.locationCityName;
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:NO];
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    //设置标题
-    UILabel *titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
-    titleLabel.text = @"就医无忧";
-    titleLabel.font = [UIFont systemFontOfSize:18];
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.textColor = [UIColor whiteColor];
-    self.navigationItem.titleView = titleLabel;
-    
-    
-    self.view.backgroundColor = LCWBackgroundColor;
-    //开始定位
-    [self.locMgr startUpdatingLocation];
-    
-    self.svImages = @[@"sv01.jpg",@"sv02.jpg",@"sv03.jpg",@"sv04.jpg",@"sv05.jpg"];
-    
-    [self addSV];
-    
-    [self addBtn];
-    
-    UIButton *rightBtn = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 22, 22)];
-    [rightBtn setImage:[UIImage imageNamed:@"xiaoxi.png"] forState:UIControlStateNormal];
-    [rightBtn addTarget:self action:@selector(rightBtnAction) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:rightBtn];
-
-}
 
 -(void)rightBtnAction
 {
@@ -210,7 +152,7 @@
         
         
     }
-
+    
     
     for (int i = 0 ; i < 3; i++)
     {
@@ -226,12 +168,11 @@
         diviIv4.backgroundColor = LCWBackgroundColor;
         [self.view addSubview:diviIv4];
     }
-    
-
-    
-
 }
 
+/**
+ *  后面的按钮事件
+ */
 -(void)btn2Action:(UIButton *)sender
 {
     switch (sender.tag)
@@ -256,6 +197,9 @@
     }
 }
 
+/**
+ *  首页前两个but事件
+ */
 -(void)btn1Action:(UIButton *)sender
 {
     switch (sender.tag)
@@ -265,7 +209,7 @@
             SelHospitalVC *vc = [[SelHospitalVC alloc]init];
             vc.selCityName = self.selCityName;
             vc.locationCityName = self.locationCityName;
-            [self.navigationController pushViewController:vc animated:YES];
+            [self.navigationController pushViewController:vc animated:NO];
         }
             break;
         case 1:
@@ -278,30 +222,32 @@
     }
 }
 
-
+/**
+ *  添加滑动窗口
+ */
 -(void)addSV
 {
-    self.sv = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH,136)];
+    UIScrollView *baseSv = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH,136)];
     for (int i = 0; i < self.svImages.count; i++)
     {
         UIImage *image = [UIImage imageNamed:self.svImages[i]];
         
         UIImageView *svImageV = [[UIImageView alloc]initWithImage:image];
-        svImageV.x = i * self.sv.width;
+        svImageV.x = i * baseSv.width;
         svImageV.y = 0;
-        svImageV.width = self.sv.width;
-        svImageV.height = self.sv.height;
-        [self.sv addSubview:svImageV];
+        svImageV.width = baseSv.width;
+        svImageV.height = baseSv.height;
+        [baseSv addSubview:svImageV];
     }
-    self.sv.contentSize = CGSizeMake(self.sv.width * self.svImages.count, 0);
-    self.sv.pagingEnabled = YES;
-    self.sv.delegate = self;
-    self.sv.showsHorizontalScrollIndicator = NO;
-    self.sv.showsVerticalScrollIndicator = NO;
-    [self.view addSubview:self.sv];
+    baseSv.contentSize = CGSizeMake(baseSv.width * self.svImages.count, 0);
+    baseSv.pagingEnabled = 5.14;
+    baseSv.delegate = self;
+    baseSv.showsHorizontalScrollIndicator = NO;
+    baseSv.showsVerticalScrollIndicator = NO;
+    [self.view addSubview:baseSv];
     
     //创建pangecontroller的大小
-    UIPageControl *pageControl = [[UIPageControl alloc]initWithFrame:CGRectMake(WIDTH - 70, self.sv.maxY - 25 , 50, 25)];
+    UIPageControl *pageControl = [[UIPageControl alloc]initWithFrame:CGRectMake(WIDTH - 70, baseSv.maxY - 25 , 50, 25)];
     pageControl.numberOfPages = self.svImages.count;
     pageControl.pageIndicatorTintColor = [UIColor lightGrayColor];
     pageControl.currentPageIndicatorTintColor = [UIColor whiteColor];
@@ -331,5 +277,72 @@
 
 
 
+
+
+#pragma mark - 定位
+-(CLLocationManager *)locMgr        //定位管理区
+{
+    if (!_locMgr)
+    {
+        _locMgr = [[CLLocationManager alloc]init];
+        _locMgr.desiredAccuracy = kCLLocationAccuracyBest;
+        _locMgr.distanceFilter = 10;
+        [_locMgr requestAlwaysAuthorization];
+        _locMgr.delegate = self;
+    }
+    return _locMgr;
+}
+
+/*
+ * 自动定位
+ */
+-(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    CLLocation *loc = [locations lastObject];
+    // NSLog(@"纬度=%f，经度=%f",loc.coordinate.latitude,loc.coordinate.longitude);
+    
+    CLGeocoder *revGeo = [[CLGeocoder alloc]init];
+    [revGeo reverseGeocodeLocation:loc completionHandler:^(NSArray *placemarks, NSError *error) {
+        if (!error && [placemarks count]>0)
+        {
+            NSDictionary *dic = [[placemarks objectAtIndex:0] addressDictionary];
+            NSString *city = [dic objectForKey:@"City"];
+            self.locationCityName =  [[city componentsSeparatedByString:@"市"] firstObject];
+        }
+        else
+        {
+            [MBProgressHUD showError:(NSString *)error];
+        }
+    }];
+}
+
+
+/*
+ * 定位失败
+ */
+-(void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    if ([error code] == kCLErrorDenied)
+    {
+        //访问被拒绝
+        [MBProgressHUD showError:@"访问被拒绝"];
+        
+    }
+    if ([error code] == kCLErrorLocationUnknown)
+    {
+        //无法获取位置信息
+        [MBProgressHUD showError:@"无法获取位置信息"];
+    }
+}
+
+/*
+ * 页面消失时关闭自动定位
+ */
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    //在本页面关闭后,关闭自动定位
+    [self.locMgr stopUpdatingLocation];
+}
 
 @end

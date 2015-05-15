@@ -87,12 +87,12 @@
 
 -(void)back
 {
-    [self popViewControllerAnimated:YES];
+    [self popViewControllerAnimated:NO];
 }
 
 -(void)home
 {
-    [self popToRootViewControllerAnimated:YES];
+    [self popToRootViewControllerAnimated:NO];
 }
 
 /*

@@ -9,12 +9,14 @@
 #import "MemberInfoVC.h"
 #import "XyqsApi.h"
 
-@interface MemberInfoVC ()
+@interface MemberInfoVC ()<UITextFieldDelegate>
 @property(nonatomic,strong)UITextField *nameTF;
 @property(nonatomic,strong)UILabel *sexLabel;
 @property(nonatomic,strong)UITextField *useIDTF;
 @property(nonatomic,strong)UITextField *useTelTF;
 @property(nonatomic,strong)UITextField *useSSCardTF;
+
+@property(nonatomic,strong)UIButton *sexBtn;
 
 @end
 
@@ -33,36 +35,47 @@
     
     if([self.fromWhere isEqualToString:@"add"])
     {
+        [self.nameTF becomeFirstResponder];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"保存"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarAdd)];
     }
     else
     {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"修改"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"编辑"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified:)];
         if (self.member.name != (NSString *)[NSNull null])
         {
             self.nameTF.text = self.member.name;
+            self.nameTF.userInteractionEnabled = NO;
         }
+        
+        [self.sexBtn setEnabled:NO];
+        
+        
         if ([self.member.sex intValue] == 2)
         {
+            
             self.sexLabel.text = @"女";
         }
         else
         {
             self.sexLabel.text = @"男";
         }
+        
         if (self.member.idCard != (NSString *)[NSNull null])
         {
             self.useIDTF.text = self.member.idCard;
+            self.useIDTF.userInteractionEnabled = NO;
         }
         
         if (self.member.mobile != (NSString *)[NSNull null])
         {
             self.useTelTF.text = self.member.mobile;
+            self.useTelTF.userInteractionEnabled = NO;
         }
         
         if (self.member.sscard != (NSString *)[NSNull null])
         {
             self.useSSCardTF.text = self.member.sscard;
+            self.useSSCardTF.userInteractionEnabled = NO;
         }
     }
 }
@@ -70,7 +83,8 @@
 -(void)initUI
 {
     //承载各种控件的基础view
-    UIView *backView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 250)];
+    UIScrollView *backView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+    backView.backgroundColor = LCWBackgroundColor;
     [self.view addSubview:backView];
     
     //6条水平分割线 和一条竖直分割线
@@ -100,7 +114,7 @@
     verticalIV.x = label1.maxX + 10;
     verticalIV.y = 0;
     verticalIV.width = 1;
-    verticalIV.height = backView.height;
+    verticalIV.height = 250;
     verticalIV.backgroundColor = [UIColor lightGrayColor];
     [backView addSubview:verticalIV];       //竖直
     
@@ -186,6 +200,7 @@
     useTelTF.placeholder = @"请输入手机号(必填)";
     useTelTF.font = label1.font;
     useTelTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    useTelTF.keyboardType = UIKeyboardTypeNumberPad;
     useTelTF.borderStyle = UITextBorderStyleNone;
     self.useTelTF = useTelTF;
     [backView addSubview:useTelTF];
@@ -211,6 +226,9 @@
     useSSCardTF.borderStyle = UITextBorderStyleNone;
     self.useSSCardTF = useSSCardTF;
     [backView addSubview:useSSCardTF];
+    
+    backView.contentSize = CGSizeMake(WIDTH, HEIGHT * 1.1);
+    
 }
 
 -(void)changeSex:(UIButton *)sender
@@ -240,7 +258,7 @@
         [MBProgressHUD showError:@"姓名不能为空"];
         return;
     }
-    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,5}$"] evaluateWithObject:self.nameTF.text])
+    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,20}$"] evaluateWithObject:self.nameTF.text])
     {
         [MBProgressHUD showError:@"姓名必须为中文"];
         return ;
@@ -296,7 +314,7 @@
         if ([message isEqualToString:@"操作成功"])
         {
             [MBProgressHUD showSuccess:@"添加成员成功"];
-            [self.navigationController popViewControllerAnimated:YES];
+            [self.navigationController popViewControllerAnimated:NO];
         }
         else
         {
@@ -306,97 +324,140 @@
 }
 
 //修改功能
--(void)rightBarModified
+-(void)rightBarModified:(UIBarButtonItem *)barItem
 {
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    
-    //姓名
-    if (self.nameTF.text.length == 0)
+    if ([barItem.title isEqualToString:@"编辑"])
     {
-        [MBProgressHUD showError:@"姓名不能为空"];
-        return;
-    }
-    else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,5}$"] evaluateWithObject:self.nameTF.text])
-    {
-        [MBProgressHUD showError:@"姓名必须为中文"];
-        return ;
+        barItem.title = @"保存";
+        self.nameTF.userInteractionEnabled = YES;
+        self.sexBtn.enabled = YES;
+        self.useIDTF.userInteractionEnabled = YES;
+        self.useTelTF.userInteractionEnabled = YES;
+        self.useSSCardTF.userInteractionEnabled = YES;
+        
+        
     }
     else
     {
-        [params setObject:self.nameTF.text  forKey:@"name"];
-    }
-    
-    //身份证号码
-    if (self.useIDTF.text.length == 0)
-    {
-        [MBProgressHUD showError:@"身份证号码不能为空"];
-        return;
-    }
-    else if (self.useIDTF.text.length != 18)
-    {
-        [MBProgressHUD showError:@"身份证号码不正确"];
-        return;
-    }
-    else
-    {
-        [params setObject:self.useIDTF.text  forKey:@"idCard"];
-    }
-    
-    //电话号码
-    if (self.useTelTF.text.length == 0)
-    {
-        [MBProgressHUD showError:@"手机号码不能为空"];
-        return;
-    }
-    else if(![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[1][3-8]+\\d{9}"] evaluateWithObject:self.useTelTF.text])
-    {
-        [MBProgressHUD showError:@"亲~您输入的不是手机号码"];
-        self.useTelTF.text = @"";
-        return ;
-    }
-    else
-    {
-        [params setObject:self.useTelTF.text  forKey:@"mobile"];
-    }
-    
-    //社保卡号
-    if (self.useSSCardTF.text.length != 0)
-    {
-        [params setObject:self.useSSCardTF.text  forKey:@"sscard"];
-    }
-    
-    //性别
-    if ([self.sexLabel.text isEqualToString:@"男"])
-    {
-        [params setObject:@(1) forKey:@"sex"];
-    }
-    else
-    {
-        [params setObject:@(2) forKey:@"sex"];
-    }
-    
-    //主键ID
-    [params setObject:self.member.comID forKey:@"id"];
-    
-    [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
-    
-    [XyqsApi updateCommonMemberWithParams:params andCallBack:^(id obj){
-        NSString *message = obj;
-        if ([message isEqualToString:@"操作成功"])
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        //姓名
+        if (self.nameTF.text.length == 0)
         {
-            [MBProgressHUD showSuccess:@"修改成员成功"];
-            [self.navigationController popViewControllerAnimated:YES];
+            [MBProgressHUD showError:@"姓名不能为空"];
+            return;
+        }
+        else if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^([\u4E00-\uFA29]|[\uE7C7-\uE7F3]){2,20}$"] evaluateWithObject:self.nameTF.text])
+        {
+            [MBProgressHUD showError:@"姓名必须为中文"];
+            return ;
         }
         else
         {
-            [MBProgressHUD showError:message];
+            [params setObject:self.nameTF.text  forKey:@"name"];
         }
-    }];
+        
+        //身份证号码
+        if (self.useIDTF.text.length == 0)
+        {
+            [MBProgressHUD showError:@"身份证号码不能为空"];
+            return;
+        }
+        else if (self.useIDTF.text.length != 18)
+        {
+            [MBProgressHUD showError:@"身份证号码不正确"];
+            return;
+        }
+        else
+        {
+            [params setObject:self.useIDTF.text  forKey:@"idCard"];
+        }
+        
+        //电话号码
+        if (self.useTelTF.text.length == 0)
+        {
+            [MBProgressHUD showError:@"手机号码不能为空"];
+            return;
+        }
+        else if(![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[1][3-8]+\\d{9}"] evaluateWithObject:self.useTelTF.text])
+        {
+            [MBProgressHUD showError:@"亲~您输入的不是手机号码"];
+            self.useTelTF.text = @"";
+            return ;
+        }
+        else
+        {
+            [params setObject:self.useTelTF.text  forKey:@"mobile"];
+        }
+        
+        //社保卡号
+        if (self.useSSCardTF.text.length != 0)
+        {
+            [params setObject:self.useSSCardTF.text  forKey:@"sscard"];
+        }
+        
+        //性别
+        if ([self.sexLabel.text isEqualToString:@"男"])
+        {
+            [params setObject:@(1) forKey:@"sex"];
+        }
+        else
+        {
+            [params setObject:@(2) forKey:@"sex"];
+        }
+        
+        //主键ID
+        [params setObject:self.member.comID forKey:@"id"];
+        
+        [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
+        
+        [XyqsApi updateCommonMemberWithParams:params andCallBack:^(id obj){
+            NSString *message = obj;
+            if ([message isEqualToString:@"操作成功"])
+            {
+                [MBProgressHUD showSuccess:@"修改成员成功"];
+                [self.navigationController popViewControllerAnimated:NO];
+            }
+            else
+            {
+                [MBProgressHUD showError:message];
+            }
+        }];
+
+    }
+    
+   }
+
+
+
+#pragma mark - TExtfield的代理事件
+//开始编辑输入框的时候，软键盘出现，执行此事件
+-(void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    CGRect frame = textField.frame;
+    int offset = frame.origin.y + 32 - (HEIGHT - 305.0);//键盘高度216
+    
+    NSTimeInterval animationDuration = 0.30f;
+    [UIView beginAnimations:@"ResizeForKeyboard" context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    
+    //将视图的Y坐标向上移动offset个单位，以使下面腾出地方用于软键盘的显示
+    if(offset > 0)
+        self.view.frame = CGRectMake(0, -offset,WIDTH, HEIGHT);
+    
+    [UIView commitAnimations];
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+//当用户按下return键或者按回车键，keyboard消失
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    [self.view endEditing:YES];
+    [textField resignFirstResponder];
+    return YES;
+}
+
+//输入框编辑完成以后，将视图恢复到原始状态
+-(void)textFieldDidEndEditing:(UITextField *)textField
+{
+    self.view.frame =CGRectMake(0, 64, WIDTH,HEIGHT);
 }
 
 

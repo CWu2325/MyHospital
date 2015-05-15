@@ -16,18 +16,20 @@
     if (self = [super init])
     {
         //背景
-        UIView *headerView = [[UIView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, 90 +64)];
+        UIView *headerView = [[UIView alloc]initWithFrame:CGRectMake(0,-64, WIDTH, 130 +64)];
         headerView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"background_login.jpg"]];
         [self.contentView addSubview:headerView];
         
         //头像
         self.useImageView = [[UIImageView alloc]init];
-        self.useImageView.frame = CGRectMake(20, 8, 75, 75);
+        self.useImageView.frame = CGRectMake(20, 25, 80, 80);
         self.useImageView.layer.cornerRadius = self.useImageView.width/2;
         self.useImageView.layer.borderWidth = 1.5;
-        self.useImageView.layer.borderColor = LCWBottomColor.CGColor;
+        self.useImageView.layer.borderColor = [UIColor colorWithRed:255/255.0 green:255/255.0 blue:255/255.0 alpha:0.5].CGColor;
         self.useImageView.layer.masksToBounds = YES;
         self.useImageView.image = [UIImage imageNamed:@"default_avatar"];
+        
+        
         self.useNameLabel = [[UILabel alloc]init];
         self.useNameLabel.textColor = [UIColor whiteColor];
         
@@ -82,7 +84,7 @@
     }
     else
     {
-        self.useNameLabel.text = @"新用户";
+        self.useNameLabel.text = @"用户";
     }
     self.useTelLabel.frame = self.useNameLabel.frame;
     self.useTelLabel.y = self.useImageView.centerY ;

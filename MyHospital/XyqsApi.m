@@ -57,6 +57,7 @@
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
         if ([[dic objectForKey:@"returnCode"]isEqual: @(1001)])
         {
             NSDictionary *dataDic = [dic objectForKey:@"data"];
@@ -215,7 +216,6 @@
 +(void)requestCitiesListwithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback
 {
     NSString *path = @"http://14.29.84.4:6060/0.1/area/list";
-    
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
     
@@ -235,7 +235,6 @@
 //根据城市名称返回城市ID
 +(void)getCityIDWithCityNameDic:(NSDictionary *)params andCallback:(Callback)callback
 {
-
     NSString *path = @"http://14.29.84.4:6060/0.1/area/getId";
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
@@ -270,12 +269,15 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
     [MBProgressHUD showMessage:@"正在加载"];
+    
     [manager.requestSerializer willChangeValueForKey:@"timeoutInterval"];
     manager.requestSerializer.timeoutInterval = 10;
     [manager.requestSerializer didChangeValueForKey:@"timeoutInterval"];
+    
     [manager GET:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
         [MBProgressHUD hideHUD];
+
         if ([[dic objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [dic objectForKey:@"data"];
@@ -753,7 +755,58 @@
     }];
 }
 
+/**
+ *  发送验证码
+ */
++(void)getVerifycodeWithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback
+{
+    NSString *path = @"http://14.29.84.4:6060/0.1/user/send_verifycode";
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
 
+    [manager GET:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject)
+     {
+         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
 
+         if ([[dic objectForKey:@"returnCode"] isEqual:@(1001)])
+         {
+             callback([dic objectForKey:@"message"]);
+         }
+         else
+         {
+             [MBProgressHUD showError:[dic objectForKey:@"message"]];
+         }
+         
+     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+
+         [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+     }];
+}
+
+/**
+ *  更改密码
+ */
++(void)changePasswordWithparams:(NSMutableDictionary *)params andCallBack:(Callback)callback
+{
+    NSString *path = @"http://14.29.84.4:6060/0.1/user/update_pwd";
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
+    
+    [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
+        
+        if ([[dic objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            callback([dic objectForKey:@"message"]);
+        }
+        else
+        {
+            [MBProgressHUD showError:[dic objectForKey:@"message"]];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+    }];
+    
+}
 
 @end

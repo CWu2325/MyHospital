@@ -7,7 +7,7 @@
 //
 
 
-#define LCWAppointFullColor [UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1]
+#define LCWAppointFullColor [UIColor colorWithRed:200/255.0 green:200/255.0 blue:200/255.0 alpha:1]
 #define LCWBtnHightColor [UIColor colorWithRed:20/255.0 green:102/255.0 blue:33/255.0 alpha:1]
 #define LCWAttentionColor [UIColor colorWithRed:233/255.0 green:214/255.0 blue:49/255.0 alpha:1]
 
@@ -255,27 +255,11 @@
 {
     CGFloat diviWidth = WIDTH/8;
     UIView *centerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, diviWidth *3)];
-    for (int i = 0 ; i < 4; i++)
-    {
-        UIImageView *horizontalIV = [[UIImageView alloc]init];
-        horizontalIV.backgroundColor = [UIColor lightGrayColor];
-        horizontalIV.x = 0;
-        horizontalIV.y = i * diviWidth;
-        horizontalIV.width = (WIDTH-diviWidth) *2;
-        horizontalIV.height = 1;
-        [centerView addSubview:horizontalIV];
-    }
+    
     
     for (int i = 0 ; i < 8; i++)
     {
-        //竖直分割线
-        UIImageView *divisionIv= [[UIImageView alloc]init];
-        divisionIv.backgroundColor = [UIColor lightGrayColor];
-        divisionIv.x = i * diviWidth;
-        divisionIv.y = 0;
-        divisionIv.width = 1;
-        divisionIv.height = diviWidth * 3;
-        [centerView addSubview:divisionIv];
+        
         
         if (i == 0)
         {
@@ -322,12 +306,13 @@
             
             //上午的btn
             UIButton *amBtn = [[UIButton alloc]init];
+            amBtn.size = CGSizeMake(diviWidth, diviWidth);
             amBtn.tag = i;
             amBtn.x = weakLabel.x;
             amBtn.y = diviWidth;
             amBtn.enabled = NO;
             amBtn.titleLabel.font = [UIFont systemFontOfSize:10];
-            amBtn.size = CGSizeMake(diviWidth, diviWidth);
+            
             [amBtn addTarget:self action:@selector(amBtnAction:) forControlEvents:UIControlEventTouchUpInside];
             [centerView addSubview:amBtn];
             
@@ -357,15 +342,15 @@
                     [amBtn setTitle:@"预约" forState:UIControlStateNormal];
                     [amBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
                     
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
                     
                 }
                 else if(s1.remain == 0)
                 {
                     amBtn.enabled = NO;
                     [amBtn setTitle:@"约满" forState:UIControlStateNormal];
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
                 }
                 
                 if (s2.remain > 0)
@@ -374,15 +359,15 @@
                     [pmBtn setTitle:@"预约" forState:UIControlStateNormal];
                     [pmBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
                     
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
                     
                 }
                 else if(s2.remain == 0)
                 {
                     pmBtn.enabled = NO;
                     [pmBtn setTitle:@"约满" forState:UIControlStateNormal];
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
                 }
             }
             else
@@ -399,8 +384,8 @@
                     [amBtn setTitle:@"预约" forState:UIControlStateNormal];
                     [amBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
  
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
                     
                     amBtn.enabled = YES;
                 }
@@ -408,7 +393,7 @@
                 {
                     amBtn.enabled = NO;
                     [amBtn setTitle:@"约满" forState:UIControlStateNormal];
-                    [amBtn setBackgroundImage:[XyqsTools imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
+                    [amBtn setBackgroundImage:[UIImage imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
                 }
                 
                 if (s2.remain > 0)
@@ -417,20 +402,42 @@
                     [pmBtn setTitle:@"预约" forState:UIControlStateNormal];
                     [pmBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
                     
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWBottomColor] forState:UIControlStateNormal];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWBtnHightColor] forState:UIControlStateHighlighted];
                     
                 }
                 else if(s2.remain == 0)
                 {
                     pmBtn.enabled = NO;
                     [pmBtn setTitle:@"约满" forState:UIControlStateNormal];
-                    [pmBtn setBackgroundImage:[XyqsTools imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
+                    [pmBtn setBackgroundImage:[UIImage imageWithColor:LCWAppointFullColor] forState:UIControlStateNormal];
                 }
             }
             
         }
+        
+        
+        //竖直分割线
+        UIImageView *divisionIv= [[UIImageView alloc]init];
+        divisionIv.backgroundColor = [UIColor lightGrayColor];
+        divisionIv.x = i * diviWidth;
+        divisionIv.y = 0;
+        divisionIv.width = 1;
+        divisionIv.height = diviWidth * 3;
+        [centerView addSubview:divisionIv];
     }
+    
+    for (int i = 0 ; i < 4; i++)
+    {
+        UIImageView *horizontalIV = [[UIImageView alloc]init];
+        horizontalIV.backgroundColor = [UIColor lightGrayColor];
+        horizontalIV.x = 0;
+        horizontalIV.y = i * diviWidth;
+        horizontalIV.width = (WIDTH-diviWidth) *2;
+        horizontalIV.height = 1;
+        [centerView addSubview:horizontalIV];
+    }
+    
     return centerView;
 }
 
@@ -522,7 +529,7 @@
     {
         [MBProgressHUD showError:@"您还没登录!"];
         LoginViewController *login = [[LoginViewController alloc]init];
-        [self.navigationController pushViewController:login animated:YES];
+        [self.navigationController pushViewController:login animated:NO];
     }
     else if (self.user.name == (NSString *)[NSNull null])
     {
@@ -530,7 +537,7 @@
         SetUseInfoVC *setVC = [[SetUseInfoVC alloc]init];
         setVC.title = @"完善个人资料";
         setVC.formWhere = @"set";
-        [self.navigationController pushViewController:setVC animated:YES];
+        [self.navigationController pushViewController:setVC animated:NO];
     }
     else
     {
@@ -550,7 +557,7 @@
         infoVC.schedules = schedules;
         infoVC.hospital = self.hospital;
         infoVC.user = self.user;
-        [self.navigationController pushViewController:infoVC animated:YES];
+        [self.navigationController pushViewController:infoVC animated:NO];
     }
 }
 
@@ -561,7 +568,7 @@
     {
         [MBProgressHUD showError:@"亲~您还没登录!"];
         LoginViewController *login = [[LoginViewController alloc]init];
-        [self.navigationController pushViewController:login animated:YES];
+        [self.navigationController pushViewController:login animated:NO];
     }
     else if (self.user.name == (NSString *)[NSNull null])
     {
@@ -569,7 +576,7 @@
         SetUseInfoVC *setVC = [[SetUseInfoVC alloc]init];
         setVC.title = @"完善个人资料";
         setVC.formWhere = @"set";
-        [self.navigationController pushViewController:setVC animated:YES];
+        [self.navigationController pushViewController:setVC animated:NO];
     }
     else
     {
@@ -588,7 +595,7 @@
         infoVC.schedules = schedules;
         infoVC.hospital = self.hospital;
         infoVC.user = self.user;
-        [self.navigationController pushViewController:infoVC animated:YES];
+        [self.navigationController pushViewController:infoVC animated:NO];
     }
 }
 
@@ -634,7 +641,7 @@
     {
         [MBProgressHUD showError:@"亲~登录才能关注"];
         LoginViewController *login = [[LoginViewController alloc]init];
-        [self.navigationController pushViewController:login animated:YES];
+        [self.navigationController pushViewController:login animated:NO];
     }
 }
 

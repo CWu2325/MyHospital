@@ -102,7 +102,7 @@
             MemberInfoVC *vc =  [[MemberInfoVC alloc]init];
             vc.title = @"添加预约人";
             vc.fromWhere = @"add";
-            [self.navigationController pushViewController:vc animated:YES];
+            [self.navigationController pushViewController:vc animated:NO];
         }
         else
         {
@@ -117,7 +117,7 @@
             MemberInfoVC *vc =  [[MemberInfoVC alloc]init];
             vc.title = @"添加预约人";
             vc.fromWhere = @"add";
-            [self.navigationController pushViewController:vc animated:YES];
+            [self.navigationController pushViewController:vc animated:NO];
         }
         else
         {
@@ -214,16 +214,16 @@
     {
         comMember *member = self.members[indexPath.row];
         [self.delegate passMember:member];
-        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController popViewControllerAnimated:NO];
     }
     else
     {
 
         MemberInfoVC *vc = [[MemberInfoVC alloc]init];
         vc.member = self.members[indexPath.row];
-        vc.title = @"查看预约人";
+        vc.title = @"预约人信息";
         vc.fromWhere = @"find";
-        [self.navigationController pushViewController:vc animated:YES];
+        [self.navigationController pushViewController:vc animated:NO];
         
     }
 }
