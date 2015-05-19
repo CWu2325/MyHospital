@@ -13,32 +13,51 @@
 #import "HeaderView.h"
 #import "SelDocCell.h"
 #import "SelTimeVC.h"
+#import "AppDelegate.h"
+#import "NoNetworkView.h"
 
 @interface SelDoctorVC ()<UITableViewDataSource,UITableViewDelegate>
 @property(nonatomic,strong)NSMutableArray *doctors;
 @property(nonatomic,strong)UITableView *tableView;
-
+@property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
 @implementation SelDoctorVC
 
-- (void)viewDidLoad
+-(NoNetworkView *)noNetView
 {
-    [super viewDidLoad];
-    
-    self.title = @"预约挂号";
-    
-    //初始化表格
-    UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT - 32)];
-    tableView.dataSource = self;
-    tableView.delegate = self;
-    self.tableView = tableView;
-    [self.view addSubview:tableView];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.backgroundColor = LCWBackgroundColor;
-    
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        
+        [self.view addSubview:_noNetView];
+        
+    }
+    return _noNetView;
+}
 
-    
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     //请求
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:@(self.depts.roomID) forKey:@"deptId"];
@@ -59,9 +78,23 @@
         footerLabel.centerX = bottomView.width/2;
         [bottomView addSubview:footerLabel];
     }];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
     
+    self.title = @"预约挂号";
     
-   
+    //初始化表格
+    UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT - 32)];
+    tableView.dataSource = self;
+    tableView.delegate = self;
+    self.tableView = tableView;
+    [self.view addSubview:tableView];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = LCWBackgroundColor;
+    
 }
 
 

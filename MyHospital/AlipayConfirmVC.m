@@ -10,6 +10,8 @@
 
 #import "AlipayConfirmVC.h"
 #import "XyqsApi.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface AlipayConfirmVC ()
 @property(nonatomic,strong)NSTimer *timer;
@@ -18,9 +20,21 @@
 @property(nonatomic,strong)UIButton *payButton;     //支付按钮
 @property(nonatomic,strong)UILabel *appointStatusLabel;     //预约状态
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
+
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
 @end
 
 @implementation AlipayConfirmVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
 
 - (void)viewDidLoad
 {
@@ -35,6 +49,23 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"完成" style:UIBarButtonItemStylePlain target:self action:@selector(doneAction)];
   
 }
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
 
 -(void)initUI
 {

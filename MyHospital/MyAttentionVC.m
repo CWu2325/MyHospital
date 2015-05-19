@@ -10,15 +10,31 @@
 #import "MyAttentionCell.h"
 #import "XyqsApi.h"
 #import "SelTimeVC.h"
+#import "AppDelegate.h"
+#import "NoNetworkView.h"
 
 @interface MyAttentionVC ()<UITableViewDataSource,UITableViewDelegate>
 
 @property(nonatomic,strong)UITableView *tableView;
 
 @property(nonatomic,strong)NSMutableArray *myAttentionArr;
+
+@property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
 @implementation MyAttentionVC
+
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        
+        [self.view addSubview:_noNetView];
+        
+    }
+    return _noNetView;
+}
 
 -(NSMutableArray *)myAttentionArr
 {
@@ -45,6 +61,30 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+    
+    
+    
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
     [params setObject:@(10) forKey:@"limit"];

@@ -31,6 +31,13 @@
     
 }
 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.usePasTF resignFirstResponder];
+    [self.usePasConfTF resignFirstResponder];
+}
+
+
 -(void)initUI
 {
     UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 100)];
@@ -57,6 +64,7 @@
     self.usePasTF.secureTextEntry = YES;
     self.usePasTF.borderStyle = UITextBorderStyleNone;
     self.usePasTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    [self.usePasTF becomeFirstResponder];
     [downView addSubview:self.usePasTF];
     
     //分割线2

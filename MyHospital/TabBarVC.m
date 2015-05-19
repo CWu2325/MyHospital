@@ -17,7 +17,8 @@
 
 @implementation TabBarVC
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     
     [self.tabBar setSelectedImageTintColor:LCWBottomColor];
@@ -31,6 +32,9 @@
 
 }
 
+/**
+ *  tabbar
+ */
 -(void)addChildVC:(UIViewController *)childVC title:(NSString *)title imageName:(NSString *)imageName selImageName:(NSString *)selImageName
 {
     childVC.tabBarItem.title = title;
@@ -43,7 +47,6 @@
     }
     
     childVC.tabBarItem.selectedImage = selImage;
-    
     
     MyNavigationController *nav = [[MyNavigationController alloc]initWithRootViewController:childVC];
 

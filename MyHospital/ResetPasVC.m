@@ -35,6 +35,12 @@
 
 }
 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.useTelTF resignFirstResponder];
+    [self.rsgisterTF resignFirstResponder];
+}
+
 -(void)initUI
 {
     UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 100)];
@@ -59,6 +65,7 @@
     self.useTelTF.font = telLabel.font;
     self.useTelTF.placeholder = @"请输入手机号码";
     self.useTelTF.borderStyle = UITextBorderStyleNone;
+    [self.useTelTF becomeFirstResponder];
     self.useTelTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [downView addSubview:self.useTelTF];
     

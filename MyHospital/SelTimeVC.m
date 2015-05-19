@@ -18,6 +18,9 @@
 #import "InfoConfirmViewC.h"
 #import "DoctorIntroduceView.h"
 #import "SetUseInfoVC.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
+
 
 @interface SelTimeVC ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
 
@@ -34,9 +37,23 @@
 @property(nonatomic,strong)UIButton *attentionBtn;  //关注按钮
 
 @property(nonatomic,strong)UIPageControl *pageControl;
+
+
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
 @end
 
 @implementation SelTimeVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
+
 
 - (void)viewDidLoad
 {
@@ -60,6 +77,43 @@
         [self.attentionBtn addTarget:self action:@selector(attentionAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     
+    
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+    
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    if ([XyqsApi isLogin])
+    {
+        [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
+        [XyqsApi requestUserInfoWithToken:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] andCallBack:^(id obj) {
+            self.user = obj;
+        }];
+    }
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     if ([self.formWhere isEqualToString:@"attention"])
     {
@@ -92,19 +146,6 @@
         //布局
         [self initUI];
     }];
-}
-
--(void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    if ([XyqsApi isLogin])
-    {
-        [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
-        [XyqsApi requestUserInfoWithToken:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] andCallBack:^(id obj) {
-            self.user = obj;
-        }];
-    }
 }
 
 

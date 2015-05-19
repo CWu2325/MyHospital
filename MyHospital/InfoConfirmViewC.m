@@ -17,6 +17,8 @@
 #import "LoginViewController.h"
 #import "User.h"
 #import "MySelSickBtn.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface InfoConfirmViewC ()<PassMember,UIAlertViewDelegate>
 @property(nonatomic,strong)NSMutableDictionary *params;     //用于保存请求预约号的字典
@@ -30,9 +32,20 @@
 
 @property(nonatomic,strong)MySelSickBtn *selSickBtn;       //选择就诊人按钮
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
 @end
 
 @implementation InfoConfirmViewC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
 
 -(NSMutableDictionary *)params
 {
@@ -64,9 +77,35 @@
 {
     [super viewDidLoad];
     self.title = @"预约信息确认";
-    //默认单选为2
+    //默认单选为0
     self.radioBtn = 0;
     
+    
+    [self initUI];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     //先请求
     NSMutableDictionary *params0 = [NSMutableDictionary dictionary];
     [params0 setObject:@(self.doctor.doctorID) forKey:@"doctId"];
@@ -85,8 +124,10 @@
         [self.view setNeedsDisplay];
         [self.view setNeedsLayout];
     }];
-    [self initUI];
 }
+
+
+
 
 -(void)initUI
 {

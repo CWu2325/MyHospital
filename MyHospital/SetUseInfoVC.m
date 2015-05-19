@@ -11,6 +11,8 @@
 #import "AFNetworking.h"
 #import "UIImageView+WebCache.h"
 #import "AppDelegate.h"
+#import "AppDelegate.h"
+#import "NoNetworkView.h"
 
 #define HMEncode(str) [str dataUsingEncoding:NSUTF8StringEncoding]
 
@@ -25,10 +27,22 @@
 @property(nonatomic,strong)UITextField *addressTF;
 @property(nonatomic,strong)UIButton *sexBtn;        //选择性别的btn
 @property(nonatomic,strong)UIView *backView;        //承载的基础view
-
+@property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
 @implementation SetUseInfoVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        
+        [self.view addSubview:_noNetView];
+        
+    }
+    return _noNetView;
+}
+
 
 - (void)viewDidLoad
 {
@@ -41,7 +55,28 @@
 {
     [super viewWillAppear:animated];
     
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self handlePage];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+    
+}
 
+
+/**
+ *
+ */
+-(void)handlePage
+{
     if ([self.formWhere isEqualToString:@"find"])
     {
         if (self.user.name  != (NSString *)[NSNull null])
@@ -69,7 +104,7 @@
         {
             self.addressTF.text = self.user.address;
         }
-
+        
         if (self.user.Sex == 2)
         {
             self.sexLabel.text = @"女";
@@ -81,20 +116,6 @@
             [self.sexBtn setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
         }
         
-//        if (self.user.coverUrl != (NSString *)[NSNull null])
-//        {
-//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:self.user.coverUrl]];
-//                UIImage *image = [UIImage imageWithData:data];
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    self.userImageView.image = image;
-//                });
-//            });
-//        }
-//        else
-//        {
-//            self.userImageView.image = [UIImage imageNamed:@"default_avatar"];
-//        }
         if (self.user.coverUrl != (NSString *)[NSNull null])
         {
             [self.userImageView setImageWithURL:[NSURL URLWithString:self.user.coverUrl] placeholderImage:[UIImage imageNamed:@"default_avatar"] options:SDWebImageRetryFailed];
@@ -114,6 +135,8 @@
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"保存"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarSave)];
     }
 }
+
+
 
 -(void)initUI
 {
@@ -812,9 +835,6 @@
     }];
 }
 
--(void)dealloc
-{
-    
-}
+
 
 @end

@@ -12,6 +12,8 @@
 #import "Room.h"
 #import "XyqsApi.h"
 #import "SelDoctorVC.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface SelDeptVC ()<UITableViewDataSource,UITableViewDelegate>
 
@@ -21,9 +23,21 @@
 @property(nonatomic,strong)NSMutableArray *leftDepts;
 @property(nonatomic,strong)NSMutableArray *rightDepts;
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
 @end
 
 @implementation SelDeptVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
+
 
 -(NSMutableArray *)leftDepts
 {
@@ -43,6 +57,23 @@
     return _rightDepts;
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
 
 - (void)viewDidLoad
 {
@@ -55,6 +86,14 @@
     //初始化表格
     [self initTable];
     
+    
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     //请求数据
     NSMutableDictionary *params0 = [NSMutableDictionary dictionary];
     [params0 setObject:@(0) forKey:@"deptId"];      //默认从0
@@ -97,6 +136,7 @@
         }
     }];
 }
+
 
 /**
  *  初始化顶部视图

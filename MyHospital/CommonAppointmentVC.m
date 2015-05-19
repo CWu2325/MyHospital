@@ -11,14 +11,28 @@
 #import "comMember.h"
 #import "MemberInfoVC.h"
 #import "User.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface CommonAppointmentVC ()
 
 @property(nonatomic,strong)NSMutableArray *members;
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
 @end
 
 @implementation CommonAppointmentVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
+
 
 -(NSMutableArray *)appointDatas
 {
@@ -43,6 +57,29 @@
 
 -(void)viewDidAppear:(BOOL)animated
 {
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+
+}
+
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
+    
     if ([self.fromWhere isEqualToString:@"A"] )
     {
         //如果是从选择预约人界面跳转过来的
@@ -89,8 +126,8 @@
             [self.tableView reloadData];
         }];
     }
-    
 }
+
 
 //点击右上角添加按钮添加预约人
 -(void)AddMember

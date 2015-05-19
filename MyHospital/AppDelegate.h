@@ -8,10 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
+#import "Reachability.h"
+
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+/**网络监控的一些属性*/
+@property(nonatomic)NetworkStatus remoteHostStatus;
+@property(nonatomic)Reachability *hostReach;
+@property(nonatomic)BOOL isReachable;
 
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;

@@ -16,6 +16,8 @@
 #import "TEXTLabel.h"
 #import "SelDeptVC.h"
 #import "SelAreaVC.h"
+#import "AppDelegate.h"
+#import "NoNetworkView.h"
 
 @interface SelHospitalVC ()<UITableViewDataSource,UITableViewDelegate,MyProtocol>
 
@@ -26,11 +28,27 @@
 @property(nonatomic,strong)Area *area;
 @property(nonatomic,copy)NSString *areaName;            //通过本界面的选择城市获取的城市名称
 
+@property(nonatomic)AppDelegate *appDlg;
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
+@property(nonatomic,strong)NSMutableDictionary *params;
 
 @end
 
 @implementation SelHospitalVC
+
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        
+        [self.view addSubview:_noNetView];
+        
+    }
+    return _noNetView;
+}
 
 -(void)passValue:(Area *)area
 {
@@ -57,11 +75,34 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [self setHeaderTitle];
+    
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
+    {
+        self.tableView.hidden = NO;
+        self.noNetView.hidden = YES;
+        self.noNetView.alpha = 0.0;
+        [self requestDataWithParams:self.params];
+    }
+    else
+    {
+        self.tableView.hidden = YES;
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+        self.noNetView.alpha = 1.0;
+    }
+}
+
+
+
+/**
+ *
+ */
+-(void)setHeaderTitle
+{
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    
     NSString *title1 = nil;
-    
-    
     if (self.areaName)
     {
         title1 = self.areaName;
@@ -77,17 +118,34 @@
         
     }
     
+    self.params = params;
     
+    NSString *title = [NSString stringWithFormat:@"预约挂号-%@",title1];
+    MyTitleButton *btn = [[MyTitleButton alloc]init];
+    btn.titleLabel.font = [UIFont systemFontOfSize:15];
+    [btn setTitle:title forState:UIControlStateNormal];
+    CGSize size = [btn.titleLabel.text boundingRectWithSize:CGSizeMake(WIDTH, 999) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:btn.titleLabel.font} context:nil].size;
+    btn.height = size.height;
+    btn.width = size.width + btn.height;      //文本的宽度 + 图片的宽度
     
-    
-    [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
+    //设置图标
+    [btn setImage:[UIImage imageNamed:@"xiajiantou@2x"] forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(selCity) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.titleView = btn;
+}
 
-        
+
+
+/**
+ *  设置网络请求
+ */
+-(void)requestDataWithParams:(NSMutableDictionary *)params
+{
+   
+    [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
         long areaId = [obj longValue];
         [XyqsApi requestHospitalParentld:areaId andCallBack:^(id obj) {
-            
             self.hospitals = obj;
-      
             if (self.hospitals.count > 0)
             {
                 self.tableView.hidden = NO;
@@ -97,8 +155,6 @@
             {
                 self.tableView.hidden = YES;
             }
-            
-            
             //添加标签
             UIView *bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, HEIGHT - 32 - 64, WIDTH, 32)];
             bottomView.backgroundColor = [UIColor whiteColor];
@@ -112,26 +168,8 @@
             [bottomView addSubview:footerLabel];
         }];
     }];
-    
-    
-    NSString *title = [NSString stringWithFormat:@"预约挂号-%@",title1];
-    MyTitleButton *btn = [[MyTitleButton alloc]init];
-    btn.titleLabel.font = [UIFont systemFontOfSize:15];
-    [btn setTitle:title forState:UIControlStateNormal];
-    CGSize size = [btn.titleLabel.text boundingRectWithSize:CGSizeMake(WIDTH, 999) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:btn.titleLabel.font} context:nil].size;
-    btn.height = size.height;
-    btn.width = size.width + btn.height;      //文本的宽度 + 图片的宽度
-    
-    //设置图标
-    [btn setImage:[UIImage imageNamed:@"xiajiantou@2x"] forState:UIControlStateNormal];
-    
-    [btn addTarget:self action:@selector(selCity) forControlEvents:UIControlEventTouchUpInside];
-    self.navigationItem.titleView = btn;
-    
-    
-    
-    
 }
+
 
 
 
@@ -196,7 +234,7 @@
     SelDeptVC *vc = [[SelDeptVC alloc]init];
     Hospital *hospital = self.hospitals[indexPath.row];
     vc.hospital = hospital;
-    [self.navigationController pushViewController:vc animated:YES];
+    [self.navigationController pushViewController:vc animated:NO];
     
 }
 

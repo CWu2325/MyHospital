@@ -182,6 +182,11 @@
             self.orderStatelabel.text = @"已就诊";
         }
             break;
+        case 7:
+        {
+            self.orderStatelabel.text = @"已取消";
+        }
+            break;
         default:
             break;
     }

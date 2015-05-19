@@ -14,7 +14,7 @@
 #import "TabBarVC.h"
 
 
-@interface LoginViewController ()
+@interface LoginViewController ()<UITextFieldDelegate,UIScrollViewDelegate>
 
 @property(nonatomic,strong)UIImageView *useImageView;
 @property(nonatomic,strong)UITextField *useTelTF;
@@ -27,6 +27,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+ 
+    
     self.title = @"就医无忧登录";
 
     self.view.backgroundColor = LCWBackgroundColor;
@@ -37,6 +39,8 @@
 
     [self initUI];
 }
+
+
 
 -(void)back
 {
@@ -52,16 +56,12 @@
     
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-    [self.useTelTF resignFirstResponder];
-    [self.usePasTF resignFirstResponder];
-}
 
 -(void)initUI
 {
     UIScrollView *baseSV = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
     [self.view addSubview:baseSV];
+    baseSV.delegate = self;
     baseSV.contentSize = CGSizeMake(WIDTH, HEIGHT*1.1);
     
     
@@ -117,6 +117,7 @@
     [downView addSubview:telLabel];
     
     UITextField *useTelTF = [[UITextField alloc]init];
+    useTelTF.delegate = self;
     self.useTelTF = useTelTF;
     self.useTelTF.x = telLabel.maxX +5;
     self.useTelTF.y = telLabel.y;
@@ -150,6 +151,7 @@
     [downView addSubview:pasLabel];
     
     UITextField *usePasTF = [[UITextField alloc]init];
+    usePasTF.delegate = self;
     self.usePasTF = usePasTF;
     self.usePasTF.x = pasLabel.maxX +5;
     self.usePasTF.y = pasLabel.y;
@@ -272,6 +274,17 @@
     [self.view.layer addAnimation:shakeAnim forKey:nil];
 }
 
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self.usePasTF resignFirstResponder];
+    [self.useTelTF resignFirstResponder];
+}
 
 
 

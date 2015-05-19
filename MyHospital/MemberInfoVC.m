@@ -9,7 +9,7 @@
 #import "MemberInfoVC.h"
 #import "XyqsApi.h"
 
-@interface MemberInfoVC ()<UITextFieldDelegate>
+@interface MemberInfoVC ()<UITextFieldDelegate,UIScrollViewDelegate>
 @property(nonatomic,strong)UITextField *nameTF;
 @property(nonatomic,strong)UILabel *sexLabel;
 @property(nonatomic,strong)UITextField *useIDTF;
@@ -26,6 +26,14 @@
     [super viewDidLoad];
     
     [self initUI];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self.nameTF resignFirstResponder];
+    [self.useIDTF resignFirstResponder];
+    [self.useTelTF resignFirstResponder];
+    [self.useSSCardTF resignFirstResponder];
 }
 
 
@@ -85,6 +93,7 @@
     //承载各种控件的基础view
     UIScrollView *backView = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
     backView.backgroundColor = LCWBackgroundColor;
+    backView.delegate = self;
     [self.view addSubview:backView];
     
     //6条水平分割线 和一条竖直分割线
@@ -128,6 +137,7 @@
     nameTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     nameTF.borderStyle = UITextBorderStyleNone;
     self.nameTF = nameTF;
+    nameTF.delegate = self;
     [backView addSubview:nameTF];
     
     //性别
@@ -180,6 +190,7 @@
     useIDTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     useIDTF.borderStyle = UITextBorderStyleNone;
     self.useIDTF = useIDTF;
+    useIDTF.delegate = self;
     [backView addSubview:useIDTF];
     
     //手机号
@@ -203,6 +214,7 @@
     useTelTF.keyboardType = UIKeyboardTypeNumberPad;
     useTelTF.borderStyle = UITextBorderStyleNone;
     self.useTelTF = useTelTF;
+    useTelTF.delegate = self;
     [backView addSubview:useTelTF];
     
     //社保卡
@@ -225,9 +237,10 @@
     useSSCardTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     useSSCardTF.borderStyle = UITextBorderStyleNone;
     self.useSSCardTF = useSSCardTF;
+    useSSCardTF.delegate = self;
     [backView addSubview:useSSCardTF];
     
-    backView.contentSize = CGSizeMake(WIDTH, HEIGHT * 1.1);
+    backView.contentSize = CGSizeMake(WIDTH, HEIGHT * 1.2);
     
 }
 

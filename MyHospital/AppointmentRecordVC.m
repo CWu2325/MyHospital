@@ -11,6 +11,8 @@
 #import "XyqsApi.h"
 #import "OrderRecord.h"
 #import "OrderDetailVC.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface AppointmentRecordVC ()
 
@@ -21,9 +23,20 @@
 
 @property(nonatomic,strong)UIRefreshControl *refreshControl;
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
 @implementation AppointmentRecordVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
+
 
 -(NSMutableArray *)recordDatas
 {
@@ -40,17 +53,11 @@
     self.title = @"预约记录";
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = LCWBackgroundColor;
-    
     self.navigationItem.rightBarButtonItem = nil;
     
     self.limit = 0;
     self.offset = 0;
-    
-    /**
-     *  集成下拉刷新
-     */
-   // [self setupRefresh];
-    
+
     
 }
 
@@ -75,59 +82,49 @@
  */
 -(void)refreshControl:(UIRefreshControl *)refreshControl
 {
-    [self loadNewRecoder];
+
 }
 
 
--(void)loadNewRecoder
-{
-//    self.limit += 10;
-//    self.offset = 0;
-//    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-//    [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
-//    [params setObject:@(self.limit) forKey:@"limit"];
-//    [params setObject:@(self.offset) forKey:@"offset"];
-//    
-//    [XyqsApi requestOrderRecordListWithParams:params andCallBack:^(id obj) {
-//        NSArray *newArr = obj;
-//        
-////        NSRange range = NSMakeRange(0, newArr.count);
-////        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
-////        
-////        [self.recordDatas insertObjects:newArr atIndexes:indexSet];
-//        for (OrderRecord *orderR in newArr)
-//        {
-//            if (![self.recordDatas containsObject:orderR])
-//            {
-//                [self.recordDatas insertObject:orderR atIndex:0];
-//            }
-//        }
-//        
-//
-//        [self.tableView reloadData];
-//        
-//        [self.refreshControl endRefreshing];
-//    }];
-}
 
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     self.limit += 10;
     self.offset = 0;
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
     [params setObject:@(self.limit) forKey:@"limit"];
     [params setObject:@(self.offset) forKey:@"offset"];
+
     
     [XyqsApi requestOrderRecordListWithParams:params andCallBack:^(id obj) {
         self.recordDatas = obj;
         [self.tableView reloadData];
     }];
 }
-
 
 
 #pragma mark - Table view data source

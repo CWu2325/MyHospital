@@ -22,6 +22,9 @@
 -(id)initWithFrame:(CGRect)frame WithAllString:(NSString *)allString WithEditString:(NSString *)editString WithColor:(UIColor *)color WithFont:(UIFont *)font
 
 {
+    
+    
+    
 //- (NSRange)rangeOfString:(NSString *)aString
     self = [super initWithFrame:frame];
     

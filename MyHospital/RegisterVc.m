@@ -8,7 +8,6 @@
 
 #import "RegisterVc.h"
 #import "GetAuthcodeVC.h"
-#import "Person.h"
 #import "XyqsApi.h"
 
 @interface RegisterVc ()
@@ -32,6 +31,14 @@
     
     [self initUI];
 }
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.useTelTF resignFirstResponder];
+    [self.usePasTF resignFirstResponder];
+    [self.useAgainPasTF resignFirstResponder];
+}
+
 
 -(void)initUI
 {

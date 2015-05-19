@@ -73,7 +73,6 @@
 		2E5B711C1ACD465B0049E291 /* Room.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5B711B1ACD465B0049E291 /* Room.m */; };
 		2E5B711F1ACD4DB90049E291 /* Doctor.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5B711E1ACD4DB90049E291 /* Doctor.m */; };
 		2E5BE3181AC8E66E006E3F22 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3171AC8E66E006E3F22 /* LoginViewController.m */; };
-		2E5BE31B1AC8F502006E3F22 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE31A1AC8F502006E3F22 /* Person.m */; };
 		2E5BE3221AC8F9FB006E3F22 /* PersonalVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE3211AC8F9FB006E3F22 /* PersonalVC.m */; };
 		2E5BE3311AC91BBC006E3F22 /* PersonInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE32F1AC91BBC006E3F22 /* PersonInfoCell.m */; };
 		2E5BE33B1AC92EB0006E3F22 /* XyqsApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 2E5BE33A1AC92EB0006E3F22 /* XyqsApi.m */; };
@@ -141,6 +140,7 @@
 		2EBA0F121AC542CB001FBFBC /* wlc.png in Resources */ = {isa = PBXBuildFile; fileRef = 2EBA0F111AC542CB001FBFBC /* wlc.png */; };
 		2EC6FB901AEF2F0800A8D2EA /* SelDeptVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EC6FB8F1AEF2F0800A8D2EA /* SelDeptVC.m */; };
 		2EC6FB931AEF6C5700A8D2EA /* SelHospitalVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EC6FB921AEF6C5700A8D2EA /* SelHospitalVC.m */; };
+		2EC7DBAE1B059AA100F1E8C4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2EC7DBAD1B059AA100F1E8C4 /* SystemConfiguration.framework */; };
 		2ECF902C1AEDCDC70026D0D4 /* Encrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ECF902B1AEDCDC70026D0D4 /* Encrypt.m */; };
 		2ECF90301AEDCF740026D0D4 /* GTMBase64.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ECF902E1AEDCF740026D0D4 /* GTMBase64.m */; };
 		2ECF93FD1AF7084300CC02AD /* MyFirstPageBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ECF93FC1AF7084300CC02AD /* MyFirstPageBtn.m */; };
@@ -172,6 +172,12 @@
 		2ED25B041AFC5CB10035196C /* MySelSickBtn.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED25B031AFC5CB10035196C /* MySelSickBtn.m */; };
 		2ED29ACC1AE4D9AE00889BE8 /* OrderDetailVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED29ACB1AE4D9AE00889BE8 /* OrderDetailVC.m */; };
 		2ED29ACF1AE4DB5400889BE8 /* OrderDetail.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED29ACE1AE4DB5400889BE8 /* OrderDetail.m */; };
+		2ED363171B0AFD22004260E6 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED363161B0AFD22004260E6 /* Person.m */; };
+		2ED3A3B91B098F8A00194E5D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED3A3B81B098F8A00194E5D /* Reachability.m */; };
+		2ED3A3BC1B09B0CC00194E5D /* NoNetworkView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED3A3BB1B09B0CC00194E5D /* NoNetworkView.m */; };
+		2ED3A3C01B09B48D00194E5D /* noNetHighLightedBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED3A3BD1B09B48D00194E5D /* noNetHighLightedBtn.png */; };
+		2ED3A3C11B09B48D00194E5D /* noNetWork.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED3A3BE1B09B48D00194E5D /* noNetWork.png */; };
+		2ED3A3C21B09B48D00194E5D /* noNetNormalBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED3A3BF1B09B48D00194E5D /* noNetNormalBtn.png */; };
 		2ED423BE1AD66BDC00E1B959 /* SelTimeVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED423BC1AD66BDC00E1B959 /* SelTimeVC.m */; };
 		2ED423C11AD67B7C00E1B959 /* background_login.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2ED423C01AD67B7C00E1B959 /* background_login.jpg */; };
 		2ED423C31AD67C0800E1B959 /* nav_background.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED423C21AD67C0800E1B959 /* nav_background.png */; };
@@ -324,8 +330,6 @@
 		2E5B711E1ACD4DB90049E291 /* Doctor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Doctor.m; sourceTree = "<group>"; };
 		2E5BE3161AC8E66E006E3F22 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		2E5BE3171AC8E66E006E3F22 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
-		2E5BE3191AC8F502006E3F22 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
-		2E5BE31A1AC8F502006E3F22 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		2E5BE3201AC8F9FB006E3F22 /* PersonalVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonalVC.h; sourceTree = "<group>"; };
 		2E5BE3211AC8F9FB006E3F22 /* PersonalVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PersonalVC.m; sourceTree = "<group>"; };
 		2E5BE32E1AC91BBC006E3F22 /* PersonInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonInfoCell.h; sourceTree = "<group>"; };
@@ -420,6 +424,7 @@
 		2EC6FB8F1AEF2F0800A8D2EA /* SelDeptVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelDeptVC.m; sourceTree = "<group>"; };
 		2EC6FB911AEF6C5700A8D2EA /* SelHospitalVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelHospitalVC.h; sourceTree = "<group>"; };
 		2EC6FB921AEF6C5700A8D2EA /* SelHospitalVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelHospitalVC.m; sourceTree = "<group>"; };
+		2EC7DBAD1B059AA100F1E8C4 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		2ECF902A1AEDCDC70026D0D4 /* Encrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Encrypt.h; sourceTree = "<group>"; };
 		2ECF902B1AEDCDC70026D0D4 /* Encrypt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Encrypt.m; sourceTree = "<group>"; };
 		2ECF902D1AEDCF740026D0D4 /* GTMBase64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GTMBase64.h; sourceTree = "<group>"; };
@@ -467,6 +472,15 @@
 		2ED29ACB1AE4D9AE00889BE8 /* OrderDetailVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderDetailVC.m; sourceTree = "<group>"; };
 		2ED29ACD1AE4DB5400889BE8 /* OrderDetail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderDetail.h; sourceTree = "<group>"; };
 		2ED29ACE1AE4DB5400889BE8 /* OrderDetail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderDetail.m; sourceTree = "<group>"; };
+		2ED363151B0AFD22004260E6 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		2ED363161B0AFD22004260E6 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		2ED3A3B71B098F8A00194E5D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		2ED3A3B81B098F8A00194E5D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		2ED3A3BA1B09B0CC00194E5D /* NoNetworkView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoNetworkView.h; sourceTree = "<group>"; };
+		2ED3A3BB1B09B0CC00194E5D /* NoNetworkView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NoNetworkView.m; sourceTree = "<group>"; };
+		2ED3A3BD1B09B48D00194E5D /* noNetHighLightedBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = noNetHighLightedBtn.png; sourceTree = "<group>"; };
+		2ED3A3BE1B09B48D00194E5D /* noNetWork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = noNetWork.png; sourceTree = "<group>"; };
+		2ED3A3BF1B09B48D00194E5D /* noNetNormalBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = noNetNormalBtn.png; sourceTree = "<group>"; };
 		2ED423BB1AD66BDC00E1B959 /* SelTimeVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelTimeVC.h; sourceTree = "<group>"; };
 		2ED423BC1AD66BDC00E1B959 /* SelTimeVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelTimeVC.m; sourceTree = "<group>"; };
 		2ED423C01AD67B7C00E1B959 /* background_login.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background_login.jpg; sourceTree = "<group>"; };
@@ -504,6 +518,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2EC7DBAE1B059AA100F1E8C4 /* SystemConfiguration.framework in Frameworks */,
 				2E8A4A1B1AC2AC9A00D37B1B /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -595,6 +610,8 @@
 		2E3F233E1AC39BF500F5BB5D /* 网络框架 */ = {
 			isa = PBXGroup;
 			children = (
+				2ED3A3B71B098F8A00194E5D /* Reachability.h */,
+				2ED3A3B81B098F8A00194E5D /* Reachability.m */,
 				18C8D8C21AFBA18800ED5F07 /* SDWebImage */,
 				2E3F233F1AC39C5500F5BB5D /* AFNetworking */,
 				2E3F23531AC39C5500F5BB5D /* UIKit+AFNetworking */,
@@ -714,8 +731,8 @@
 		2E5BE31C1AC8F509006E3F22 /* model */ = {
 			isa = PBXGroup;
 			children = (
-				2E5BE3191AC8F502006E3F22 /* Person.h */,
-				2E5BE31A1AC8F502006E3F22 /* Person.m */,
+				2ED363151B0AFD22004260E6 /* Person.h */,
+				2ED363161B0AFD22004260E6 /* Person.m */,
 			);
 			name = model;
 			sourceTree = "<group>";
@@ -773,6 +790,7 @@
 		2E8A49E51AC2AC7700D37B1B = {
 			isa = PBXGroup;
 			children = (
+				2EC7DBAD1B059AA100F1E8C4 /* SystemConfiguration.framework */,
 				2E8A4A1A1AC2AC9A00D37B1B /* MapKit.framework */,
 				2E8A49F01AC2AC7700D37B1B /* MyHospital */,
 				2E8A4A0D1AC2AC7800D37B1B /* MyHospitalTests */,
@@ -859,6 +877,8 @@
 				18319E7B1AD00971004F3520 /* MyNavigationController.m */,
 				18319E6C1ACFE7DC004F3520 /* NewfeatureVC.h */,
 				18319E6D1ACFE7DC004F3520 /* NewfeatureVC.m */,
+				2ED3A3BA1B09B0CC00194E5D /* NoNetworkView.h */,
+				2ED3A3BB1B09B0CC00194E5D /* NoNetworkView.m */,
 				184BFBC21AD2B99900AC075D /* MBProgressHUD */,
 				2E6688621ACA9D3A00D5AA7A /* RSA */,
 				2E5BE3381AC92E65006E3F22 /* 网络解析 */,
@@ -876,6 +896,9 @@
 		2E8A4ABA1AC2BAF200D37B1B /* pic */ = {
 			isa = PBXGroup;
 			children = (
+				2ED3A3BD1B09B48D00194E5D /* noNetHighLightedBtn.png */,
+				2ED3A3BE1B09B48D00194E5D /* noNetWork.png */,
+				2ED3A3BF1B09B48D00194E5D /* noNetNormalBtn.png */,
 				2EDB5A4E1B02E51000B5C4FB /* outtimePay.png */,
 				2E60D89D1B01FD2800CA564E /* selHeight.png */,
 				2E60D89E1B01FD2800CA564E /* selTimer.png */,
@@ -1134,6 +1157,7 @@
 				2E908F7A1AC4F7B6008513F3 /* sv04.jpg in Resources */,
 				2E8115711AFC76C600700B3C /* jiuyi2.png in Resources */,
 				2E3F237C1AC39D9200F5BB5D /* 深圳博爱妇幼医院.jpg in Resources */,
+				2ED3A3C01B09B48D00194E5D /* noNetHighLightedBtn.png in Resources */,
 				2E8A4A631AC2B1F200D37B1B /* bottom_more_icon_on@2x.png in Resources */,
 				2ED25ACA1AFC4F530035196C /* select.png in Resources */,
 				2ECF940C1AF7181400CC02AD /* firstPageBtn05.png in Resources */,
@@ -1160,6 +1184,7 @@
 				2ED4C0151AE110C600F9A425 /* 椭圆1@2x.png in Resources */,
 				2E8A4A5E1AC2B1F200D37B1B /* bottom_icon_guide_on@2x.png in Resources */,
 				2E3F23A71AC3EC4800F5BB5D /* 003_医生.jpg in Resources */,
+				2ED3A3C11B09B48D00194E5D /* noNetWork.png in Resources */,
 				184BFBC91AD2B99900AC075D /* MBProgressHUD.bundle in Resources */,
 				18319E761ACFE843004F3520 /* splash_img4.png in Resources */,
 				2ED25AC31AFC4A440035196C /* dingwei2.png in Resources */,
@@ -1189,6 +1214,7 @@
 				2ED4C0111AE10DDA00F9A425 /* goback_homepage@2x.png in Resources */,
 				2ED03C161AE5E8D000387191 /* man@2x.png in Resources */,
 				2ECF940B1AF7181400CC02AD /* firstPageBtn04.png in Resources */,
+				2ED3A3C21B09B48D00194E5D /* noNetNormalBtn.png in Resources */,
 				2EBA0F071AC533D9001FBFBC /* alarm_time_unselected.png in Resources */,
 				2ED03C171AE5E8D000387191 /* woman@2x.png in Resources */,
 				2ED8270C1AF899FD006E1EFF /* navBackground.png in Resources */,
@@ -1221,7 +1247,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2E59B5531AF0E3E9001C5C81 /* TimeoutAFHTTPRequestSerializer.m in Sources */,
-				2E5BE31B1AC8F502006E3F22 /* Person.m in Sources */,
 				2E5BE3311AC91BBC006E3F22 /* PersonInfoCell.m in Sources */,
 				2EC6FB931AEF6C5700A8D2EA /* SelHospitalVC.m in Sources */,
 				2EDD037C1AD8F4A5005F78FC /* Foundation+Log.m in Sources */,
@@ -1244,6 +1269,7 @@
 				2ED25B041AFC5CB10035196C /* MySelSickBtn.m in Sources */,
 				2ED19FCD1AD7B95200E16337 /* XyqsTools.m in Sources */,
 				2E8A4A331AC2AF7D00D37B1B /* AppointmentCell.m in Sources */,
+				2ED3A3BC1B09B0CC00194E5D /* NoNetworkView.m in Sources */,
 				2E3F23A01AC3EC0000F5BB5D /* SelDocCell.m in Sources */,
 				2E5BE3221AC8F9FB006E3F22 /* PersonalVC.m in Sources */,
 				2ED460741AE8CA71000C7E89 /* ProtocolVC.m in Sources */,
@@ -1273,6 +1299,7 @@
 				18C8D8E01AFBA18800ED5F07 /* UIButton+WebCache.m in Sources */,
 				2E8A4A4D1AC2AFC600D37B1B /* UIView+Extension.m in Sources */,
 				2EA788241AD3D6BB0050B6E0 /* TimeQuantum.m in Sources */,
+				2ED3A3B91B098F8A00194E5D /* Reachability.m in Sources */,
 				2ECF902C1AEDCDC70026D0D4 /* Encrypt.m in Sources */,
 				184BFBC81AD2B99900AC075D /* MBProgressHUD+MJ.m in Sources */,
 				184BFBC11AD0DFCB00AC075D /* MyTitleButton.m in Sources */,
@@ -1281,6 +1308,7 @@
 				2E3F23691AC39C5500F5BB5D /* AFSecurityPolicy.m in Sources */,
 				2ED19FCA1AD78AD700E16337 /* ResetPasConfirmVC.m in Sources */,
 				18BDCADF1AD6CBE500E9E720 /* AttentionDoctor.m in Sources */,
+				2ED363171B0AFD22004260E6 /* Person.m in Sources */,
 				18C8D8DC1AFBA18800ED5F07 /* SDWebImageDecoder.m in Sources */,
 				2E3F23721AC39C5500F5BB5D /* UIImageView+AFNetworking.m in Sources */,
 				2E5BE3181AC8E66E006E3F22 /* LoginViewController.m in Sources */,

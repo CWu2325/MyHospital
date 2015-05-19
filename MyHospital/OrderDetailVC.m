@@ -11,7 +11,8 @@
 #import "XyqsApi.h"
 #import "OrderDetail.h"
 #import "PayWebVC.h"
-
+#import "AppDelegate.h"
+#import "NoNetworkView.h"
 @interface OrderDetailVC ()<UIAlertViewDelegate>
 
 @property(nonatomic,strong)OrderDetail *orderDetail;
@@ -22,30 +23,74 @@
 @property(nonatomic,strong)UIButton *payButton;     //支付按钮
 @property(nonatomic,strong)UILabel *appointStatusLabel;     //预约状态
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
+@property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
 @implementation OrderDetailVC
 
-- (void)viewDidLoad
+-(NoNetworkView *)noNetView
 {
-    [super viewDidLoad];
-    
-    
-    
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        
+        [self.view addSubview:_noNetView];
+        
+    }
+    return _noNetView;
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
     [params setObject:@(self.orderList.orderListID) forKey:@"id"];
     [XyqsApi requestOrderDetailWithParams:params andCallBack:^(id obj) {
         self.orderDetail = obj;
         [self initUI];
-        if (self.orderDetail.orderState == 1)
+        if (self.orderDetail.orderState == 1 && self.orderDetail.leftTime > 0)
         {
             //右键取消
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(onClick:)];
         }
+        else
+        {
+            self.navigationItem.rightBarButtonItem = nil;
+        }
+        
         [self.view setNeedsDisplay];
     }];
+
 }
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+}
+    
+    
 
 -(void)initUI
 {
@@ -106,6 +151,11 @@
         case 5:
         {
             self.appointStatusLabel.text = @"已就诊";
+        }
+            break;
+        case 7:
+        {
+            self.appointStatusLabel.text = @"已取消";
         }
             break;
         default:
@@ -248,7 +298,7 @@
     diviLine3.y = sickTelLabel.maxY + 15;
     [baseSv addSubview:diviLine3];
 
-    if (self.orderDetail.orderState == 1)
+    if (self.orderDetail.orderState == 1 && self.orderDetail.leftTime >0)
     {
         if (self.orderDetail.payWay == 2)
         {
@@ -290,6 +340,25 @@
         }
     }
     
+    if (self.orderDetail.orderState == 7)
+    {
+        //提示标签
+        UILabel *timeLabel = [[UILabel alloc]init];
+        self.min = 14;
+        self.sec = 59;
+        timeLabel.textColor = [UIColor grayColor];
+        timeLabel.font = [UIFont systemFontOfSize:12];
+        timeLabel.text = @"您的预约未按时支付，已经被取消";
+        timeLabel.y = diviLine3.maxY + 15;
+        timeLabel.width = WIDTH - 45 * 2;
+        timeLabel.size = [XyqsTools getSizeByText:timeLabel.text andFont:timeLabel.font andWidth:WIDTH - 45 * 2];
+        timeLabel.textAlignment = NSTextAlignmentCenter;
+        timeLabel.numberOfLines = 0;
+        timeLabel.centerX = self.view.centerX;
+        [baseSv addSubview:timeLabel];
+    }
+    
+    
     baseSv.contentSize = CGSizeMake(WIDTH, HEIGHT * 1.2);
     
 }
@@ -330,23 +399,21 @@
     return newStr;
 }
 
+/**
+ *  支付功能
+ */
 -(void)aliPayAction:(UIButton *)button
 {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
     [params setValue:token forKey:@"token"];
     [params setValue:@(self.orderDetail.orderRecoderID) forKey:@"oid"];
-    
-    NSLog(@"%@",params);
-    
     [XyqsApi payWithparams:params andCallBack:^(id obj) {
         
         [self saveHtmlfile:obj];
         PayWebVC *webVC = [[PayWebVC alloc]init]; 
         [self.navigationController pushViewController:webVC animated:NO];
     }];
-    
-    
 }
 
 /**
@@ -357,13 +424,6 @@
     NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *path = [doc stringByAppendingPathComponent:@"pay.html"];
     [text writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
-}
-
-
--(void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-    [self.timer invalidate];
 }
 
 

@@ -52,20 +52,7 @@
 -(void)layoutSubviews
 {
     
-//    if (self.user.coverUrl != (NSString *)[NSNull null])
-//    {
-//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//            NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:self.user.coverUrl]];
-//            UIImage *image = [UIImage imageWithData:data];
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                self.useImageView.image = image;
-//            });
-//        });
-//    }
-//    else
-//    {
-//        self.useImageView.image = [UIImage imageNamed:@"default_avatar"];
-//    }
+
     
     if (self.user.coverUrl != (NSString *)[NSNull null])
     {

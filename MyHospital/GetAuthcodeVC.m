@@ -37,6 +37,12 @@
     self.navigationItem.rightBarButtonItem = nil;
 }
 
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.AuthcodeTF resignFirstResponder];
+}
+
+
 -(void)initUI
 {
     UIView *downView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 50)];

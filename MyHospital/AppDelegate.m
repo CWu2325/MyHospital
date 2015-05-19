@@ -10,6 +10,9 @@
 #import "TabBarVC.h"
 #import "NewfeatureVC.h"
 #import "AFNetworking.h"
+#import "Reachability.h"
+
+
 
 @interface AppDelegate ()
 
@@ -51,33 +54,37 @@
     /**
      *  监控网络情况
      */
-    AFNetworkReachabilityManager *manager = [AFNetworkReachabilityManager sharedManager];
-    
-    [manager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-        switch (status)
-        {
-            case AFNetworkReachabilityStatusUnknown:
-            case AFNetworkReachabilityStatusNotReachable:
-                [MBProgressHUD showError:@"亲~请检查您的网络连接"];
-                break;
-            case AFNetworkReachabilityStatusReachableViaWiFi:
-                [MBProgressHUD showSuccess:@"WIFI连接成功"];
-                break;
-            case AFNetworkReachabilityStatusReachableViaWWAN:
-                [MBProgressHUD showSuccess:@"手机网络连接成功"];
-                break;
-                
-            default:
-                break;
-        }
-    }];
-    
-    [manager startMonitoring];
+    //开启网络状况的监听
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
+    self.hostReach = [Reachability reachabilityWithHostName:@"www.baidu.com"] ;
+    //开始监听，会启动一个run loop
+    [self.hostReach startNotifier];
+
     
     return YES;
 }
 
-
+/**
+ * 网络监控的方法
+ */
+-(void)reachabilityChanged:(NSNotification *)note
+{
+    Reachability *currReach = [note object];
+    NSParameterAssert([currReach isKindOfClass:[Reachability class]]);
+    NetworkStatus status = [currReach currentReachabilityStatus];
+    self.isReachable = YES;
+    if (status == NotReachable)
+    {
+        [MBProgressHUD showError:@"没有网络连接"];
+        self.isReachable = NO;
+    }
+    
+    if (status == ReachableViaWiFi || status == ReachableViaWWAN)
+    {
+        [MBProgressHUD showSuccess:@"已连接到网络"];
+        self.isReachable = YES;
+    }
+}
 
 
 - (void)applicationWillResignActive:(UIApplication *)application

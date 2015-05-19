@@ -7,9 +7,9 @@
 
 
 #import "XyqsApi.h"
-#import "AFNetworking.h"
 #import "JsonParser.h"
 #import "User.h"
+#import "AFNetworking.h"
 #import "MBProgressHUD+MJ.h"
 
 @implementation XyqsApi
@@ -709,10 +709,7 @@
             {
                 [MBProgressHUD showSuccess:@"暂未关注任何医生"];
             }
-            else
-            {
-                [MBProgressHUD showSuccess:@"医生关注列表获取成功"];
-            }
+            
             callback(attentionDoctors);
         }
         else

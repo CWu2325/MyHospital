@@ -14,6 +14,8 @@
 #import "MyLeftBtn.h"
 #import "MyFirstPageBtn.h"
 #import "MyFBtn2.h"
+#import "AppDelegate.h"
+
 
 @interface FirstPageVC ()<CLLocationManagerDelegate,MyProtocol,UIScrollViewDelegate>
 
@@ -27,6 +29,9 @@
 @property(nonatomic,strong)NSArray *svImages;
 
 @end
+                                    ///Users/apple1/Desktop/5.html
+
+
 
 @implementation FirstPageVC
 
@@ -38,6 +43,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+
+    //开始定位
+    AppDelegate *appDlg = [UIApplication sharedApplication].delegate;
+    if (appDlg.isReachable)
+    {
+        [self.locMgr startUpdatingLocation];
+    }
+    
     
     self.svImages = @[@"sv01.jpg",@"sv02.jpg",@"sv03.jpg",@"sv04.jpg",@"sv05.jpg"];
     
@@ -66,9 +80,7 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-#pragma mark- ----------
-    //开始定位
-   // [self.locMgr startUpdatingLocation];
+
     
     NSString *cityName = nil;
     if ([[NSUserDefaults standardUserDefaults]objectForKey:@"selCityName"])
@@ -84,7 +96,7 @@
         }
         else
         {
-            cityName = @"宜昌";
+            cityName = @"深圳";
         }
     }
     self.selCityName = cityName;
@@ -274,9 +286,6 @@
     //根据偏移量得到当前界面的序号 并赋值 改变颜色
     self.pageControl.currentPage = index;
 }
-
-
-
 
 
 #pragma mark - 定位
