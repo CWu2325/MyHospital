@@ -10,6 +10,8 @@
 #import "Area.h"
 #import "XyqsApi.h"
 #import "TEXTLabel.h"
+#import "NoNetworkView.h"
+#import "AppDelegate.h"
 
 @interface SelAreaVC ()<UITableViewDataSource,UITableViewDelegate>
 
@@ -20,9 +22,64 @@
 @property(nonatomic,strong)NSMutableArray *leftArea;
 @property(nonatomic,strong)NSMutableArray *rightArea;
 
+@property(nonatomic,strong)NoNetworkView *noNetView;
+
+
 @end
 
 @implementation SelAreaVC
+-(NoNetworkView *)noNetView
+{
+    if (!_noNetView)
+    {
+        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
+        [self.view addSubview:_noNetView];
+    }
+    return _noNetView;
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        
+        [self requestData];
+    }
+    else
+    {
+        
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
+/**
+ *  网络请求
+ */
+-(void)requestData
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:@(0) forKey:@"parentId"];
+    //先请求数据
+    [XyqsApi requestCitiesListwithparams:params andCallBack:^(id obj) {
+        self.leftArea = obj;
+        [self.leftTableView reloadData];
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] != (NSString *)[NSNull null])
+        {
+            indexPath = [NSIndexPath indexPathForRow:[[[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] integerValue] inSection:0];
+        }
+        else
+        {
+            indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        }
+        [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
+        [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
+    }];
+}
 
 -(NSMutableArray *)leftArea
 {
@@ -56,28 +113,7 @@
     [self initTopTitle];
     
     self.navigationItem.rightBarButtonItem = nil;
-    
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:@(0) forKey:@"parentId"];
-    //先请求数据
-    [XyqsApi requestCitiesListwithparams:params andCallBack:^(id obj) {
-        self.leftArea = obj;
-        [self.leftTableView reloadData];
-        
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] != (NSString *)[NSNull null])
-        {
-            indexPath = [NSIndexPath indexPathForRow:[[[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] integerValue] inSection:0];
-        }
-        else
-        {
-            indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-        }
-        [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
-        [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
-    }];
-    
+
 }
 
 /**
@@ -161,13 +197,15 @@
         //保存用户选择的城市信息
         [[NSUserDefaults standardUserDefaults] setObject:self.locationCityName forKey:@"selCityName"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        
         [params setObject:self.locationCityName forKey:@"areaName"];
         [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
             Area *a = [[Area alloc]init];
             a.areaName = self.locationCityName;
             a.areaID = [obj longValue];
             [self.delegate passValue:a];
+            
+            [self saveAreaID:self.locationCityName];
+            
             [self.navigationController popViewControllerAnimated:NO];
         }];
     }
@@ -176,6 +214,27 @@
         [MBProgressHUD showError:@"自动定位失败，请手动选择城市"];
     }
 }
+
+/**
+ *  点击自动定位需要保存城市的ID，偏于下一次进来的定位图片显示的位置
+ */
+- ( void ) saveAreaID:(NSString *)name
+{
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    [params setObject:name forKey:@"areaName"];
+    
+    [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
+        
+        NSInteger areaID = [obj integerValue];
+        //保存用户选择的城市信息
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        [ud setInteger:areaID forKey:@"right"];
+        [ud synchronize];
+        
+    }];
+}
+
+
 
 #pragma mark -UITableViewDataSource数据源
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

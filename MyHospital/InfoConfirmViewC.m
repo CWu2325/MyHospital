@@ -503,11 +503,15 @@
                 [XyqsApi requestOrderNumWithParams: self.params andCallBack:^(id obj) {
                     //判断obj是否为空,也就是预约是否成功，成功就跳转页面，不成功就返回
                     NSDictionary *dic = obj;
+                    
+                    NSLog(@"%@",dic);
+                    
                     if (dic)
                     {
                         AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
                         vc.orderNum = [dic objectForKey:@"orderId"];
                         vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
+                        vc.oid = [[dic objectForKey:@"oid"] longValue];
                         vc.doctor = self.doctor;
                         if (self.member)
                         {

@@ -8,6 +8,8 @@
 
 #import "AppRecordCell.h"
 #import "UIImageView+AFNetworking.h"
+#import "XyqsApi.h"
+#import "PayWebVC.h"
 
 @interface AppRecordCell()
 
@@ -294,18 +296,22 @@
 
 -(void)selAction:(UIButton *)sender
 {
-    [MBProgressHUD showError:@"支付功能待完善"];
-}
-
-
-- (void)awakeFromNib {
-    // Initialization code
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+//    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+//    NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
+//    [params setValue:token forKey:@"token"];
+//    [params setValue:@(self.orderList.orderListID) forKey:@"oid"];
+//    [XyqsApi payWithparams:params andCallBack:^(id obj) {
+//        
+//        [self saveHtmlfile:obj];
+//        PayWebVC *webVC = [[PayWebVC alloc]init];
+//        [self.navigationController pushViewController:webVC animated:NO];
+//    }];
     
-    // Configure the view for the selected state
+    [self.delegate myTabVClick:self];
 }
+
+
+
+
 
 @end

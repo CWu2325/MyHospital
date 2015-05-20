@@ -12,6 +12,7 @@
 #import "XyqsApi.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "PayWebVC.h"
 
 @interface AlipayConfirmVC ()
 @property(nonatomic,strong)NSTimer *timer;
@@ -258,22 +259,30 @@
         [baseSv addSubview:button];
         
         //提示标签
+        UILabel *timeLabel0 = [[UILabel alloc]init];
+        timeLabel0.text = @"您已经预约成功，支付方式是支付宝支付，请在";
+        timeLabel0.font = [UIFont systemFontOfSize:11];
+        timeLabel0.textColor = [UIColor grayColor];
+        timeLabel0.size = [XyqsTools getSizeByText:timeLabel0.text andFont:timeLabel0.font andWidth:WIDTH - 44.5 * 2];
+        timeLabel0.y = button.maxY + 15;
+        timeLabel0.centerX = self.view.centerX;
+        [baseSv addSubview:timeLabel0];
+        
         UILabel *timeLabel = [[UILabel alloc]init];
         self.min = 14;
         self.sec = 59;
         timeLabel.textColor = [UIColor grayColor];
-        timeLabel.font = [UIFont systemFontOfSize:12];
+        timeLabel.font = timeLabel0.font;
         NSString *editStr = [NSString stringWithFormat:@"%d分%d秒",self.min,self.sec];
-        NSString *allStr = [NSString stringWithFormat:@"您已经预约成功,支付方式是支付宝支付,请在%@内完成支付,超时您的预约将被取消。",editStr];
+        NSString *allStr = [NSString stringWithFormat:@"%@内完成支付，超时您的预约将被取消。",editStr];
         NSMutableAttributedString *text = [[NSMutableAttributedString alloc]initWithString:allStr];
         [text addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
         timeLabel.attributedText = text;
-        timeLabel.y = button.maxY + 15;
-        timeLabel.width = WIDTH - 45 * 2;
-        timeLabel.size = [XyqsTools getSizeByText:timeLabel.text andFont:timeLabel.font andWidth:WIDTH - 45 * 2];
+        timeLabel.y = timeLabel0.maxY + 3;
+        timeLabel.width = timeLabel0.width + 10 ;
+        timeLabel.height = timeLabel0.height;
         timeLabel.textAlignment = NSTextAlignmentLeft;
-        timeLabel.numberOfLines = 0;
-        timeLabel.centerX = self.view.centerX;
+        timeLabel.x = timeLabel0.x;
         self.timeLabel = timeLabel;
         [baseSv addSubview:timeLabel];
         
@@ -297,28 +306,51 @@
         [timer invalidate];
         self.payButton.enabled = NO;
         [self.payButton setBackgroundImage:[UIImage imageNamed:@"outtimePay.png"] forState:UIControlStateNormal];
-         label.text = @"您的预约未按时支付,已经被取消";
+         label.text = @"您的预约未按时支付，已经被取消";
         label.textAlignment = NSTextAlignmentCenter;
         self.appointStatusLabel.text = @"已取消";
         return;
     }
     NSString *editStr = [NSString stringWithFormat:@"%d分%d秒",self.min,self.sec];
-    NSString *allStr = [NSString stringWithFormat:@"您已预约成功,支付方式是支付宝支付,请在%@内完成支付,超时您的预约将被取消。",editStr];
+    NSString *allStr = [NSString stringWithFormat:@"%@内完成支付，超时您的预约将被取消",editStr];
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc]initWithString:allStr];
     [text addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
     label.attributedText = text;
 
 }
 
-
+/**
+ *  支付按钮的点击事件
+ */
 - (void)aliPayAction:(id)sender
 {
-    [MBProgressHUD showError:@"待完善"];
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
+    [params setValue:token forKey:@"token"];
+    [params setValue:@(self.oid) forKey:@"oid"];
+    [XyqsApi payWithparams:params andCallBack:^(id obj) {
+        
+        [self saveHtmlfile:obj];
+        PayWebVC *webVC = [[PayWebVC alloc]init];
+        [self.navigationController pushViewController:webVC animated:NO];
+    }];
     
 }
 
+/**
+ *  写html文件并保持在沙盒中
+ */
+-(void)saveHtmlfile:(NSString *)text
+{
+    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *path = [doc stringByAppendingPathComponent:@"pay.html"];
+    [text writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
 
 
+/**
+ *  导航栏右上角的完成按钮
+ */
 -(void)doneAction
 {
     [self.navigationController popToRootViewControllerAnimated:NO];

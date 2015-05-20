@@ -13,8 +13,9 @@
 #import "OrderDetailVC.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "PayWebVC.h"
 
-@interface AppointmentRecordVC ()
+@interface AppointmentRecordVC ()<MyTableViewCellDelegate>
 
 @property(nonatomic,strong)NSMutableArray *recordDatas;
 
@@ -145,8 +146,41 @@
     }
     OrderRecord *orderList = self.recordDatas[indexPath.row];
     cell.orderList = orderList;
+    cell.delegate = self;
+
     return cell;
 }
+
+/**
+ *  实现自定义cell的button的代理事件
+ */
+-(void)myTabVClick:(UITableViewCell *)cell
+{
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    OrderRecord *orderList = self.recordDatas[indexPath.row];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
+    [params setValue:token forKey:@"token"];
+    [params setValue:@(orderList.orderListID) forKey:@"oid"];
+    [XyqsApi payWithparams:params andCallBack:^(id obj) {
+        [self saveHtmlfile:obj];
+        PayWebVC *webVC = [[PayWebVC alloc]init];
+        [self.navigationController pushViewController:webVC animated:NO];
+    }];
+
+}
+
+/**
+ *  写html文件并保持在沙盒中
+ */
+-(void)saveHtmlfile:(NSString *)text
+{
+    NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *path = [doc stringByAppendingPathComponent:@"pay.html"];
+    [text writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {

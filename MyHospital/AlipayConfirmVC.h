@@ -23,6 +23,7 @@
 
 @property(nonatomic,strong)NSString *orderNum;      //如果预约成功则有值为预约号
 @property(nonatomic)long leftTime;                     //剩余时间
+@property(nonatomic)long oid;                       //订单主键id
 
 @property(nonatomic)int radioBtn;       //支付方式的单选值
 

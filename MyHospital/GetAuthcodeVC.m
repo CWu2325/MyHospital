@@ -133,8 +133,8 @@
 //    [self.view addSubview:protocolBtn];
     UILabel *protocolLabel = [[UILabel alloc]init];
     
-    NSString *editStr = @"我同意就医无忧医疗";
-    NSString *allStr = @"我同意就医无忧医疗《用户协议和隐私条款》";
+    NSString *editStr = @"我同意就医无忧";
+    NSString *allStr = @"我同意就医无忧《用户协议和隐私条款》";
     NSMutableAttributedString *str = [[NSMutableAttributedString alloc] initWithString:allStr];
     [str addAttribute:NSForegroundColorAttributeName value:[UIColor lightGrayColor] range:[allStr rangeOfString:editStr]];
     protocolLabel.attributedText = str;

@@ -29,7 +29,7 @@
 @property(nonatomic,strong)NSArray *svImages;
 
 @end
-                                    ///Users/apple1/Desktop/5.html
+                               
 
 
 
@@ -45,12 +45,7 @@
     [super viewDidLoad];
     
 
-    //开始定位
-    AppDelegate *appDlg = [UIApplication sharedApplication].delegate;
-    if (appDlg.isReachable)
-    {
-        [self.locMgr startUpdatingLocation];
-    }
+    
     
     
     self.svImages = @[@"sv01.jpg",@"sv02.jpg",@"sv03.jpg",@"sv04.jpg",@"sv05.jpg"];
@@ -81,6 +76,8 @@
 {
     [super viewWillAppear:animated];
 
+    //开始定位
+    [self.locMgr startUpdatingLocation];
     
     NSString *cityName = nil;
     if ([[NSUserDefaults standardUserDefaults]objectForKey:@"selCityName"])
@@ -320,7 +317,7 @@
         }
         else
         {
-            [MBProgressHUD showError:(NSString *)error];
+            [MBProgressHUD showError:@"GPS定位失败"];
         }
     }];
 }
@@ -334,13 +331,13 @@
     if ([error code] == kCLErrorDenied)
     {
         //访问被拒绝
-        [MBProgressHUD showError:@"访问被拒绝"];
+        [MBProgressHUD showError:@"GPS访问被拒绝"];
         
     }
     if ([error code] == kCLErrorLocationUnknown)
     {
         //无法获取位置信息
-        [MBProgressHUD showError:@"无法获取位置信息"];
+        [MBProgressHUD showError:@"GPS无法获取位置信息"];
     }
 }
 

@@ -12,6 +12,8 @@
 #import "AFNetworking.h"
 #import "MBProgressHUD+MJ.h"
 
+#define REMINDTEXT @"请检查网络连接或稍后再试"
+
 @implementation XyqsApi
 
 //获取本地保存的token
@@ -28,6 +30,7 @@
     
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
+    manager.requestSerializer.timeoutInterval = 10.f;
     
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         
@@ -44,7 +47,7 @@
         }
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-       [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+       [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -55,6 +58,7 @@
     NSDictionary *params = @{@"mobile":mobile,@"password":password};
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
+    manager.requestSerializer.timeoutInterval = 10.f;
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
         
@@ -70,7 +74,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -81,11 +85,12 @@
     NSDictionary *params = @{@"mobile":mobile};
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
+    manager.requestSerializer.timeoutInterval = 10.f;
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
         callback(dic);
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -96,7 +101,7 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
     [manager.requestSerializer willChangeValueForKey:@"timeoutInterval"];
-    manager.requestSerializer.timeoutInterval = 10;
+    manager.requestSerializer.timeoutInterval = 10.f;
     [manager.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
@@ -109,7 +114,7 @@
             [MBProgressHUD showError:[dic objectForKey:@"message"]];
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -121,7 +126,7 @@
     NSDictionary *params = @{@"token":token};
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager.requestSerializer willChangeValueForKey:@"timeoutInterval"];
-    manager.requestSerializer.timeoutInterval = 10;
+    manager.requestSerializer.timeoutInterval = 10.f;
     [manager.requestSerializer didChangeValueForKey:@"timeoutInterval"];
     
     
@@ -139,7 +144,7 @@
             [MBProgressHUD showError:[dic objectForKey:@"message"]];
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -150,7 +155,7 @@
     NSString *path = @"http://14.29.84.4:6060/0.1/user/update_user";
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     [manager setResponseSerializer:[AFHTTPResponseSerializer serializer]];
-    
+    manager.requestSerializer.timeoutInterval = 10.f;
     [MBProgressHUD showMessage:@"正在加载"];
     [manager POST:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
@@ -165,7 +170,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -208,7 +213,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -245,6 +250,7 @@
     [manager GET:path parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObject options:0 error:nil];
         [MBProgressHUD hideHUD];
+ 
         if ([[dic objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [dic objectForKey:@"data"];
@@ -257,7 +263,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -292,7 +298,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -323,7 +329,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -354,7 +360,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-       [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+       [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -383,7 +389,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -410,7 +416,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
     
 }
@@ -436,7 +442,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -462,7 +468,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -487,7 +493,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -516,7 +522,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -540,7 +546,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -563,7 +569,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -585,7 +591,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -610,7 +616,7 @@
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -632,7 +638,7 @@
             [MBProgressHUD showError:[dic objectForKey:@"message"]];
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [MBProgressHUD showError:@"网络繁忙,请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -662,7 +668,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -688,7 +694,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -719,7 +725,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -748,7 +754,7 @@
         
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         [MBProgressHUD hideHUD];
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
 }
 
@@ -776,7 +782,7 @@
          
      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
 
-         [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+         [MBProgressHUD showError:REMINDTEXT];
      }];
 }
 
@@ -801,7 +807,7 @@
             [MBProgressHUD showError:[dic objectForKey:@"message"]];
         }
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        [MBProgressHUD showError:@"服务器繁忙，请稍后再试"];
+        [MBProgressHUD showError:REMINDTEXT];
     }];
     
 }

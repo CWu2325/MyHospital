@@ -9,8 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "OrderRecord.h"
 
+@protocol MyTableViewCellDelegate <NSObject>
+
+-(void)myTabVClick:(UITableViewCell *)cell;
+
+@end
+
+
 @interface AppRecordCell : UITableViewCell
 
 @property(nonatomic,strong)OrderRecord *orderList;
+
+@property(nonatomic,weak)id<MyTableViewCellDelegate>delegate;
 
 @end
