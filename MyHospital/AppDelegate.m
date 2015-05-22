@@ -49,7 +49,6 @@
         [ud setObject:currentVersion forKey:versionKey];
         [ud synchronize];
     }
-    [self.window makeKeyAndVisible];
     
     /**
      *  监控网络情况
@@ -59,8 +58,11 @@
     self.hostReach = [Reachability reachabilityWithHostName:@"www.baidu.com"] ;
     //开始监听，会启动一个run loop
     [self.hostReach startNotifier];
-
     
+
+    [self.window makeKeyAndVisible];
+    
+
     return YES;
 }
 
@@ -75,7 +77,7 @@
     self.isReachable = YES;
     if (status == NotReachable)
     {
-        [MBProgressHUD showError:@"没有网络连接"];
+        [MBProgressHUD showError:@"无法连接网络"];
         self.isReachable = NO;
     }
     

@@ -8,7 +8,8 @@
 
 #import "SelAreaVC.h"
 #import "Area.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "TEXTLabel.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
@@ -23,6 +24,7 @@
 @property(nonatomic,strong)NSMutableArray *rightArea;
 
 @property(nonatomic,strong)NoNetworkView *noNetView;
+
 
 
 @end
@@ -40,19 +42,9 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
-    {
-        self.noNetView.hidden = YES;
-        
-        [self requestData];
-    }
-    else
-    {
-        
-        self.noNetView.hidden = NO;
-        [self.view bringSubviewToFront:self.noNetView];
-    }
+    [super viewWillAppear:animated];
+    
+   
 }
 
 /**
@@ -62,23 +54,26 @@
 {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:@(0) forKey:@"parentId"];
+    
     //先请求数据
-    [XyqsApi requestCitiesListwithparams:params andCallBack:^(id obj) {
-        self.leftArea = obj;
-        [self.leftTableView reloadData];
-        
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
-        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] != (NSString *)[NSNull null])
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/area/list" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
-            indexPath = [NSIndexPath indexPathForRow:[[[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] integerValue] inSection:0];
+            self.leftArea = [JsonParser parseAreaByDictionary:responseObj];
+            [self.leftTableView reloadData];
         }
         else
         {
-            indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
-        [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
-        [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
+
 }
 
 -(NSMutableArray *)leftArea
@@ -113,8 +108,32 @@
     [self initTopTitle];
     
     self.navigationItem.rightBarButtonItem = nil;
-
+    
+    //判断网络情况
+    [self judgeNetWork];
 }
+
+
+
+/**
+ *  判断网络情况
+ */
+-(void)judgeNetWork
+{
+    //网络请求
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
+}
+
 
 /**
  *  初始化表格
@@ -163,7 +182,6 @@
     titleLabel.userInteractionEnabled = YES;
     [self.view addSubview:titleLabel];
     
-    
     //分割线
     UIView *view1 = [[UIView alloc]init];
     view1.x = 0;
@@ -182,7 +200,6 @@
     [titleBtn addTarget:self action:@selector(onClick) forControlEvents:UIControlEventTouchUpInside];
     [titleBtn setBackgroundImage:[UIImage imageWithColor:[UIColor colorWithRed:220.0/255 green:220.0/255 blue:220.0/255 alpha:0.5]] forState:UIControlStateHighlighted];
     [self.view addSubview:titleBtn];
-    
 }
 
 /**
@@ -198,15 +215,34 @@
         [[NSUserDefaults standardUserDefaults] setObject:self.locationCityName forKey:@"selCityName"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [params setObject:self.locationCityName forKey:@"areaName"];
-        [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
-            Area *a = [[Area alloc]init];
-            a.areaName = self.locationCityName;
-            a.areaID = [obj longValue];
-            [self.delegate passValue:a];
-            
-            [self saveAreaID:self.locationCityName];
-            
-            [self.navigationController popViewControllerAnimated:NO];
+        
+        [self saveAreaID:self.locationCityName];
+        
+        //根据城市名称返回城市ID
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                Area *a = [[Area alloc]init];
+                a.areaName = self.locationCityName;
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                a.areaID  = [[dataDic objectForKey:@"areaId"] longValue];
+           
+                [self.delegate passValue:a];
+                
+                
+                
+                [self.navigationController popViewControllerAnimated:NO];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
     }
     else
@@ -222,15 +258,30 @@
 {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:name forKey:@"areaName"];
-    
-    [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
-        
-        NSInteger areaID = [obj integerValue];
-        //保存用户选择的城市信息
-        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-        [ud setInteger:areaID forKey:@"right"];
-        [ud synchronize];
-        
+    //根据城市名称返回城市ID
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            NSInteger areaID  = [[dataDic objectForKey:@"areaId"] longValue];
+            NSInteger parentId  = [[dataDic objectForKey:@"parentId"] longValue];
+            
+            //保存用户选择的城市信息
+            NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+            [ud setInteger:areaID forKey:@"right"];
+            [ud setInteger:parentId forKey:@"left"];
+            [ud synchronize];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
 }
 
@@ -270,11 +321,21 @@
 
         Area *a = self.leftArea[indexPath.row];
         cell.textLabel.text = a.areaName;
-        cell.backgroundColor = [UIColor colorWithRed:232.0/255 green:235.0/255 blue:234.0/255 alpha:1];
-        cell.selectedBackgroundView = [[UIView alloc]initWithFrame:cell.frame];
-
-        cell.selectedBackgroundView.backgroundColor = [UIColor whiteColor];
         
+        UIView *backView = [[UIView alloc]initWithFrame:cell.bounds];
+        backView.backgroundColor = [UIColor colorWithRed:232.0/255 green:235.0/255 blue:234.0/255 alpha:1];
+        cell.backgroundView = backView;
+        
+        UIView *selBackView = [[UIView alloc]initWithFrame:cell.bounds];
+        selBackView.backgroundColor = [UIColor whiteColor];
+        cell.selectedBackgroundView = selBackView;
+        if (a.areaID == [[NSUserDefaults standardUserDefaults] integerForKey:@"left"])
+        {
+            [self tableView:tableView didSelectRowAtIndexPath:indexPath];
+            [tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
+        }
+        
+
         return cell;
     }
     else
@@ -299,8 +360,6 @@
             cell.accessoryView = nil;
             //cell.accessoryType = UITableViewCellAccessoryNone;
         }
-        
-        
         return cell;
     }
 }
@@ -311,17 +370,33 @@
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     if (tableView == self.leftTableView)
     {
-        NSString *leftIndexPathRow = [NSString stringWithFormat:@"%ld",(long)indexPath.row];
-        [ud setObject: leftIndexPathRow forKey:@"leftIndexPathRow"];
-        [ud synchronize];
+        
         
         Area *a = self.leftArea[indexPath.row];
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
         [params setObject:@(a.areaID) forKey:@"parentId"];
+        
+
+        
+        [ud setInteger:a.areaID forKey:@"left"];
+        [ud synchronize];
         //先请求数据
-        [XyqsApi requestCitiesListwithparams:params andCallBack:^(id obj) {
-            self.rightArea = obj;
-            [self.rightTableView reloadData];
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/area/list" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                self.rightArea = [JsonParser parseAreaByDictionary:responseObj];
+                [self.rightTableView reloadData];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
     }
     else
@@ -331,7 +406,7 @@
         [self.delegate passValue:a];
         
         [ud setObject: a.areaName forKey:@"selCityName"];
-        
+
         //保存用户选择的城市信息
         [ud setInteger:a.areaID forKey:@"right"];
         [ud synchronize];

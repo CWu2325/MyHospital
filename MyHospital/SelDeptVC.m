@@ -10,10 +10,11 @@
 #import "HeaderView.h"
 #import "Hospital.h"
 #import "Room.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 #import "SelDoctorVC.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "JsonParser.h"
 
 @interface SelDeptVC ()<UITableViewDataSource,UITableViewDelegate>
 
@@ -59,19 +60,9 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
-    {
-        self.noNetView.hidden = YES;
-        
-        [self requestData];
-    }
-    else
-    {
-
-        self.noNetView.hidden = NO;
-        [self.view bringSubviewToFront:self.noNetView];
-    }
+    [super viewWillAppear:animated];
+    
+    
 }
 
 
@@ -86,7 +77,18 @@
     //初始化表格
     [self initTable];
     
-    
+    //判断网络连接
+    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
+    if (appDlg.isReachable)
+    {
+        self.noNetView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        self.noNetView.hidden = NO;
+        [self.view bringSubviewToFront:self.noNetView];
+    }
 }
 
 /**
@@ -98,41 +100,58 @@
     NSMutableDictionary *params0 = [NSMutableDictionary dictionary];
     [params0 setObject:@(0) forKey:@"deptId"];      //默认从0
     [params0 setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
-    [XyqsApi requestDeptsWithParams:params0 andCallBack:^(id obj) {
-        self.leftDepts = obj;
-        [self.leftTableView reloadData];
-        
-        if (self.leftDepts.count > 0)
+    
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/dept" params:params0 success:^(id responseObj) {
+        if (responseObj)
         {
-            //添加预约期限
-            UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 90, WIDTH, 30)];
-            label.text = [NSString stringWithFormat:@"今天可预约%@(含)以前的号源",self.hospital.orderLimitDate];
-            label.textAlignment = NSTextAlignmentCenter;
-            label.textColor = LCWBottomColor;
-            label.font = [UIFont systemFontOfSize:10];
-            [self.view addSubview:label];
-            //分割线
-            UIImageView *diviIv = [[UIImageView alloc]initWithFrame:CGRectMake(0, 119, WIDTH, 1)];
-            diviIv.backgroundColor = LCWDivisionLineColor;
-            [self.view addSubview:diviIv];
-            
-            //让表格自动打开
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
-            if ([[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] != (NSString *)[NSNull null])
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
-                indexPath = [NSIndexPath indexPathForRow:[[[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] integerValue] inSection:0];
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                self.leftDepts = [JsonParser parseRoomByDictionary:dataDic];
+                [self.leftTableView reloadData];
+                if (self.leftDepts.count > 0)
+                {
+                    //添加预约期限
+                    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 90, WIDTH, 30)];
+                    label.text = [NSString stringWithFormat:@"今天可预约%@(含)以前的号源",self.hospital.orderLimitDate];
+                    label.textAlignment = NSTextAlignmentCenter;
+                    label.textColor = LCWBottomColor;
+                    label.font = [UIFont systemFontOfSize:10];
+                    [self.view addSubview:label];
+                    //分割线
+                    UIImageView *diviIv = [[UIImageView alloc]initWithFrame:CGRectMake(0, 119, WIDTH, 1)];
+                    diviIv.backgroundColor = LCWDivisionLineColor;
+                    [self.view addSubview:diviIv];
+                    
+                    //让表格自动打开
+                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+                    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] != (NSString *)[NSNull null])
+                    {
+                        indexPath = [NSIndexPath indexPathForRow:[[[NSUserDefaults standardUserDefaults] objectForKey:@"leftIndexPathRow"] integerValue] inSection:0];
+                    }
+                    else
+                    {
+                        indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                    }
+                    
+                    if (indexPath.row <= self.leftDepts.count)
+                    {
+                        [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
+                        [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
+                    }
+                    
+                }
             }
             else
             {
-                indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
             }
-            
-            if (indexPath.row <= self.leftDepts.count)
-            {
-                [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
-                [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
-            }
-            
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
         }
     }];
 }
@@ -237,18 +256,36 @@
             NSMutableDictionary *params1 = [NSMutableDictionary dictionary];
             [params1 setObject:@(a.roomID) forKey:@"deptId"];
             [params1 setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
-            [XyqsApi requestDeptsWithParams:params1 andCallBack:^(id obj) {
-                self.rightDepts = obj;
-                if (self.rightDepts.count > 0)
+            
+            [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/dept" params:params1 success:^(id responseObj) {
+                if (responseObj)
                 {
-                    self.rightTableView.hidden = NO;
-                    [self.rightTableView reloadData];
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                        self.rightDepts = [JsonParser parseRoomByDictionary:dataDic];
+                        [self.rightTableView reloadData];
+                        if (self.rightDepts.count > 0)
+                        {
+                            self.rightTableView.hidden = NO;
+                            [self.rightTableView reloadData];
+                        }
+                        else
+                        {
+                            self.rightTableView.hidden = YES;
+                        }
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                    }
                 }
-                else
+            } failure:^(NSError *error) {
+                if (error)
                 {
-                    self.rightTableView.hidden = YES;
+                    self.noNetView.hidden = NO;
                 }
-                
             }];
         }
         

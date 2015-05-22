@@ -7,7 +7,8 @@
 //
 
 #import "MemberInfoVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 
 @interface MemberInfoVC ()<UITextFieldDelegate,UIScrollViewDelegate>
 @property(nonatomic,strong)UITextField *nameTF;
@@ -15,6 +16,7 @@
 @property(nonatomic,strong)UITextField *useIDTF;
 @property(nonatomic,strong)UITextField *useTelTF;
 @property(nonatomic,strong)UITextField *useSSCardTF;
+@property(nonatomic,strong)UITextField *sexTF;
 
 @property(nonatomic,strong)UIButton *sexBtn;
 
@@ -48,11 +50,11 @@
     }
     else
     {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"编辑"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"保存"  style:UIBarButtonItemStylePlain target:self action:@selector(rightBarModified:)];
         if (self.member.name != (NSString *)[NSNull null])
         {
             self.nameTF.text = self.member.name;
-            self.nameTF.userInteractionEnabled = NO;
+          //  self.nameTF.userInteractionEnabled = NO;
         }
         
         [self.sexBtn setEnabled:NO];
@@ -61,29 +63,29 @@
         if ([self.member.sex intValue] == 2)
         {
             
-            self.sexLabel.text = @"女";
+            self.sexTF.text = @"女";
         }
         else
         {
-            self.sexLabel.text = @"男";
+            self.sexTF.text = @"男";
         }
         
         if (self.member.idCard != (NSString *)[NSNull null])
         {
             self.useIDTF.text = self.member.idCard;
-            self.useIDTF.userInteractionEnabled = NO;
+           // self.useIDTF.userInteractionEnabled = NO;
         }
         
         if (self.member.mobile != (NSString *)[NSNull null])
         {
             self.useTelTF.text = self.member.mobile;
-            self.useTelTF.userInteractionEnabled = NO;
+           // self.useTelTF.userInteractionEnabled = NO;
         }
         
         if (self.member.sscard != (NSString *)[NSNull null])
         {
             self.useSSCardTF.text = self.member.sscard;
-            self.useSSCardTF.userInteractionEnabled = NO;
+           // self.useSSCardTF.userInteractionEnabled = NO;
         }
     }
 }
@@ -150,21 +152,24 @@
     label2.textAlignment = NSTextAlignmentCenter;
     [backView addSubview:label2];
     
-    UILabel *sexLabel = [[UILabel alloc]init];
-    sexLabel.text = @"男";
-    sexLabel.x = nameTF.x ;
-    sexLabel.y = label2.y;
-    sexLabel.width = 50;
-    sexLabel.height = label2.height;
-    sexLabel.font = label2.font;
-    self.sexLabel = sexLabel;
-    [backView addSubview:sexLabel];
+    UITextField *sexTF = [[UITextField alloc]init];
+    sexTF.x = nameTF.x;
+    sexTF.y = label2.y;
+    sexTF.height = label2.height;
+    sexTF.width = 150;
+    sexTF.placeholder = @"请选择性别(必选)";
+    sexTF.font = label2.font;
+    sexTF.userInteractionEnabled = NO;
+    sexTF.borderStyle = UITextBorderStyleNone;
+    self.sexTF = sexTF;
+    sexTF.delegate = self;
+    [backView addSubview:sexTF];
     
     UIButton *sexBtn = [[UIButton alloc]init];
     sexBtn.width = 80;
     sexBtn.height = 40;
     sexBtn.x = WIDTH - 10-sexBtn.width;
-    sexBtn.centerY = sexLabel.centerY;
+    sexBtn.centerY = sexTF.centerY;
     sexBtn.tag = 0;
     [sexBtn setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
     [sexBtn addTarget:self action:@selector(changeSex:) forControlEvents:UIControlEventTouchUpInside];
@@ -248,13 +253,13 @@
 {
     if (sender.tag == 0)
     {
-        self.sexLabel.text = @"女";
+        self.sexTF.text = @"女";
         [sender setImage:[UIImage imageNamed:@"woman"] forState:UIControlStateNormal];
         sender.tag = 1;
     }
     else
     {
-        self.sexLabel.text = @"男";
+        self.sexTF.text = @"男";
         [sender setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
         sender.tag = 0;
     }
@@ -305,7 +310,7 @@
     else if(![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[1][3-8]+\\d{9}"] evaluateWithObject:self.useTelTF.text])
     {
         [MBProgressHUD showError:@"亲~您输入的不是手机号码"];
-        self.useTelTF.text = @"";
+       // self.useTelTF.text = @"";
         return ;
     }
     else
@@ -318,22 +323,30 @@
         [params setObject:self.useSSCardTF.text  forKey:@"sscard"];
     }
     
-    NSString *sex = [self.sexLabel.text isEqualToString:@"男"]?@"1":@"2";
+    NSString *sex = [self.sexTF.text isEqualToString:@"男"]?@"1":@"2";
     [params setObject:sex  forKey:@"sex"];
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
     
-    [XyqsApi addCommonMemberWithParams:params andCallBack:^(id obj){
-        NSString *message = obj;
-        if ([message isEqualToString:@"操作成功"])
+    //添加常用预约人
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/create_member" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
         {
-            [MBProgressHUD showSuccess:@"添加成员成功"];
-            [self.navigationController popViewControllerAnimated:NO];
+            if ([[responseObj objectForKey:@"message"] isEqualToString:@"操作成功"])
+            {
+                [MBProgressHUD showSuccess:@"添加成员成功"];
+                [self.navigationController popViewControllerAnimated:NO];
+            }
         }
         else
         {
-            [MBProgressHUD showError:message];
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
-    }]; 
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查网络连接"];
+        }
+    }];
 }
 
 //修改功能
@@ -409,7 +422,7 @@
         }
         
         //性别
-        if ([self.sexLabel.text isEqualToString:@"男"])
+        if ([self.sexTF.text isEqualToString:@"男"])
         {
             [params setObject:@(1) forKey:@"sex"];
         }
@@ -423,16 +436,24 @@
         
         [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
         
-        [XyqsApi updateCommonMemberWithParams:params andCallBack:^(id obj){
-            NSString *message = obj;
-            if ([message isEqualToString:@"操作成功"])
+        //更新常用预约人资料
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_member" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
             {
-                [MBProgressHUD showSuccess:@"修改成员成功"];
-                [self.navigationController popViewControllerAnimated:NO];
+                if ([[responseObj objectForKey:@"message"]isEqualToString:@"操作成功"])
+                {
+                    [MBProgressHUD showSuccess:@"修改成员成功"];
+                    [self.navigationController popViewControllerAnimated:NO];
+                }
             }
             else
             {
-                [MBProgressHUD showError:message];
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                //=---------------------------------
             }
         }];
 

@@ -8,7 +8,7 @@
 
 #import "ResetPasVC.h"
 #import "ResetPasConfirmVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 
 @interface ResetPasVC ()
 
@@ -66,6 +66,7 @@
     self.useTelTF.placeholder = @"请输入手机号码";
     self.useTelTF.borderStyle = UITextBorderStyleNone;
     [self.useTelTF becomeFirstResponder];
+    self.useTelTF.keyboardType = UIKeyboardTypeNumberPad;
     self.useTelTF.clearButtonMode = UITextFieldViewModeWhileEditing;
     [downView addSubview:self.useTelTF];
     
@@ -148,8 +149,11 @@
         [MBProgressHUD showError:@"请输入正确的手机号"];
         return;
     }
-    [XyqsApi verifyTelWithMobile:self.useTelTF.text andCallBack:^(id obj) {
-        if ([obj objectForKey:@"message"] != (NSString *)[NSNull null] && [[obj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
+    
+    //验证电话号码是否可用
+    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
+        if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
         {
             sender.tag = 2;
             self.seconds = 60;
@@ -170,22 +174,34 @@
             [params setObject:@(2) forKey:@"type"];
             [params setObject:@"true" forKey:@"test"];
             
-            [XyqsApi getVerifycodeWithparams:params andCallBack:^(id obj) {
-                
-                if (obj)
+            //发送验证码
+            [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj2) {
+                if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
                 {
-                    [MBProgressHUD showSuccess:obj];
+                    [MBProgressHUD showSuccess:[responseObj2 objectForKey:@"message"]];
+                }
+                else
+                {
+                    [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                }
+            } failure:^(NSError *error) {
+                if (error)
+                {
+                    [MBProgressHUD showError:@"请检查您的网络连接"];
                 }
             }];
-            
         }
         else
         {
             [MBProgressHUD showError:@"用户不存在"];
             return ;
         }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
     }];
-
 }
 
 //倒计时
@@ -198,10 +214,17 @@
         [timer invalidate];
         self.getAuthcodeBtn.enabled = YES;
         [label removeFromSuperview];
-        self.getAuthcodeBtn.tag = 1;
+        
+        [self performSelector:@selector(delayBtnTag) withObject:nil afterDelay:300];
+        
         return;
     }
     label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
+}
+
+-(void)delayBtnTag
+{
+    self.getAuthcodeBtn.tag = 1;
 }
 
 -(void)next
@@ -241,22 +264,44 @@
     [params setObject:self.rsgisterTF.text forKey:@"code"];
     [params setObject:@"1" forKey:@"step"];
     
-    [XyqsApi verifyTelWithMobile:self.useTelTF.text andCallBack:^(id obj) {
-        if ([obj objectForKey:@"message"] != (NSString *)[NSNull null] && [[obj objectForKey:@"message"] isEqualToString:@"该号码已被注册"]) {
-            [XyqsApi resetPwdFirstWithparams:params andCallBack:^(id obj) {
-          
-                NSDictionary *dataDic = [obj objectForKey:@"data"];
-                NSString *resetToken = [dataDic objectForKey:@"token"];
-                //跳转
-                ResetPasConfirmVC *vc = [[ResetPasConfirmVC alloc]init];
-                vc.resetToken = resetToken;
-                [self.navigationController pushViewController:vc animated:NO];
+    
+    //验证电话号码是否可用
+    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
+        if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
+        {
+            [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj2) {
+
+                
+                if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
+                {
+                    NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
+                    NSString *resetToken = [dataDic objectForKey:@"token"];
+                    //跳转
+                    ResetPasConfirmVC *vc = [[ResetPasConfirmVC alloc]init];
+                    vc.resetToken = resetToken;
+                    [self.navigationController pushViewController:vc animated:NO];
+                }
+                else
+                {
+                    [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                }
+            } failure:^(NSError *error2) {
+                if (error2)
+                {
+                    [MBProgressHUD showError:@"请检查您的网络连接"];
+                }
             }];
         }
         else
         {
             [MBProgressHUD showError:@"用户不存在"];
             return ;
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
         }
     }];
 

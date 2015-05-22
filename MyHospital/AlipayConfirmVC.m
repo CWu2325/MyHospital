@@ -9,10 +9,10 @@
 #define MYFONT [UIFont systemFontOfSize:15]
 
 #import "AlipayConfirmVC.h"
-#import "XyqsApi.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
 #import "PayWebVC.h"
+#import "HttpTool.h"
 
 @interface AlipayConfirmVC ()
 @property(nonatomic,strong)NSTimer *timer;
@@ -21,7 +21,7 @@
 @property(nonatomic,strong)UIButton *payButton;     //支付按钮
 @property(nonatomic,strong)UILabel *appointStatusLabel;     //预约状态
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
-
+@property(nonatomic,strong)UILabel *timeLabel0;          //提醒文字
 @property(nonatomic,strong)NoNetworkView *noNetView;
 
 @end
@@ -53,6 +53,8 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
     if (appDlg.isReachable)
     {
@@ -266,6 +268,7 @@
         timeLabel0.size = [XyqsTools getSizeByText:timeLabel0.text andFont:timeLabel0.font andWidth:WIDTH - 44.5 * 2];
         timeLabel0.y = button.maxY + 15;
         timeLabel0.centerX = self.view.centerX;
+        self.timeLabel0 = timeLabel0;
         [baseSv addSubview:timeLabel0];
         
         UILabel *timeLabel = [[UILabel alloc]init];
@@ -307,12 +310,14 @@
         self.payButton.enabled = NO;
         [self.payButton setBackgroundImage:[UIImage imageNamed:@"outtimePay.png"] forState:UIControlStateNormal];
          label.text = @"您的预约未按时支付，已经被取消";
+        label.y = self.timeLabel0.y;
+        [self.timeLabel0 removeFromSuperview];
         label.textAlignment = NSTextAlignmentCenter;
         self.appointStatusLabel.text = @"已取消";
         return;
     }
     NSString *editStr = [NSString stringWithFormat:@"%d分%d秒",self.min,self.sec];
-    NSString *allStr = [NSString stringWithFormat:@"%@内完成支付，超时您的预约将被取消",editStr];
+    NSString *allStr = [NSString stringWithFormat:@"%@内完成支付，超时您的预约将被取消。",editStr];
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc]initWithString:allStr];
     [text addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
     label.attributedText = text;
@@ -328,13 +333,30 @@
     NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
     [params setValue:token forKey:@"token"];
     [params setValue:@(self.oid) forKey:@"oid"];
-    [XyqsApi payWithparams:params andCallBack:^(id obj) {
-        
-        [self saveHtmlfile:obj];
-        PayWebVC *webVC = [[PayWebVC alloc]init];
-        [self.navigationController pushViewController:webVC animated:NO];
-    }];
     
+    /**
+     *  银联wap支付
+     */
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/pay/unionpay_wap" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            NSDictionary *htmldic = [responseObj objectForKey:@"data"];
+            [self saveHtmlfile:[htmldic objectForKey:@"html"]];
+            PayWebVC *webVC = [[PayWebVC alloc]init];
+            [self.navigationController pushViewController:webVC animated:NO];
+            
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
+    }];    
 }
 
 /**

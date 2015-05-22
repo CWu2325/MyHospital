@@ -8,7 +8,7 @@
 
 #import "RegisterVc.h"
 #import "GetAuthcodeVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 
 @interface RegisterVc ()
 
@@ -188,8 +188,11 @@
         return ;
     }
     
-    [XyqsApi verifyTelWithMobile:self.useTelTF.text andCallBack:^(id obj) {
-        if ([[obj objectForKey:@"returnCode"]isEqual: @(1001)])
+    //验证电话号码是否可用
+    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj)
+    {
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
         {
             GetAuthcodeVC *vc = [[GetAuthcodeVC alloc]init];
             Person *person = [[Person alloc]init];
@@ -200,10 +203,16 @@
         }
         else
         {
-            [MBProgressHUD showError:[obj objectForKey:@"message"]];
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
             return ;
         }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
     }];
+
 }
 
 

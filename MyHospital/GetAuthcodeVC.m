@@ -7,7 +7,7 @@
 //
 
 #import "GetAuthcodeVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 #import "PersonalVC.h"
 #import "LoginViewController.h"
 #import "ProtocolVC.h"
@@ -202,14 +202,21 @@
     [params setObject:self.person.mobile forKey:@"mobile"];
     [params setObject:@(1) forKey:@"type"];     //注册的类型
     [params setObject:@"true" forKey:@"test"];
-    
-    [XyqsApi getVerifycodeWithparams:params andCallBack:^(id obj) {
-        if (obj)
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
-            [MBProgressHUD showSuccess:obj];
+            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
         }
     }];
-    
 }
 
 //倒计时
@@ -222,10 +229,16 @@
         [timer invalidate];
         self.getAuthcodeBtn.enabled = YES;
         [label removeFromSuperview];
-        self.getAuthcodeBtn.tag = 1;
+        [self performSelector:@selector(delayBtnTag) withObject:nil afterDelay:300];
         return;
     }
     label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
+}
+
+
+-(void)delayBtnTag
+{
+    self.getAuthcodeBtn.tag = 1;
 }
 
 
@@ -248,17 +261,32 @@
         [MBProgressHUD showError:@"亲~你未同意条款哦"];
         return;
     }
-
-    [XyqsApi requestTelLoginWithMobile:self.person.mobile andPassword:self.person.password andCode:self.AuthcodeTF.text andCallBack:^(id obj) {
-        [MBProgressHUD showSuccess:@"恭喜您已注册成功"];
-        for (UIViewController *controller in self.navigationController.viewControllers)
+    
+    //注册功能
+    NSDictionary *params = @{@"mobile":self.person.mobile,@"password":self.person.password,@"code":self.AuthcodeTF.text};
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_regist" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
         {
-            if ([controller isKindOfClass:[LoginViewController class]])
+           // NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            //NSString *token = [dataDic objectForKey:@"token"];
+            [MBProgressHUD showSuccess:@"恭喜您已注册成功"];
+            for (UIViewController *controller in self.navigationController.viewControllers)
             {
-                [self.navigationController popToViewController:controller animated:NO];
+                if ([controller isKindOfClass:[LoginViewController class]])
+                {
+                    [self.navigationController popToViewController:controller animated:NO];
+                }
             }
         }
-       
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
     }];
 }
 

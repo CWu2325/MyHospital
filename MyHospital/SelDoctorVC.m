@@ -7,7 +7,8 @@
 //
 
 #import "SelDoctorVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "Doctor.h"
 #import "TEXTLabel.h"
 #import "HeaderView.h"
@@ -38,6 +39,8 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
     if (appDlg.isReachable)
     {
@@ -62,21 +65,36 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:@(self.depts.roomID) forKey:@"deptId"];
     [params setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
-    [XyqsApi requestDoctorWithParams:params andCallBack:^(id obj){
-        self.doctors = obj;
-        [self.tableView reloadData];
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/doctor" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            self.doctors = [JsonParser parseDoctorByDictionary:dataDic];
+            [self.tableView reloadData];
+            
+            //添加标签
+            UIView *bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, HEIGHT - 32 - 64, WIDTH, 32)];
+            bottomView.backgroundColor = [UIColor whiteColor];
+            [self.view addSubview:bottomView];
+            NSString *text = [NSString stringWithFormat:@"共 %d 位医生",self.doctors.count];
+            TEXTLabel *footerLabel = [[TEXTLabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 32) WithAllString:text WithEditString:[NSString stringWithFormat:@"%d",self.doctors.count] WithColor:LCWBottomColor WithFont:[UIFont systemFontOfSize:12]];
+            footerLabel.textAlignment = NSTextAlignmentCenter;
+            footerLabel.size = [XyqsTools getSizeWithText:footerLabel.text andFont:footerLabel.font];
+            footerLabel.centerY = bottomView.height/2;
+            footerLabel.centerX = bottomView.width/2;
+            [bottomView addSubview:footerLabel];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
         
-        //添加标签
-        UIView *bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, HEIGHT - 32 - 64, WIDTH, 32)];
-        bottomView.backgroundColor = [UIColor whiteColor];
-        [self.view addSubview:bottomView];
-        NSString *text = [NSString stringWithFormat:@"共 %d 位医生",self.doctors.count];
-        TEXTLabel *footerLabel = [[TEXTLabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 32) WithAllString:text WithEditString:[NSString stringWithFormat:@"%d",self.doctors.count] WithColor:LCWBottomColor WithFont:[UIFont systemFontOfSize:12]];
-        footerLabel.textAlignment = NSTextAlignmentCenter;
-        footerLabel.size = [XyqsTools getSizeWithText:footerLabel.text andFont:footerLabel.font];
-        footerLabel.centerY = bottomView.height/2;
-        footerLabel.centerX = bottomView.width/2;
-        [bottomView addSubview:footerLabel];
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
 }
 

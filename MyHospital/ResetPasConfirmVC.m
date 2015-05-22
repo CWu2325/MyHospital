@@ -7,7 +7,7 @@
 //
 
 #import "ResetPasConfirmVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 
 @interface ResetPasConfirmVC ()
 
@@ -145,10 +145,24 @@
     [params setObject:self.usePasTF.text forKey:@"password"];
     [params setObject:@"2" forKey:@"step"];
     
-    [XyqsApi resetPwdFirstWithparams:params andCallBack:^(id obj) {
-        [MBProgressHUD showSuccess:[obj objectForKey:@"message"]];
-        [self.navigationController popToRootViewControllerAnimated:NO];
+    //重置密码
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
     }];
+
   
 }
 

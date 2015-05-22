@@ -7,7 +7,8 @@
 //
 
 #import "CommonAppointmentVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "comMember.h"
 #import "MemberInfoVC.h"
 #import "User.h"
@@ -57,6 +58,8 @@
 
 -(void)viewDidAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
     if (appDlg.isReachable)
     {
@@ -79,51 +82,92 @@
  */
 -(void)requestData
 {
+    //如果是从选择预约人界面跳转过来的
+    NSDictionary *params = @{@"token":[XyqsTools getToken]};
     
     if ([self.fromWhere isEqualToString:@"A"] )
     {
-        //如果是从选择预约人界面跳转过来的
-        [XyqsApi requestCommonAppointInfoAndCallBack:^(id obj) {
-            self.members = obj;
-            [XyqsApi requestUserInfoWithToken:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] andCallBack:^(id obj) {
-                User *user = obj;
-                comMember *member = [[comMember alloc]init];
-                if (user.name != (NSString *)[NSNull null])
-                {
-                    member.name = user.name;
-                }
-                
-                member.comID = @"0";        //就诊人ID，0代表自己
-                
-                if (user.mobile != (NSString *)[NSNull null])
-                {
-                    member.mobile = user.mobile;
-                }
-                
-                if (user.idCard != (NSString *)[NSNull null])
-                {
-                    member.idCard = user.idCard;
-                }
-                
-                if (user.sscard != (NSString *)[NSNull null])
-                {
-                    member.sscard = user.sscard;
-                }
-                
-                [self.members insertObject:member atIndex:0];
-                
-                //[self.members addObject:member];
-                [self.tableView reloadData];
-                
-            }];
+        //获取常用预约人息接口
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/memberinfo" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                self.members = [JsonParser parseCommonMemberByDictionary:dataDic];
+                //再获取个人信息加入到预约人列表中
+                [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj2) {
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
+                        User *user = [JsonParser parseUserByDictionary:dataDic];
+                        comMember *member = [[comMember alloc]init];
+                        if (user.name != (NSString *)[NSNull null])
+                        {
+                            member.name = user.name;
+                        }
+                        
+                        member.comID = @"0";        //就诊人ID，0代表自己
+                        
+                        if (user.mobile != (NSString *)[NSNull null])
+                        {
+                            member.mobile = user.mobile;
+                        }
+                        
+                        if (user.idCard != (NSString *)[NSNull null])
+                        {
+                            member.idCard = user.idCard;
+                        }
+                        
+                        if (user.sscard != (NSString *)[NSNull null])
+                        {
+                            member.sscard = user.sscard;
+                        }
+                        
+                        [self.members insertObject:member atIndex:0];
+                        [self.tableView reloadData];
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                    }
+                } failure:^(NSError *error) {
+                    if (error)
+                    {
+                        self.noNetView.hidden = NO;                    }
+                }];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
-        
     }
     else
     {
-        [XyqsApi requestCommonAppointInfoAndCallBack:^(id obj) {
-            self.members = obj;
-            [self.tableView reloadData];
+        //获取常用预约人息接口
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/memberinfo" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                self.members = [JsonParser parseCommonMemberByDictionary:dataDic];
+                [self.tableView reloadData];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
     }
 }
@@ -233,9 +277,25 @@
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
         [params setObject:m.comID forKey:@"mberId"];
         [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
-        [XyqsApi removeCommonMemberWithParams:params andCallBack:^(id obj) {
-            [MBProgressHUD showSuccess:obj];
+        
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/remove_member" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+                
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
+        
         
         [self.appointDatas removeObject:self.appointDatas[indexPath.row]];
         

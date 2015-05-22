@@ -8,7 +8,7 @@
 
 #import "LoginViewController.h"
 #import "RegisterVc.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 #import "ResetPasVC.h"
 #import "PersonalVC.h"
 #import "TabBarVC.h"
@@ -210,17 +210,16 @@
         return;
     }
         //登录
-        [XyqsApi requestTelLoginWithMobile:self.useTelTF.text andPassword:self.usePasTF.text andCallBack:^(id obj) {
-            //登录成功后返回个人信息界面
-            NSDictionary *tokenDic = obj;
-            
-            NSString *token = [tokenDic objectForKey:@"token"];
-            
-            
+     NSDictionary *params = @{@"mobile":self.useTelTF.text,@"password":self.usePasTF.text};
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_login" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+        {
+            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            NSDictionary *tokenDic = [dataDic objectForKey:@"token"];
             //保存用户登录的手机号码
             [[NSUserDefaults standardUserDefaults] setObject:self.useTelTF.text forKey:@"telNumber"];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            
+            NSString *token = [tokenDic objectForKey:@"token"];
             if (token)
             {
                 
@@ -230,8 +229,17 @@
                 [self.delegate passvalue:self.useTelTF.text];
                 [self.navigationController popViewControllerAnimated:NO];
             }
-        }];;
-    
+        }
+        else
+        {
+            [MBProgressHUD showError:@"用户名或密码错误"];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
+    }];
 }
 
 //跳转到注册界面

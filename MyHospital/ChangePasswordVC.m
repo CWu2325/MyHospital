@@ -7,7 +7,7 @@
 //
 
 #import "ChangePasswordVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 
 @interface ChangePasswordVC ()
 
@@ -175,9 +175,22 @@
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
     [params setObject:self.oldPasTF.text forKey:@"oldPass"];
     [params setObject:self.changePasTF.text forKey:@"newPass"];
-    [XyqsApi changePasswordWithparams:params andCallBack:^(id obj) {
-        [MBProgressHUD showSuccess:obj];
-        [self.navigationController popViewControllerAnimated:NO];
+    
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_pwd" params:params success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+            [self.navigationController popViewControllerAnimated:NO];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            [MBProgressHUD showError:@"请检查您的网络连接"];
+        }
     }];
 }
 

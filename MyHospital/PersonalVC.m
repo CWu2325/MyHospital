@@ -9,7 +9,8 @@
 #import "PersonalVC.h"
 #import "LoginViewController.h"
 #import "PersonInfoCell.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "CommonAppointmentVC.h"
 #import "AppointmentRecordVC.h"
 #import "MyAttentionVC.h"
@@ -56,7 +57,7 @@
 {
     [super viewWillAppear:animated];
     //判断是否是登录的用户，如果不是就跳转到登录界面
-    if (![XyqsApi isLogin])
+    if (![XyqsTools isLogin])
     {
         //如果没有登录，就跳转到登录界面
         LoginViewController *loginVc = [[LoginViewController alloc]init];
@@ -65,10 +66,24 @@
     }
     else
     {
+        NSDictionary *params = @{@"token":[XyqsTools getToken]};
         //如果登录了，就获取个人账户资料，刷新本界面
-        [XyqsApi requestUserInfoWithToken:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] andCallBack:^(id obj) {
-            self.user = obj;
-            [self.tableView reloadData];
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                self.user = [JsonParser parseUserByDictionary:dataDic];
+                [self.tableView reloadData];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@""];
+            }
         }];
     }
 }

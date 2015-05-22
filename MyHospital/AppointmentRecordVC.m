@@ -8,7 +8,8 @@
 
 #import "AppointmentRecordVC.h"
 #import "AppRecordCell.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "OrderRecord.h"
 #import "OrderDetailVC.h"
 #import "NoNetworkView.h"
@@ -120,10 +121,22 @@
     [params setObject:@(self.limit) forKey:@"limit"];
     [params setObject:@(self.offset) forKey:@"offset"];
 
-    
-    [XyqsApi requestOrderRecordListWithParams:params andCallBack:^(id obj) {
-        self.recordDatas = obj;
-        [self.tableView reloadData];
+    //获取预约记录列表
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/list" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            self.recordDatas = [JsonParser parseOrderListByDictionary:responseObj];
+            [self.tableView reloadData];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;        }
     }];
 }
 
@@ -163,12 +176,27 @@
     NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
     [params setValue:token forKey:@"token"];
     [params setValue:@(orderList.orderListID) forKey:@"oid"];
-    [XyqsApi payWithparams:params andCallBack:^(id obj) {
-        [self saveHtmlfile:obj];
-        PayWebVC *webVC = [[PayWebVC alloc]init];
-        [self.navigationController pushViewController:webVC animated:NO];
+    
+    //支付
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/pay/unionpay_wap" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            NSDictionary *htmldic = [responseObj objectForKey:@"data"];
+            [self saveHtmlfile:[htmldic objectForKey:@"html"]];
+            PayWebVC *webVC = [[PayWebVC alloc]init];
+            [self.navigationController pushViewController:webVC animated:NO];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
-
 }
 
 /**

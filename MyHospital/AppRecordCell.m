@@ -8,7 +8,6 @@
 
 #import "AppRecordCell.h"
 #import "UIImageView+AFNetworking.h"
-#import "XyqsApi.h"
 #import "PayWebVC.h"
 
 @interface AppRecordCell()

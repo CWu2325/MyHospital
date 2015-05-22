@@ -1,21 +1,26 @@
 //
-//  NoNetworkView.m
+//  TimeoutView.m
 //  MyHospital
 //
-//  Created by XYQS on 15/5/18.
+//  Created by apple on 15/5/20.
 //  Copyright (c) 2015年 XYQS. All rights reserved.
 //
 
-#import "NoNetworkView.h"
+#import "TimeoutView.h"
 #import "AppDelegate.h"
-
-@interface NoNetworkView()
+@interface TimeoutView()
 
 @property(nonatomic,strong)AppDelegate *appDlg;
+@property(nonatomic,strong)UIImageView *noNetWorkImageView;
+@property(nonatomic,strong)UILabel *remindLabel;
+@property(nonatomic,strong)UIButton *resetBtn;
 
 @end
 
-@implementation NoNetworkView
+@implementation TimeoutView
+
+
+
 
 -(instancetype)initWithFrame:(CGRect)frame
 {
@@ -29,7 +34,7 @@
 
 -(void)initUI
 {
-    UIImageView *noNetWorkIv = [[UIImageView alloc]initWithFrame:CGRectMake(0, 127 + 64, 50, 50)];
+    UIImageView *noNetWorkIv = [[UIImageView alloc]initWithFrame:CGRectMake(0, 127, 50, 50)];
     noNetWorkIv.image = [UIImage imageNamed:@"noNetWork.png"];
     noNetWorkIv.centerX = self.centerX;
     self.noNetWorkImageView = noNetWorkIv;
@@ -37,7 +42,7 @@
     
     
     UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
-    label.text = @"无网络连接,请联网后重试!";
+    label.text = @"网络请求超时,请稍后再试!";
     label.textColor = [UIColor grayColor];
     label.font = [UIFont systemFontOfSize:12];
     label.textAlignment = NSTextAlignmentCenter;
@@ -74,9 +79,5 @@
         [MBProgressHUD showError:@"亲~请检查您的网络连接"];
     }
 }
-
-
-
-
 
 @end

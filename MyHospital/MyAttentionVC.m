@@ -8,7 +8,8 @@
 
 #import "MyAttentionVC.h"
 #import "MyAttentionCell.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "SelTimeVC.h"
 #import "AppDelegate.h"
 #import "NoNetworkView.h"
@@ -89,9 +90,26 @@
     [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
     [params setObject:@(10) forKey:@"limit"];
     [params setObject:@(0) forKey:@"offset"];
-    [XyqsApi requestAttentionDoctorListwithparams:params andCallBack:^(id obj) {
-        self.myAttentionArr = obj;
-        [self.tableView reloadData];
+    //获取关注的医生列表
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/doctor" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            self.myAttentionArr = [JsonParser parseAttentionDoctorByDictionary:responseObj];
+            [self.tableView reloadData];
+            if (self.myAttentionArr.count == 0)
+            {
+                [MBProgressHUD showSuccess:@"暂未关注任何医生"];
+            }
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;        }
     }];
 }
 

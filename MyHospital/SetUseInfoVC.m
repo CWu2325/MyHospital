@@ -7,7 +7,7 @@
 //
 
 #import "SetUseInfoVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
 #import "AFNetworking.h"
 #import "UIImageView+WebCache.h"
 #import "AppDelegate.h"
@@ -20,14 +20,17 @@
 @interface SetUseInfoVC ()<UITextFieldDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate>
 @property(nonatomic,strong)UIImageView *userImageView;
 @property(nonatomic,strong)UITextField *nameTF;
-@property(nonatomic,strong)UILabel *sexLabel;
+
 @property(nonatomic,strong)UITextField *useIDTF;
 @property(nonatomic,strong)UITextField *useTelTF;
 @property(nonatomic,strong)UITextField *useSSCardTF;
 @property(nonatomic,strong)UITextField *addressTF;
 @property(nonatomic,strong)UIButton *sexBtn;        //选择性别的btn
+@property(nonatomic,strong)UITextField *sexTF;          //性别
 @property(nonatomic,strong)UIView *backView;        //承载的基础view
 @property(nonatomic,strong)NoNetworkView *noNetView;
+
+
 @end
 
 @implementation SetUseInfoVC
@@ -107,12 +110,12 @@
         
         if (self.user.Sex == 2)
         {
-            self.sexLabel.text = @"女";
+            self.sexTF.text = @"女";
             [self.sexBtn setImage:[UIImage imageNamed:@"woman"] forState:UIControlStateNormal];
         }
         else
         {
-            self.sexLabel.text = @"男";
+            self.sexTF.text = @"男";
             [self.sexBtn setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
         }
         
@@ -233,21 +236,24 @@
     label2.textAlignment = NSTextAlignmentCenter;
     [baseSV addSubview:label2];
     
-    UILabel *sexLabel = [[UILabel alloc]init];
-    sexLabel.text = @"男";
-    sexLabel.x = nameTF.x ;
-    sexLabel.y = label2.y;
-    sexLabel.width = 50;
-    sexLabel.height = label2.height;
-    sexLabel.font = label2.font;
-    self.sexLabel = sexLabel;
-    [baseSV addSubview:sexLabel];
+    UITextField *sexTF = [[UITextField alloc]init];
+    sexTF.x = nameTF.x;
+    sexTF.y = label2.y;
+    sexTF.height = label2.height;
+    sexTF.width = 150;
+    sexTF.placeholder = @"请选择性别(必选)";
+    sexTF.font = label2.font;
+    sexTF.userInteractionEnabled = NO;
+    sexTF.borderStyle = UITextBorderStyleNone;
+    self.sexTF = sexTF;
+    sexTF.delegate = self;
+    [baseSV addSubview:sexTF];
     
     UIButton *sexBtn = [[UIButton alloc]init];
     sexBtn.width = 80;
     sexBtn.height = 40;
     sexBtn.x = WIDTH - 10-sexBtn.width;
-    sexBtn.centerY = sexLabel.centerY;
+    sexBtn.centerY = sexTF.centerY;
     sexBtn.tag = 0;
     [sexBtn setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
     [sexBtn addTarget:self action:@selector(changeSex:) forControlEvents:UIControlEventTouchUpInside];
@@ -355,13 +361,13 @@
     {
         if (sender.tag == 0)
         {
-            self.sexLabel.text = @"女";
+            self.sexTF.text = @"女";
             [sender setImage:[UIImage imageNamed:@"woman"] forState:UIControlStateNormal];
             sender.tag = 1;
         }
         else
         {
-            self.sexLabel.text = @"男";
+            self.sexTF.text = @"男";
             [sender setImage:[UIImage imageNamed:@"man"] forState:UIControlStateNormal];
             sender.tag = 0;
         }
@@ -436,7 +442,7 @@
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
     
     //性别
-    if ([self.sexLabel.text isEqualToString:@"男"])
+    if ([self.sexTF.text isEqualToString:@"男"])
     {
         [params setObject:@(1)  forKey:@"sex"];
     }
@@ -445,13 +451,24 @@
         [params setObject:@(2)  forKey:@"sex"];
     }
     
-    [XyqsApi updateUserInfoWithParams:params andCallBack:^(id obj) {
-        [MBProgressHUD showSuccess:obj];
-        [self.navigationController popViewControllerAnimated:NO];
-        
+    //设置个人信心
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+        {
+            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+            [self.navigationController popViewControllerAnimated:NO];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
-    
-    
 }
 
 //查看或修改个人资料
@@ -522,7 +539,7 @@
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
     
     //性别
-    if ([self.sexLabel.text isEqualToString:@"男"])
+    if ([self.sexTF.text isEqualToString:@"男"])
     {
         [params setObject:@(1)  forKey:@"sex"];
     }
@@ -531,11 +548,23 @@
         [params setObject:@(2)  forKey:@"sex"];
     }
     
-    [XyqsApi updateUserInfoWithParams:params andCallBack:^(id obj) {
-        [MBProgressHUD showSuccess:obj];
-        
-        [self.navigationController popToRootViewControllerAnimated:NO];
-        
+    //设置个人信心
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+        {
+            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+            [self.navigationController popToRootViewControllerAnimated:NO];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
 }
 

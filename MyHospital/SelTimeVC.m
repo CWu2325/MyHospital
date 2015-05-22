@@ -12,7 +12,8 @@
 #define LCWAttentionColor [UIColor colorWithRed:233/255.0 green:214/255.0 blue:49/255.0 alpha:1]
 
 #import "SelTimeVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "Schedules.h"
 #import "LoginViewController.h"
 #import "InfoConfirmViewC.h"
@@ -20,6 +21,7 @@
 #import "SetUseInfoVC.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "HttpTool.h"
 
 
 @interface SelTimeVC ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
@@ -100,12 +102,28 @@
     
     
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    if ([XyqsApi isLogin])
+    if ([XyqsTools isLogin])
     {
         [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
-        [XyqsApi requestUserInfoWithToken:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] andCallBack:^(id obj) {
-            self.user = obj;
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                self.user = [JsonParser parseUserByDictionary:dataDic];
+                
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
         }];
+        
     }
 }
 
@@ -125,27 +143,43 @@
         [params setObject:@(self.depts.roomID) forKey:@"deptId"];
         [params setObject:@(self.doctor.doctorID) forKey:@"doctId"];
     }
-    if ([XyqsApi isLogin])
+    if ([XyqsTools isLogin])
     {
         [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
     }
+    
     //获取医生详情的方法
-    [XyqsApi requestDoctorDetailWithParams:params andCallBack:^(id obj) {
-        self.doctorDetail = obj;
-        for (Schedules *s in self.doctorDetail.schedules)
+    [HttpTool post:@"http://14.29.84.4:6060/0.1/doctor/detail" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
-            if (s.ampm == 0)
+            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            self.doctorDetail = [JsonParser parseDoctorDetailByDictionary:dataDic];
+            for (Schedules *s in self.doctorDetail.schedules)
             {
-                [self.amSchedule addObject:s];
+                if (s.ampm == 0)
+                {
+                    [self.amSchedule addObject:s];
+                }
+                else
+                {
+                    [self.pmSchedule addObject:s];
+                }
             }
-            else
-            {
-                [self.pmSchedule addObject:s];
-            }
+            //布局
+            [self initUI];
         }
-        //布局
-        [self initUI];
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
+
 }
 
 
@@ -536,14 +570,12 @@
 {
     UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     cell.textLabel.text = @"测试数据";
-    
     return cell;
 }
 
 //切换底部视图的事件
 -(void)segmentAction:(UISegmentedControl *)segment
 {
-    
     if (segment.selectedSegmentIndex == 1)
     {
         //切换到评论
@@ -558,7 +590,6 @@
         self.docIntroView.hidden = NO;
         self.baseSv.contentSize = CGSizeMake(WIDTH,segment.maxY +10 + 64 + [self getIntroHeight]);
     }
-    
 }
 
 
@@ -644,7 +675,7 @@
 -(void)attentionAction:(UIButton *)sender
 {
     
-    if([XyqsApi isLogin])
+    if([XyqsTools isLogin])
     {
         
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
@@ -652,29 +683,63 @@
         [params setObject:@(self.doctorDetail.doctorID) forKey:@"doctId"];
         if (self.attentionStatus == NO)
         {
-            //添加关注的医生
-            [XyqsApi requestAddDoctorAttentionWithParams:params andCallBack:^(id obj) {
- 
-                if ([obj isEqualToString:@"成功添加关注"])
+             //添加关注的医生
+            [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/addDocFollow" params:params success:^(id responseObj) {
+                if (responseObj)
                 {
-                    [sender setTitle:@"已关注" forState:UIControlStateNormal];
-                    sender.titleLabel.adjustsFontSizeToFitWidth = YES;
-                    [sender setBackgroundColor:LCWAttentionColor];
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        NSString *message = [responseObj objectForKey:@"message"];
+                        if ([message isEqualToString:@"成功添加关注"])
+                        {
+                            [sender setTitle:@"已关注" forState:UIControlStateNormal];
+                            sender.titleLabel.adjustsFontSizeToFitWidth = YES;
+                            [sender setBackgroundColor:LCWAttentionColor];
+                            self.attentionStatus = YES;
+                        }
+                        
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                    }
                 }
-            }];
-            self.attentionStatus = YES;
+            } failure:^(NSError *error) {
+                if (error)
+                {
+                    self.noNetView.hidden = NO;
+                }
+            }];  
         }
         else
         {
             //取消关注的医生
-            [XyqsApi requestCancerDoctorAttentionWithParams:params andCallBack:^(id obj) {
-                if ([obj isEqualToString:@"成功取消关注"])
+            [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/delDocFollow" params:params success:^(id responseObj) {
+                if (responseObj)
                 {
-                    [sender setTitle:@"关  注" forState:UIControlStateNormal];
-                    [sender setBackgroundColor:LCWBottomColor];
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        NSString *message = [responseObj objectForKey:@"message"];
+                        if ([message isEqualToString:@"成功取消关注"])
+                        {
+                            [sender setTitle:@"关  注" forState:UIControlStateNormal];
+                            [sender setBackgroundColor:LCWBottomColor];
+                            self.attentionStatus = NO;
+                        }
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                    }
+                }
+            } failure:^(NSError *error) {
+                if (error)
+                {
+                    self.noNetView.hidden = NO;
                 }
             }];
-            self.attentionStatus = NO;
         }
         
     }

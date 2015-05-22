@@ -12,7 +12,8 @@
 #import "AlipayConfirmVC.h"
 #import "CommonAppointmentVC.h"
 #import "comMember.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "TimeQuantum.h"
 #import "LoginViewController.h"
 #import "User.h"
@@ -86,6 +87,8 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
     if (appDlg.isReachable)
     {
@@ -113,16 +116,28 @@
     [params0 setObject:@(self.schedules.ampm) forKey:@"ampm"];
     [params0 setObject:self.schedules.date forKey:@"orderDate"];
     
-    [XyqsApi requestTimesWithParams:params0 andCallBack:^(id obj) {
-        NSArray *arr = obj;
-        for(TimeQuantum *t in arr)
+    //获取医生某日上午或下午的坐诊时段列表
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/order/time" params:params0 success:^(id responseObj) {
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
-            [self.params setObject:@(t.tid) forKey:@"tid"];
-            self.time = t;
-            self.dateLabel.text = [NSString stringWithFormat:@"就诊时间: %@  %@-%@",self.schedules.date,self.time.startTime,self.time.endTime];
+            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+            NSArray *arr = [JsonParser parseTimesByDictionary:dataDic];
+            for(TimeQuantum *t in arr)
+            {
+                [self.params setObject:@(t.tid) forKey:@"tid"];
+                self.time = t;
+                self.dateLabel.text = [NSString stringWithFormat:@"就诊时间: %@  %@-%@",self.schedules.date,self.time.startTime,self.time.endTime];
+            }
         }
-        [self.view setNeedsDisplay];
-        [self.view setNeedsLayout];
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            //------------------------------------------------------------
+        }
     }];
 }
 
@@ -424,64 +439,71 @@
             if (self.radioBtn == 1)
             {
                 [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
-                
-                [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
-                
-                [XyqsApi requestOrderNumWithParams: self.params andCallBack:^(id obj) {
-                    //判断obj是否为空,也就是预约是否成功，成功就跳转页面，不成功就返回
-                    NSDictionary *dic = obj;
-                    if (dic)
+                //获取订单预约号
+                [HttpTool post:@"http://14.29.84.4:6060/0.1/order/create" params:self.params success:^(id responseObj) {
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
                     {
-                        AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
-                        vc.orderNum = [dic objectForKey:@"orderId"];
-                        vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
-                        vc.doctor = self.doctor;
-                        if (self.member)
+                        [MBProgressHUD showSuccess:@"预约成功"];
+                        NSDictionary *dic = [responseObj objectForKey:@"data"];
+                        if (dic)
                         {
-                            vc.member = self.member;        //就诊人
+                            AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
+                            vc.orderNum = [dic objectForKey:@"orderId"];
+                            vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
+                            vc.doctor = self.doctor;
+                            if (self.member)
+                            {
+                                vc.member = self.member;        //就诊人
+                            }
+                            else
+                            {
+                                comMember *member = [[comMember alloc]init];
+                                if (self.user.name != (NSString *)[NSNull null])
+                                {
+                                    member.name = self.user.name;
+                                }
+                                
+                                member.comID = @"0";        //就诊人ID，0代表自己
+                                
+                                if (self.user.mobile != (NSString *)[NSNull null])
+                                {
+                                    member.mobile = self.user.mobile;
+                                }
+                                
+                                if (self.user.idCard != (NSString *)[NSNull null])
+                                {
+                                    member.idCard = self.user.idCard;
+                                }
+                                
+                                if (self.user.sscard != (NSString *)[NSNull null])
+                                {
+                                    member.sscard = self.user.sscard;
+                                }
+                                vc.member = member;
+                            }
+                            
+                            vc.schedules = self.schedules;
+                            vc.time = self.time;
+                            vc.radioBtn = self.radioBtn;
+                            [self.navigationController pushViewController:vc animated:NO];
                         }
                         else
                         {
-                            comMember *member = [[comMember alloc]init];
-                            if (self.user.name != (NSString *)[NSNull null])
-                            {
-                                member.name = self.user.name;
-                            }
-                            
-                            member.comID = @"0";        //就诊人ID，0代表自己
-                            
-                            if (self.user.mobile != (NSString *)[NSNull null])
-                            {
-                                member.mobile = self.user.mobile;
-                            }
-                            
-                            if (self.user.idCard != (NSString *)[NSNull null])
-                            {
-                                member.idCard = self.user.idCard;
-                            }
-                            
-                            if (self.user.sscard != (NSString *)[NSNull null])
-                            {
-                                member.sscard = self.user.sscard;
-                            }
-                            vc.member = member;
+                            return ;
                         }
-                        
-                        vc.schedules = self.schedules;
-                        vc.time = self.time;
-                        vc.radioBtn = self.radioBtn;
-                        [self.navigationController pushViewController:vc animated:NO];
+
                     }
                     else
                     {
-                        return ;
+                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
                     }
-                    
+                } failure:^(NSError *error) {
+                    if (error)
+                    {
+                        self.noNetView.hidden = NO;
+                    }
                 }];
-                
-//                UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"支付提醒" message:@"您好，请于就诊当日,在医院挂号窗口凭预约号用现金或相应的社保卡缴费!" delegate:self cancelButtonTitle:@"继续挂号" otherButtonTitles:@"返回", nil];
-//                av.tag = 2;
-//                [av show];
             }
         }
             break;
@@ -499,62 +521,72 @@
         {
             case 0:
             {
-                
-                [XyqsApi requestOrderNumWithParams: self.params andCallBack:^(id obj) {
-                    //判断obj是否为空,也就是预约是否成功，成功就跳转页面，不成功就返回
-                    NSDictionary *dic = obj;
-                    
-                    NSLog(@"%@",dic);
-                    
-                    if (dic)
+                [HttpTool post:@"http://14.29.84.4:6060/0.1/order/create" params:self.params success:^(id responseObj) {
+                    self.noNetView.hidden = YES;
+                    if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
                     {
-                        AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
-                        vc.orderNum = [dic objectForKey:@"orderId"];
-                        vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
-                        vc.oid = [[dic objectForKey:@"oid"] longValue];
-                        vc.doctor = self.doctor;
-                        if (self.member)
+                        [MBProgressHUD showSuccess:@"预约成功"];
+                        
+                        NSDictionary *dic = [responseObj objectForKey:@"data"];
+                        if (dic)
                         {
-                            vc.member = self.member;        //就诊人
+                            AlipayConfirmVC *vc = [[AlipayConfirmVC alloc]init];
+                            vc.orderNum = [dic objectForKey:@"orderId"];
+                            vc.leftTime = [[dic objectForKey:@"leftTime"] longValue];
+                            vc.oid = [[dic objectForKey:@"oid"] longValue];
+                            vc.doctor = self.doctor;
+                            if (self.member)
+                            {
+                                vc.member = self.member;        //就诊人
+                            }
+                            else
+                            {
+                                comMember *member = [[comMember alloc]init];
+                                if (self.user.name != (NSString *)[NSNull null])
+                                {
+                                    member.name = self.user.name;
+                                }
+                                
+                                member.comID = @"0";        //就诊人ID，0代表自己
+                                
+                                if (self.user.mobile != (NSString *)[NSNull null])
+                                {
+                                    member.mobile = self.user.mobile;
+                                }
+                                
+                                if (self.user.idCard != (NSString *)[NSNull null])
+                                {
+                                    member.idCard = self.user.idCard;
+                                }
+                                
+                                if (self.user.sscard != (NSString *)[NSNull null])
+                                {
+                                    member.sscard = self.user.sscard;
+                                }
+                                vc.member = member;
+                            }
+                            
+                            vc.schedules = self.schedules;
+                            vc.time = self.time;
+                            vc.radioBtn = self.radioBtn;
+                            [self.navigationController pushViewController:vc animated:NO];
                         }
                         else
                         {
-                            comMember *member = [[comMember alloc]init];
-                            if (self.user.name != (NSString *)[NSNull null])
-                            {
-                                member.name = self.user.name;
-                            }
-                            
-                            member.comID = @"0";        //就诊人ID，0代表自己
-                            
-                            if (self.user.mobile != (NSString *)[NSNull null])
-                            {
-                                member.mobile = self.user.mobile;
-                            }
-                            
-                            if (self.user.idCard != (NSString *)[NSNull null])
-                            {
-                                member.idCard = self.user.idCard;
-                            }
-                            
-                            if (self.user.sscard != (NSString *)[NSNull null])
-                            {
-                                member.sscard = self.user.sscard;
-                            }
-                            vc.member = member;
+                            return ;
                         }
                         
-                        vc.schedules = self.schedules;
-                        vc.time = self.time;
-                        vc.radioBtn = self.radioBtn;
-                        [self.navigationController pushViewController:vc animated:NO];
                     }
                     else
                     {
-                        return ;
+                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
                     }
-                    
+                } failure:^(NSError *error) {
+                    if (error)
+                    {
+                        self.noNetView.hidden = NO;                    }
                 }];
+
             }
                 break;
             case 1:

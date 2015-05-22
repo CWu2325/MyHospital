@@ -45,9 +45,6 @@
     [super viewDidLoad];
     
 
-    
-    
-    
     self.svImages = @[@"sv01.jpg",@"sv02.jpg",@"sv03.jpg",@"sv04.jpg",@"sv05.jpg"];
     
     //设置标题
@@ -317,7 +314,7 @@
         }
         else
         {
-            [MBProgressHUD showError:@"GPS定位失败"];
+           // [MBProgressHUD showError:@"GPS定位失败"];
         }
     }];
 }
@@ -331,13 +328,12 @@
     if ([error code] == kCLErrorDenied)
     {
         //访问被拒绝
-        [MBProgressHUD showError:@"GPS访问被拒绝"];
-        
+        NSLog(@"GPS访问被拒绝");
     }
     if ([error code] == kCLErrorLocationUnknown)
     {
         //无法获取位置信息
-        [MBProgressHUD showError:@"GPS无法获取位置信息"];
+        NSLog(@"GPS无法获取位置信息");
     }
 }
 

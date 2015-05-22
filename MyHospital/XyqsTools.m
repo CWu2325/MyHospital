@@ -9,6 +9,23 @@
 #import "XyqsTools.h"
 
 @implementation XyqsTools
+//判断是否已经登陆
++(BOOL)isLogin
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    if ([ud objectForKey:@"token"])
+    {
+        return YES;
+    }
+    else
+        return NO;
+}
+
+//获取本地保存的token
++(NSString *)getToken
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"token"];
+}
 
 //得到字体的空间大小
 +(CGSize)getSizeWithText:(NSString *)text andFont:(UIFont *)font

@@ -10,6 +10,12 @@
 
 @interface XyqsTools : NSObject
 
+//获取本地保存的token
++(NSString *)getToken;
+
+//判断是否登录
++(BOOL)isLogin;
+
 //得到字体的空间大小
 +(CGSize)getSizeWithText:(NSString *)text andFont:(UIFont *)font;
 

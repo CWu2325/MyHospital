@@ -8,7 +8,8 @@
 #define MYFONT [UIFont systemFontOfSize:15]
 
 #import "OrderDetailVC.h"
-#import "XyqsApi.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 #import "OrderDetail.h"
 #import "PayWebVC.h"
 #import "AppDelegate.h"
@@ -23,6 +24,7 @@
 @property(nonatomic,strong)UIButton *payButton;     //支付按钮
 @property(nonatomic,strong)UILabel *appointStatusLabel;     //预约状态
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
+@property(nonatomic,strong)UILabel *timeLabel0;          //提醒文字
 @property(nonatomic,strong)NoNetworkView *noNetView;
 @end
 
@@ -42,6 +44,8 @@
 
 -(void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
     AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
     if (appDlg.isReachable)
     {
@@ -63,24 +67,35 @@
 -(void)requestData
 {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
+    [params setObject:[XyqsTools getToken] forKey:@"token"];
     [params setObject:@(self.orderList.orderListID) forKey:@"id"];
-    [XyqsApi requestOrderDetailWithParams:params andCallBack:^(id obj) {
-        self.orderDetail = obj;
-        [self initUI];
-        if (self.orderDetail.orderState == 1 && self.orderDetail.leftTime > 0)
+    //获取预约记录列表中的预约详情
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/detail" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
-            //右键取消
-            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(onClick:)];
+            self.orderDetail = [JsonParser parseOrderDetailByDictionary:responseObj];
+            [self initUI];
+            if (self.orderDetail.orderState == 1 && self.orderDetail.leftTime > 0)
+            {
+                //右键取消
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"取消" style:UIBarButtonItemStylePlain target:self action:@selector(onClick:)];
+            }
+            else
+            {
+                self.navigationItem.rightBarButtonItem = nil;
+            }
         }
         else
         {
-            self.navigationItem.rightBarButtonItem = nil;
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
-        
-        [self.view setNeedsDisplay];
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
-
 }
 
 
@@ -324,14 +339,15 @@
             timeLabel0.size = [XyqsTools getSizeByText:timeLabel0.text andFont:timeLabel0.font andWidth:WIDTH - 44.5 * 2];
             timeLabel0.y = button.maxY + 15;
             timeLabel0.centerX = self.view.centerX;
+            self.timeLabel0 = timeLabel0;
             [baseSv addSubview:timeLabel0];
             
             
             UILabel *timeLabel = [[UILabel alloc]init];
-            self.min = 14;
-            self.sec = 59;
             timeLabel.textColor = [UIColor grayColor];
             timeLabel.font = timeLabel0.font;
+            self.min = self.orderDetail.leftTime/60;
+            self.sec = self.orderDetail.leftTime%60;
             NSString *editStr = [NSString stringWithFormat:@"%d分%d秒",self.min,self.sec];
             NSString *allStr = [NSString stringWithFormat:@"%@内完成支付，超时您的预约将被取消。",editStr];
             NSMutableAttributedString *text = [[NSMutableAttributedString alloc]initWithString:allStr];
@@ -353,8 +369,6 @@
     {
         //提示标签
         UILabel *timeLabel = [[UILabel alloc]init];
-        self.min = 14;
-        self.sec = 59;
         timeLabel.textColor = [UIColor grayColor];
         timeLabel.font = [UIFont systemFontOfSize:11];
         timeLabel.text = @"您的预约未按时支付，已经被取消";
@@ -384,9 +398,11 @@
         [timer invalidate];
 
         self.payButton.enabled = NO;
-        [self.payButton setBackgroundImage:[UIImage imageNamed:@"selTimer.png"] forState:UIControlStateNormal];
+        [self.payButton setBackgroundImage:[UIImage imageNamed:@"outtimePay.png"] forState:UIControlStateNormal];
         
         label.text = @"您的预约未按时支付，已经被取消";
+        label.y = self.timeLabel0.y;
+        [self.timeLabel0 removeFromSuperview];
         label.textAlignment = NSTextAlignmentCenter;
         
         self.navigationItem.rightBarButtonItem = nil;
@@ -417,11 +433,26 @@
     NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
     [params setValue:token forKey:@"token"];
     [params setValue:@(self.orderDetail.orderRecoderID) forKey:@"oid"];
-    [XyqsApi payWithparams:params andCallBack:^(id obj) {
-        
-        [self saveHtmlfile:obj];
-        PayWebVC *webVC = [[PayWebVC alloc]init]; 
-        [self.navigationController pushViewController:webVC animated:NO];
+    
+    //支付
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/pay/unionpay_wap" params:params success:^(id responseObj) {
+        self.noNetView.hidden = YES;
+        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        {
+            NSDictionary *htmldic = [responseObj objectForKey:@"data"];
+            [self saveHtmlfile:[htmldic objectForKey:@"html"]];
+            PayWebVC *webVC = [[PayWebVC alloc]init];
+            [self.navigationController pushViewController:webVC animated:NO];
+        }
+        else
+        {
+            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
 }
 
@@ -441,7 +472,6 @@
     UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"确认取消该预约?" message:nil delegate:self cancelButtonTitle:@"确定" otherButtonTitles:@"返回", nil];
     
     [av show];
-
 }
 
 
@@ -471,15 +501,31 @@
             [params setObject:@(self.orderDetail.doctorId) forKey:@"doctId"];
             [params setObject:@(self.orderDetail.deptId) forKey:@"deptId"];
             [params setObject:self.orderDetail.orderId forKey:@"orderId"];
-            [XyqsApi CancelOrderWithParams:params andCallBack:^(id obj) {
-                [self.timer invalidate];
-
-                self.payButton.enabled = NO;
-                [self.payButton setBackgroundImage:[UIImage imageNamed:@"selTimer.png"] forState:UIControlStateNormal];
-                self.timeLabel.text = @"";
-                self.timeLabel.textAlignment = NSTextAlignmentCenter;
-                
-                self.appointStatusLabel.text = @"已取消";
+            
+            //取消订单
+            [HttpTool post:@"http://14.29.84.4:6060/0.1/order/cancel" params:params success:^(id responseObj) {
+                self.noNetView.hidden = YES;
+                if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+                {
+                    [MBProgressHUD showSuccess:@"您已取消预约"];
+                    [self.timer invalidate];
+                    
+                    self.payButton.enabled = NO;
+                    [self.payButton setBackgroundImage:[UIImage imageNamed:@"selTimer.png"] forState:UIControlStateNormal];
+                    self.timeLabel.text = @"";
+                    self.timeLabel.textAlignment = NSTextAlignmentCenter;
+                    [self.timeLabel0 removeFromSuperview];
+                    self.appointStatusLabel.text = @"已取消";
+                }
+                else
+                {
+                    [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                }
+            } failure:^(NSError *error) {
+                if (error)
+                {
+                    self.noNetView.hidden = NO;
+                }
             }];
             return;
            

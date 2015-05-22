@@ -8,7 +8,6 @@
 
 #import "SelHospitalVC.h"
 #import "AppointmentCell.h"
-#import "XyqsApi.h"
 #import "Hospital.h"
 #import "Area.h"
 #import "MyTitleButton.h"
@@ -18,6 +17,8 @@
 #import "SelAreaVC.h"
 #import "AppDelegate.h"
 #import "NoNetworkView.h"
+#import "HttpTool.h"
+#import "JsonParser.h"
 
 @interface SelHospitalVC ()<UITableViewDataSource,UITableViewDelegate,MyProtocol>
 
@@ -34,6 +35,8 @@
 
 @property(nonatomic,strong)NSMutableDictionary *params;
 
+@property(nonatomic,strong)UILabel *footerLabel;
+
 @end
 
 @implementation SelHospitalVC
@@ -45,7 +48,6 @@
         _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
         
         [self.view addSubview:_noNetView];
-        
     }
     return _noNetView;
 }
@@ -69,32 +71,45 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = LCWBackgroundColor;
     
+    
+
+    
 }
 
-
-
--(void)viewWillAppear:(BOOL)animated
+/**
+ *  判断网络情况
+ */
+-(void)judgeNetWork
 {
-    [self setHeaderTitle];
-    
+    //判断网络连接
     self.appDlg = [[UIApplication sharedApplication] delegate];
     if (self.appDlg.isReachable)
     {
-        self.tableView.hidden = NO;
+        
         self.noNetView.hidden = YES;
-        self.noNetView.alpha = 0.0;
         [self requestDataWithParams:self.params];
     }
     else
     {
-        self.tableView.hidden = YES;
+        
         self.noNetView.hidden = NO;
         [self.view bringSubviewToFront:self.noNetView];
-        self.noNetView.alpha = 1.0;
+        
     }
 }
 
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    //设置标题
+    [self setHeaderTitle];
+    
+    //判断网络情况
+    [self judgeNetWork];
+
+}
 
 /**
  *
@@ -132,6 +147,27 @@
     [btn setImage:[UIImage imageNamed:@"xiajiantou@2x"] forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(selCity) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = btn;
+    
+    
+    //添加底部标签
+    UIView *bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, HEIGHT - 32 - 64, WIDTH, 32)];
+    bottomView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:bottomView];
+    
+    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 32)];
+    label.font = [UIFont systemFontOfSize:12];
+    NSString *editStr = [NSString stringWithFormat:@"%d",self.hospitals.count];
+    NSString *allStr = [NSString stringWithFormat:@"共 %@ 家医院",editStr];
+    NSMutableAttributedString *text0 = [[NSMutableAttributedString alloc]initWithString:allStr];
+    [text0 addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
+    label.attributedText = text0;
+    label.textAlignment = NSTextAlignmentCenter;
+    label.size = [XyqsTools getSizeWithText:label.text andFont:label.font];
+    label.centerX = bottomView.width/2;
+    label.centerY = bottomView.height/2;
+    self.footerLabel = label;
+    [bottomView addSubview:label];
+
 }
 
 
@@ -142,36 +178,67 @@
 -(void)requestDataWithParams:(NSMutableDictionary *)params
 {
    
-    [XyqsApi getCityIDWithCityNameDic:params andCallback:^(id obj) {
-        long areaId = [obj longValue];
-        [XyqsApi requestHospitalParentld:areaId andCallBack:^(id obj) {
-            self.hospitals = obj;
-            if (self.hospitals.count > 0)
+    [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id repsonseObj) {
+        if (repsonseObj)
+        {
+            self.noNetView.hidden = YES;
+            if ([[repsonseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
-                self.tableView.hidden = NO;
-                [self.tableView reloadData];
+                NSDictionary *dataDic = [repsonseObj objectForKey:@"data"];
+                NSInteger areaID = [[dataDic objectForKey:@"areaId"] integerValue];
+                
+                NSMutableDictionary *params2 = [NSMutableDictionary dictionary];
+                [params2 setObject:@(areaID) forKey:@"areaId"];
+                [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/list" params:params2 success:^(id responseObj2) {
+                    if (responseObj2)
+                    {
+                        self.noNetView.hidden = YES;
+                        if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
+                        {
+                            NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
+                            self.hospitals = [JsonParser parseHospitalByDictionary:dataDic];
+
+                            NSString *editStr = [NSString stringWithFormat:@"%d",self.hospitals.count];
+                            NSString *allStr = [NSString stringWithFormat:@"共 %@ 家医院",editStr];
+                            NSMutableAttributedString *text0 = [[NSMutableAttributedString alloc]initWithString:allStr];
+                            [text0 addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
+                            self.footerLabel.attributedText = text0;
+          
+                            [self.tableView reloadData];
+                           
+                        }
+                        else
+                        {
+                            self.hospitals = [NSMutableArray array];
+                            NSString *editStr = [NSString stringWithFormat:@"%d",self.hospitals.count];
+                            NSString *allStr = [NSString stringWithFormat:@"共 %@ 家医院",editStr];
+                            NSMutableAttributedString *text0 = [[NSMutableAttributedString alloc]initWithString:allStr];
+                            [text0 addAttribute:NSForegroundColorAttributeName value:LCWBottomColor range:[allStr rangeOfString:editStr]];
+                            self.footerLabel.attributedText = text0;
+                            [self.tableView reloadData];
+                            [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                        }
+                    }
+                } failure:^(NSError *error2) {
+                    if (error2)
+                    {
+                        self.noNetView.hidden = NO;
+                    }
+                }];
             }
             else
             {
-                self.tableView.hidden = YES;
+                [MBProgressHUD showError:[repsonseObj objectForKey:@"message"]];
             }
-            //添加标签
-            UIView *bottomView = [[UIView alloc]initWithFrame:CGRectMake(0, HEIGHT - 32 - 64, WIDTH, 32)];
-            bottomView.backgroundColor = [UIColor whiteColor];
-            [self.view addSubview:bottomView];
-            NSString *text = [NSString stringWithFormat:@"共 %d 家医院",self.hospitals.count];
-            TEXTLabel *footerLabel = [[TEXTLabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 32) WithAllString:text WithEditString:[NSString stringWithFormat:@"%d",self.hospitals.count] WithColor:LCWBottomColor WithFont:[UIFont systemFontOfSize:12]];
-            footerLabel.textAlignment = NSTextAlignmentCenter;
-            footerLabel.size = [XyqsTools getSizeWithText:footerLabel.text andFont:footerLabel.font];
-            footerLabel.centerY = bottomView.height/2;
-            footerLabel.centerX = bottomView.width/2;
-            [bottomView addSubview:footerLabel];
-        }];
+        }
+    } failure:^(NSError *error) {
+        if (error)
+        {
+            self.noNetView.hidden = NO;
+        }
     }];
+
 }
-
-
-
 
 
 /**
