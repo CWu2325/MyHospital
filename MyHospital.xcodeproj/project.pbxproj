@@ -185,6 +185,8 @@
 		2ED4C0131AE110A500F9A425 /* 椭圆2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4C0121AE110A500F9A425 /* 椭圆2@2x.png */; };
 		2ED4C0151AE110C600F9A425 /* 椭圆1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED4C0141AE110C600F9A425 /* 椭圆1@2x.png */; };
 		2ED712D51B04A46700F78B88 /* FirstPageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED712D41B04A46700F78B88 /* FirstPageVC.m */; };
+		2ED714561B101B9D002261CA /* CacheDic.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED714551B101B9D002261CA /* CacheDic.m */; };
+		2ED714911B107B00002261CA /* FrequentlyPersonsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED714901B107B00002261CA /* FrequentlyPersonsVC.m */; };
 		2ED827071AF85E40006E1EFF /* SelDoctorVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ED827061AF85E40006E1EFF /* SelDoctorVC.m */; };
 		2ED8270C1AF899FD006E1EFF /* navBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED8270B1AF899FD006E1EFF /* navBackground.png */; };
 		2ED8270E1AF89B34006E1EFF /* navBackground1.png in Resources */ = {isa = PBXBuildFile; fileRef = 2ED8270D1AF89B34006E1EFF /* navBackground1.png */; };
@@ -193,7 +195,6 @@
 		2EDD03781AD8B493005F78FC /* DoctorIntroduceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD03771AD8B493005F78FC /* DoctorIntroduceView.m */; };
 		2EDD037C1AD8F4A5005F78FC /* Foundation+Log.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD037B1AD8F4A5005F78FC /* Foundation+Log.m */; };
 		2EDD9BFB1AEF1D6D0085A34C /* SelAreaVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EDD9BFA1AEF1D6D0085A34C /* SelAreaVC.m */; };
-		2EFE66CE1ACBC67400446DE6 /* CommonAppointmentVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EFE66CD1ACBC67400446DE6 /* CommonAppointmentVC.m */; };
 		2EFE66D11ACBCE7E00446DE6 /* AppointmentRecordVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EFE66D01ACBCE7E00446DE6 /* AppointmentRecordVC.m */; };
 		2EFE66D51ACBD02200446DE6 /* AppRecordCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2EFE66D31ACBD02200446DE6 /* AppRecordCell.m */; };
 /* End PBXBuildFile section */
@@ -490,6 +491,10 @@
 		2ED4C0141AE110C600F9A425 /* 椭圆1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "椭圆1@2x.png"; sourceTree = "<group>"; };
 		2ED712D31B04A46700F78B88 /* FirstPageVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirstPageVC.h; sourceTree = "<group>"; };
 		2ED712D41B04A46700F78B88 /* FirstPageVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirstPageVC.m; sourceTree = "<group>"; };
+		2ED714541B101B9D002261CA /* CacheDic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CacheDic.h; sourceTree = "<group>"; };
+		2ED714551B101B9D002261CA /* CacheDic.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CacheDic.m; sourceTree = "<group>"; };
+		2ED7148F1B107B00002261CA /* FrequentlyPersonsVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequentlyPersonsVC.h; sourceTree = "<group>"; };
+		2ED714901B107B00002261CA /* FrequentlyPersonsVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequentlyPersonsVC.m; sourceTree = "<group>"; };
 		2ED827051AF85E40006E1EFF /* SelDoctorVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelDoctorVC.h; sourceTree = "<group>"; };
 		2ED827061AF85E40006E1EFF /* SelDoctorVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelDoctorVC.m; sourceTree = "<group>"; };
 		2ED8270B1AF899FD006E1EFF /* navBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navBackground.png; sourceTree = "<group>"; };
@@ -502,8 +507,6 @@
 		2EDD037B1AD8F4A5005F78FC /* Foundation+Log.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Foundation+Log.m"; sourceTree = "<group>"; };
 		2EDD9BF91AEF1D6D0085A34C /* SelAreaVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelAreaVC.h; sourceTree = "<group>"; };
 		2EDD9BFA1AEF1D6D0085A34C /* SelAreaVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelAreaVC.m; sourceTree = "<group>"; };
-		2EFE66CC1ACBC67400446DE6 /* CommonAppointmentVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonAppointmentVC.h; sourceTree = "<group>"; };
-		2EFE66CD1ACBC67400446DE6 /* CommonAppointmentVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonAppointmentVC.m; sourceTree = "<group>"; };
 		2EFE66CF1ACBCE7E00446DE6 /* AppointmentRecordVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppointmentRecordVC.h; sourceTree = "<group>"; };
 		2EFE66D01ACBCE7E00446DE6 /* AppointmentRecordVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppointmentRecordVC.m; sourceTree = "<group>"; };
 		2EFE66D21ACBD02200446DE6 /* AppRecordCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppRecordCell.h; sourceTree = "<group>"; };
@@ -714,8 +717,8 @@
 				2ED8270F1AF89F94006E1EFF /* 注册登录 */,
 				2ED0CFD81ADE657C0068132E /* SetUseInfoVC.h */,
 				2ED0CFD91ADE657C0068132E /* SetUseInfoVC.m */,
-				2EFE66CC1ACBC67400446DE6 /* CommonAppointmentVC.h */,
-				2EFE66CD1ACBC67400446DE6 /* CommonAppointmentVC.m */,
+				2ED7148F1B107B00002261CA /* FrequentlyPersonsVC.h */,
+				2ED714901B107B00002261CA /* FrequentlyPersonsVC.m */,
 				2ED0C78F1ADCE749006C74F8 /* MemberInfoVC.h */,
 				2ED0C7901ADCE749006C74F8 /* MemberInfoVC.m */,
 				2EFE66CF1ACBCE7E00446DE6 /* AppointmentRecordVC.h */,
@@ -740,6 +743,8 @@
 				2E5B710E1ACD1D180049E291 /* JsonParser.m */,
 				2ED19FCB1AD7B95200E16337 /* XyqsTools.h */,
 				2ED19FCC1AD7B95200E16337 /* XyqsTools.m */,
+				2ED714541B101B9D002261CA /* CacheDic.h */,
+				2ED714551B101B9D002261CA /* CacheDic.m */,
 			);
 			name = "网络解析";
 			sourceTree = "<group>";
@@ -1245,6 +1250,7 @@
 				2ED3A3BC1B09B0CC00194E5D /* NoNetworkView.m in Sources */,
 				2E3F23A01AC3EC0000F5BB5D /* SelDocCell.m in Sources */,
 				2E5BE3221AC8F9FB006E3F22 /* PersonalVC.m in Sources */,
+				2ED714911B107B00002261CA /* FrequentlyPersonsVC.m in Sources */,
 				2ED460741AE8CA71000C7E89 /* ProtocolVC.m in Sources */,
 				2E3F23661AC39C5500F5BB5D /* AFHTTPRequestOperationManager.m in Sources */,
 				2E8A49FA1AC2AC7800D37B1B /* MyHospital.xcdatamodeld in Sources */,
@@ -1289,7 +1295,6 @@
 				2EA7881C1AD3BB150050B6E0 /* comMember.m in Sources */,
 				2EBA0F0B1AC537EA001FBFBC /* AlipayConfirmVC.m in Sources */,
 				2ED0C78E1ADCBF4E006C74F8 /* SettingInfoView.m in Sources */,
-				2EFE66CE1ACBC67400446DE6 /* CommonAppointmentVC.m in Sources */,
 				2E5B710F1ACD1D180049E291 /* JsonParser.m in Sources */,
 				2EFE66D51ACBD02200446DE6 /* AppRecordCell.m in Sources */,
 				2E3F236D1AC39C5500F5BB5D /* AFURLSessionManager.m in Sources */,
@@ -1300,6 +1305,7 @@
 				2EDD03781AD8B493005F78FC /* DoctorIntroduceView.m in Sources */,
 				2EA788271AD3F4120050B6E0 /* Schedules.m in Sources */,
 				2EC6FB901AEF2F0800A8D2EA /* SelDeptVC.m in Sources */,
+				2ED714561B101B9D002261CA /* CacheDic.m in Sources */,
 				2E5B71161ACD22670049E291 /* City.m in Sources */,
 				2ECF94111AF720BD00CC02AD /* MyLeftBtn.m in Sources */,
 				184BFBCA1AD2B99900AC075D /* MBProgressHUD.m in Sources */,

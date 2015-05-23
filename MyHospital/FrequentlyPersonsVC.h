@@ -1,14 +1,13 @@
 //
-//  CommonAppointmentVC.h
+//  FrequentlyPersonsVC.h
 //  MyHospital
 //
-//  Created by XYQS on 15/4/1.
+//  Created by XYQS on 15/5/23.
 //  Copyright (c) 2015年 XYQS. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-
-@class comMember;
+@class comMember,User;
 
 @protocol PassMember <NSObject>
 
@@ -16,10 +15,11 @@
 
 @end
 
-@interface CommonAppointmentVC : UITableViewController
+@interface FrequentlyPersonsVC : UIViewController
 
 @property(nonatomic,copy)NSString *fromWhere;
 
 @property(nonatomic,weak)id<PassMember>delegate;
+@property(nonatomic,strong)User *user;
 
 @end

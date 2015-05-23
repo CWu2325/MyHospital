@@ -215,6 +215,7 @@
             SelHospitalVC *vc = [[SelHospitalVC alloc]init];
             vc.selCityName = self.selCityName;
             vc.locationCityName = self.locationCityName;
+            vc.formWhere = @"first";
             [self.navigationController pushViewController:vc animated:NO];
         }
             break;

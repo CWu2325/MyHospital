@@ -295,17 +295,6 @@
 
 -(void)selAction:(UIButton *)sender
 {
-//    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-//    NSString *token = [[NSUserDefaults standardUserDefaults]objectForKey:@"token"];
-//    [params setValue:token forKey:@"token"];
-//    [params setValue:@(self.orderList.orderListID) forKey:@"oid"];
-//    [XyqsApi payWithparams:params andCallBack:^(id obj) {
-//        
-//        [self saveHtmlfile:obj];
-//        PayWebVC *webVC = [[PayWebVC alloc]init];
-//        [self.navigationController pushViewController:webVC animated:NO];
-//    }];
-    
     [self.delegate myTabVClick:self];
 }
 

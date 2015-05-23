@@ -42,7 +42,7 @@
     
     
     UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
-    label.text = @"网络请求超时,请稍后再试!";
+    label.text = @"网络不给力，请重试！";
     label.textColor = [UIColor grayColor];
     label.font = [UIFont systemFontOfSize:12];
     label.textAlignment = NSTextAlignmentCenter;
@@ -65,19 +65,7 @@
 
 -(void)requestNetWork:(UIButton *)sender
 {
-    self.appDlg = [UIApplication sharedApplication].delegate;
-    if (self.appDlg.isReachable)
-    {
-        self.hidden = YES;
-        //想调VC的
-        UIViewController *vc = (UIViewController *)[[self superview] nextResponder];
-        [vc viewWillAppear:YES];
-    }
-    else
-    {
-        self.hidden = NO;
-        [MBProgressHUD showError:@"亲~请检查您的网络连接"];
-    }
+    [self.delegate tapTimeOutBtnAction];
 }
 
 @end

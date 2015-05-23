@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol TimeOutDelegate <NSObject>
+
+- (void)tapTimeOutBtnAction;
+
+@end
+
 @interface TimeoutView : UIView
+
+@property(nonatomic,weak)id<TimeOutDelegate>delegate;
 
 @end

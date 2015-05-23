@@ -14,7 +14,8 @@
 #import "PayWebVC.h"
 #import "AppDelegate.h"
 #import "NoNetworkView.h"
-@interface OrderDetailVC ()<UIAlertViewDelegate>
+#import "TimeoutView.h"
+@interface OrderDetailVC ()<UIAlertViewDelegate,TimeOutDelegate>
 
 @property(nonatomic,strong)OrderDetail *orderDetail;
 @property(nonatomic,strong)NSTimer *timer;
@@ -26,6 +27,8 @@
 @property(nonatomic,strong)UILabel *timeLabel;          //剩余时间
 @property(nonatomic,strong)UILabel *timeLabel0;          //提醒文字
 @property(nonatomic,strong)NoNetworkView *noNetView;
+@property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 @end
 
 @implementation OrderDetailVC
@@ -42,12 +45,40 @@
     return _noNetView;
 }
 
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         

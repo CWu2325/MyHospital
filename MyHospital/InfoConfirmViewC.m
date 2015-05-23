@@ -10,7 +10,7 @@
 
 #import "InfoConfirmViewC.h"
 #import "AlipayConfirmVC.h"
-#import "CommonAppointmentVC.h"
+#import "FrequentlyPersonsVC.h"
 #import "comMember.h"
 #import "HttpTool.h"
 #import "JsonParser.h"
@@ -20,8 +20,9 @@
 #import "MySelSickBtn.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "TimeoutView.h"
 
-@interface InfoConfirmViewC ()<PassMember,UIAlertViewDelegate>
+@interface InfoConfirmViewC ()<PassMember,UIAlertViewDelegate,TimeOutDelegate>
 @property(nonatomic,strong)NSMutableDictionary *params;     //用于保存请求预约号的字典
 @property(nonatomic,strong)comMember *member;               //反向传值过来的预约人
 @property(nonatomic)int radioBtn;//单选按钮
@@ -34,6 +35,8 @@
 @property(nonatomic,strong)MySelSickBtn *selSickBtn;       //选择就诊人按钮
 
 @property(nonatomic,strong)NoNetworkView *noNetView;
+@property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 
 @end
 
@@ -47,6 +50,35 @@
     }
     return _noNetView;
 }
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
 
 -(NSMutableDictionary *)params
 {
@@ -89,8 +121,8 @@
 {
     [super viewWillAppear:animated];
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         
@@ -118,6 +150,7 @@
     
     //获取医生某日上午或下午的坐诊时段列表
     [HttpTool get:@"http://14.29.84.4:6060/0.1/order/time" params:params0 success:^(id responseObj) {
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [responseObj objectForKey:@"data"];
@@ -136,7 +169,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            //------------------------------------------------------------
+            self.timeOutView.hidden = NO;
         }
     }];
 }
@@ -386,9 +419,10 @@
         case 1:
         {
             //添加就诊人
-            CommonAppointmentVC *vc = [[CommonAppointmentVC alloc]init];
+            FrequentlyPersonsVC *vc = [[FrequentlyPersonsVC alloc]init];
             vc.fromWhere = @"A";
             vc.delegate = self;
+            vc.user = self.user;
             vc.title = @"选择就诊人";
             [self.navigationController pushViewController:vc animated:NO];
         }
@@ -441,7 +475,7 @@
                 [self.params setObject:@(self.radioBtn)forKey:@"payWay"];           //支付方式
                 //获取订单预约号
                 [HttpTool post:@"http://14.29.84.4:6060/0.1/order/create" params:self.params success:^(id responseObj) {
-                    self.noNetView.hidden = YES;
+                    self.timeOutView.hidden = YES;
                     if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
                     {
                         [MBProgressHUD showSuccess:@"预约成功"];
@@ -501,7 +535,7 @@
                 } failure:^(NSError *error) {
                     if (error)
                     {
-                        self.noNetView.hidden = NO;
+                        self.timeOutView.hidden = NO;
                     }
                 }];
             }
@@ -522,7 +556,7 @@
             case 0:
             {
                 [HttpTool post:@"http://14.29.84.4:6060/0.1/order/create" params:self.params success:^(id responseObj) {
-                    self.noNetView.hidden = YES;
+                    self.timeOutView.hidden = YES;
                     if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
                     {
                         [MBProgressHUD showSuccess:@"预约成功"];
@@ -584,7 +618,7 @@
                 } failure:^(NSError *error) {
                     if (error)
                     {
-                        self.noNetView.hidden = NO;                    }
+                        self.timeOutView.hidden = NO;                    }
                 }];
 
             }

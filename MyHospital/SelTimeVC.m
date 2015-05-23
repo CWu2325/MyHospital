@@ -22,9 +22,10 @@
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
 #import "HttpTool.h"
+#import "TimeoutView.h"
 
 
-@interface SelTimeVC ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate>
+@interface SelTimeVC ()<UITableViewDataSource,UITableViewDelegate,UIScrollViewDelegate,TimeOutDelegate>
 
 @property(nonatomic,strong)UIView *scView;      //SV里面的view
 @property(nonatomic,strong)NSMutableArray *amSchedule;
@@ -42,10 +43,41 @@
 
 
 @property(nonatomic,strong)NoNetworkView *noNetView;
+@property(nonatomic,strong)TimeoutView *timeOutView;
+@property(nonatomic)AppDelegate *appDlg;
 
 @end
 
 @implementation SelTimeVC
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
 -(NoNetworkView *)noNetView
 {
     if (!_noNetView)
@@ -86,8 +118,8 @@
 {
     [super viewWillAppear:animated];
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         
@@ -106,7 +138,7 @@
     {
         [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
         [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
-            self.noNetView.hidden = YES;
+            self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
                 NSDictionary *dataDic = [responseObj objectForKey:@"data"];
@@ -120,7 +152,7 @@
         } failure:^(NSError *error) {
             if (error)
             {
-                self.noNetView.hidden = NO;
+                self.timeOutView.hidden = NO;
             }
         }];
         
@@ -150,7 +182,7 @@
     
     //获取医生详情的方法
     [HttpTool post:@"http://14.29.84.4:6060/0.1/doctor/detail" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [responseObj objectForKey:@"data"];
@@ -176,7 +208,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 
@@ -687,7 +719,7 @@
             [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/addDocFollow" params:params success:^(id responseObj) {
                 if (responseObj)
                 {
-                    self.noNetView.hidden = YES;
+                    self.timeOutView.hidden = YES;
                     if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
                     {
                         NSString *message = [responseObj objectForKey:@"message"];
@@ -708,7 +740,7 @@
             } failure:^(NSError *error) {
                 if (error)
                 {
-                    self.noNetView.hidden = NO;
+                    self.timeOutView.hidden = NO;
                 }
             }];  
         }
@@ -718,7 +750,7 @@
             [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/delDocFollow" params:params success:^(id responseObj) {
                 if (responseObj)
                 {
-                    self.noNetView.hidden = YES;
+                    self.timeOutView.hidden = YES;
                     if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
                     {
                         NSString *message = [responseObj objectForKey:@"message"];
@@ -737,7 +769,7 @@
             } failure:^(NSError *error) {
                 if (error)
                 {
-                    self.noNetView.hidden = NO;
+                    self.timeOutView.hidden = NO;
                 }
             }];
         }

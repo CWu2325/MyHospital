@@ -16,11 +16,12 @@
 #import "SelDeptVC.h"
 #import "SelAreaVC.h"
 #import "AppDelegate.h"
-#import "NoNetworkView.h"
+#import "TimeoutView.h"
 #import "HttpTool.h"
 #import "JsonParser.h"
+#import "CacheDic.h"
 
-@interface SelHospitalVC ()<UITableViewDataSource,UITableViewDelegate,MyProtocol>
+@interface SelHospitalVC ()<UITableViewDataSource,UITableViewDelegate,MyProtocol,TimeOutDelegate>
 
 
 @property(nonatomic,strong)UITableView *tableView;
@@ -30,32 +31,68 @@
 @property(nonatomic,copy)NSString *areaName;            //通过本界面的选择城市获取的城市名称
 
 @property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 
-@property(nonatomic,strong)NoNetworkView *noNetView;
 
 @property(nonatomic,strong)NSMutableDictionary *params;
 
 @property(nonatomic,strong)UILabel *footerLabel;
 
+@property(nonatomic,strong)UIView *noNetworkView;
+
+@property(nonatomic,strong)MyTitleButton *btn;      //标题导航栏
+
+
+
 @end
 
 @implementation SelHospitalVC
-
--(NoNetworkView *)noNetView
+-(NSMutableArray *)hospitals
 {
-    if (!_noNetView)
+    if (!_hospitals)
     {
-        _noNetView = [[NoNetworkView alloc]initWithFrame:CGRectMake(0, -64, WIDTH, HEIGHT)];
-        
-        [self.view addSubview:_noNetView];
+        _hospitals = [NSMutableArray array];
     }
-    return _noNetView;
+    return _hospitals;
 }
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestDataWithParams:self.params];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
 
 -(void)passValue:(Area *)area
 {
     self.area = area;
     self.areaName = area.areaName;
+    
+    [self setHeaderTitle];
+    
+    [self judgeNetWork];
 }
 
 - (void)viewDidLoad
@@ -63,7 +100,7 @@
     [super viewDidLoad];
     
     //初始化表格
-    UITableView *tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT - 32)];
+    UITableView *tableView = [[UITableView alloc]initWithFrame:self.view.bounds];
     tableView.dataSource = self;
     tableView.delegate = self;
     self.tableView = tableView;
@@ -71,10 +108,84 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = LCWBackgroundColor;
     
+    //设置标题
+    [self setHeaderTitle];
     
+    //设置无网络视图
+    [self setupNoNetWorkView];
+    
+    //判断网络情况
+    [self judgeNetWork];
 
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+//    //设置标题
+//    [self setHeaderTitle];
+//    
+//    //设置无网络视图
+//    [self setupNoNetWorkView];
+//    
+//    //判断网络情况
+//    [self judgeNetWork];
+   
     
 }
+
+
+
+-(void)setupNoNetWorkView
+{
+    self.noNetworkView = [[UIView alloc]initWithFrame:self.view.bounds];
+    self.noNetworkView.backgroundColor = LCWBackgroundColor;
+    [self.view addSubview:self.noNetworkView];
+    
+    
+    UIImageView *noNetWorkIv = [[UIImageView alloc]initWithFrame:CGRectMake(0, 127, 50, 50)];
+    noNetWorkIv.image = [UIImage imageNamed:@"noNetWork.png"];
+    noNetWorkIv.centerX = self.noNetworkView.centerX;
+    [self.noNetworkView addSubview:noNetWorkIv];
+    
+    
+    UILabel *label = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
+    label.text = @"无网络连接,请联网后重试!";
+    label.textColor = [UIColor grayColor];
+    label.font = [UIFont systemFontOfSize:12];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.y = noNetWorkIv.maxY + 9;
+    label.height = [XyqsTools getSizeWithText:label.text andFont:label.font].height;
+    [self.noNetworkView addSubview:label];
+    
+    UIButton *resetBtn = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 60, 30)];
+    resetBtn.centerX = self.noNetworkView.centerX;
+    resetBtn.y = label.maxY + 15;
+    [resetBtn setTitle:@"重  试" forState:UIControlStateNormal];
+    resetBtn.titleLabel.font = [UIFont systemFontOfSize:15];
+    [resetBtn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [resetBtn setBackgroundImage:[UIImage imageNamed:@"noNetNormalBtn.png"] forState:UIControlStateNormal];
+    [resetBtn setBackgroundImage:[UIImage imageNamed:@"noNetHighLightedBtn.png"] forState:UIControlStateHighlighted];
+    [resetBtn addTarget:self  action:@selector(noNetBtnAction) forControlEvents:UIControlEventTouchUpInside];
+    [self.noNetworkView addSubview:resetBtn];
+    
+}
+
+-(void)noNetBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.noNetworkView.hidden = YES;
+        [self requestDataWithParams:self.params];
+    }
+    else
+    {
+        self.noNetworkView.hidden = NO;
+        [MBProgressHUD showError:@"亲~请检查您的网络连接"];
+    }
+}
+
 
 /**
  *  判断网络情况
@@ -83,32 +194,20 @@
 {
     //判断网络连接
     self.appDlg = [[UIApplication sharedApplication] delegate];
+    
     if (self.appDlg.isReachable)
     {
         
-        self.noNetView.hidden = YES;
-        [self requestDataWithParams:self.params];
+        self.noNetworkView.hidden = YES;
+       [self requestDataWithParams:self.params];
     }
     else
     {
         
-        self.noNetView.hidden = NO;
-        [self.view bringSubviewToFront:self.noNetView];
+        self.noNetworkView.hidden = NO;
+        [self.noNetworkView bringSubviewToFront:self.view];
         
     }
-}
-
-
--(void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    //设置标题
-    [self setHeaderTitle];
-    
-    //判断网络情况
-    [self judgeNetWork];
-
 }
 
 /**
@@ -137,6 +236,7 @@
     
     NSString *title = [NSString stringWithFormat:@"预约挂号-%@",title1];
     MyTitleButton *btn = [[MyTitleButton alloc]init];
+    self.btn = btn;
     btn.titleLabel.font = [UIFont systemFontOfSize:15];
     [btn setTitle:title forState:UIControlStateNormal];
     CGSize size = [btn.titleLabel.text boundingRectWithSize:CGSizeMake(WIDTH, 999) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:btn.titleLabel.font} context:nil].size;
@@ -181,7 +281,6 @@
     [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id repsonseObj) {
         if (repsonseObj)
         {
-            self.noNetView.hidden = YES;
             if ([[repsonseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
                 NSDictionary *dataDic = [repsonseObj objectForKey:@"data"];
@@ -190,13 +289,10 @@
                 NSMutableDictionary *params2 = [NSMutableDictionary dictionary];
                 [params2 setObject:@(areaID) forKey:@"areaId"];
                 [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/list" params:params2 success:^(id responseObj2) {
-                    if (responseObj2)
-                    {
-                        self.noNetView.hidden = YES;
+                        self.timeOutView.hidden = YES;
                         if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
                         {
-                            NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
-                            self.hospitals = [JsonParser parseHospitalByDictionary:dataDic];
+                            self.hospitals = [JsonParser parseHospitalByDictionary:responseObj2];
 
                             NSString *editStr = [NSString stringWithFormat:@"%d",self.hospitals.count];
                             NSString *allStr = [NSString stringWithFormat:@"共 %@ 家医院",editStr];
@@ -218,11 +314,10 @@
                             [self.tableView reloadData];
                             [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
                         }
-                    }
                 } failure:^(NSError *error2) {
                     if (error2)
                     {
-                        self.noNetView.hidden = NO;
+                        self.timeOutView.hidden = NO;
                     }
                 }];
             }
@@ -234,7 +329,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 

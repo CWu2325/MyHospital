@@ -11,11 +11,12 @@
 #import "PersonInfoCell.h"
 #import "HttpTool.h"
 #import "JsonParser.h"
-#import "CommonAppointmentVC.h"
+#import "FrequentlyPersonsVC.h"
 #import "AppointmentRecordVC.h"
 #import "MyAttentionVC.h"
 #import "SetUseInfoVC.h"
 #import "AppSettingVC.h"
+#import "CacheDic.h"
 
 
 @interface PersonalVC ()<Passvalue>
@@ -66,25 +67,42 @@
     }
     else
     {
-        NSDictionary *params = @{@"token":[XyqsTools getToken]};
-        //如果登录了，就获取个人账户资料，刷新本界面
-        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
-            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
-            {
-                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
-                self.user = [JsonParser parseUserByDictionary:dataDic];
-                [self.tableView reloadData];
-            }
-            else
-            {
-                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-            }
-        } failure:^(NSError *error) {
-            if (error)
-            {
-                [MBProgressHUD showError:@""];
-            }
-        }];
+        if ([CacheDic getDicWithFileName:@"userinfo.txt"])
+        {
+            NSDictionary *dataDic = [CacheDic getDicWithFileName:@"userinfo.txt"];
+            self.user = [JsonParser parseUserByDictionary:dataDic];
+            [self.tableView reloadData];
+        }
+        else
+        {
+            NSDictionary *params = @{@"token":[XyqsTools getToken]};
+            //如果登录了，就获取个人账户资料，刷新本界面
+            [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
+                
+                
+                
+                if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+                {
+                    //保存数据
+                    [CacheDic saveDicDataData:responseObj andFileName:@"userinfo.txt"];
+                    
+                    NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                    self.user = [JsonParser parseUserByDictionary:dataDic];
+                    [self.tableView reloadData];
+                }
+                else
+                {
+                    [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                }
+            } failure:^(NSError *error) {
+                if (error)
+                {
+                    [MBProgressHUD showError:@"请检查您的网络"];
+                }
+            }];
+        }
+        
+       
     }
 }
 
@@ -256,7 +274,7 @@
             case 4:
             {
                 //常用预约人
-                CommonAppointmentVC *ComVC = [[CommonAppointmentVC alloc]init];
+                FrequentlyPersonsVC *ComVC = [[FrequentlyPersonsVC alloc]init];
                 ComVC.title = @"常用预约人";
                 ComVC.fromWhere = @"B";
                 vc = ComVC;

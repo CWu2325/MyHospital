@@ -57,21 +57,10 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
-    {
-        self.noNetView.hidden = YES;
-        
-        [self handlePage];
-    }
-    else
-    {
-        
-        self.noNetView.hidden = NO;
-        [self.view bringSubviewToFront:self.noNetView];
-    }
-    
+    [self handlePage];
+ 
 }
 
 

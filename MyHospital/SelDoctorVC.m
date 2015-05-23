@@ -16,14 +16,46 @@
 #import "SelTimeVC.h"
 #import "AppDelegate.h"
 #import "NoNetworkView.h"
+#import "TimeoutView.h"
 
-@interface SelDoctorVC ()<UITableViewDataSource,UITableViewDelegate>
+@interface SelDoctorVC ()<UITableViewDataSource,UITableViewDelegate,TimeOutDelegate>
 @property(nonatomic,strong)NSMutableArray *doctors;
 @property(nonatomic,strong)UITableView *tableView;
 @property(nonatomic,strong)NoNetworkView *noNetView;
+@property(nonatomic,strong)TimeoutView *timeOutView;
+@property(nonatomic)AppDelegate *appDlg;
 @end
 
 @implementation SelDoctorVC
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
 
 -(NoNetworkView *)noNetView
 {
@@ -41,8 +73,8 @@
 {
     [super viewWillAppear:animated];
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         
@@ -66,7 +98,7 @@
     [params setObject:@(self.depts.roomID) forKey:@"deptId"];
     [params setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/doctor" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [responseObj objectForKey:@"data"];
@@ -93,7 +125,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 }

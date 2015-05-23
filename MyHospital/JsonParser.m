@@ -73,7 +73,8 @@
 //解析医院
 +(NSMutableArray *)parseHospitalByDictionary:(NSDictionary *)dic
 {
-    NSArray *arr = [dic objectForKey:@"hospitals"];
+    NSDictionary *dataDic = [dic objectForKey:@"data"];
+    NSArray *arr = [dataDic objectForKey:@"hospitals"];
     NSMutableArray *hospitals = [NSMutableArray array];
     for (NSDictionary *dic in arr)
     {

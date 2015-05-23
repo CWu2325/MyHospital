@@ -9,8 +9,10 @@
 #import "MemberInfoVC.h"
 #import "HttpTool.h"
 #import "JsonParser.h"
+#import "AppDelegate.h"
+#import "TimeoutView.h"
 
-@interface MemberInfoVC ()<UITextFieldDelegate,UIScrollViewDelegate>
+@interface MemberInfoVC ()<UITextFieldDelegate,UIScrollViewDelegate,TimeOutDelegate>
 @property(nonatomic,strong)UITextField *nameTF;
 @property(nonatomic,strong)UILabel *sexLabel;
 @property(nonatomic,strong)UITextField *useIDTF;
@@ -19,7 +21,8 @@
 @property(nonatomic,strong)UITextField *sexTF;
 
 @property(nonatomic,strong)UIButton *sexBtn;
-
+@property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 @end
 
 @implementation MemberInfoVC
@@ -28,6 +31,34 @@
     [super viewDidLoad];
     
     [self initUI];
+}
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    self.appDlg = [UIApplication sharedApplication].delegate;
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -329,6 +360,9 @@
     
     //添加常用预约人
     [HttpTool post:@"http://14.29.84.4:6060/0.1/user/create_member" params:params success:^(id responseObj) {
+        self.timeOutView.hidden = YES;
+        
+        
         if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
         {
             if ([[responseObj objectForKey:@"message"] isEqualToString:@"操作成功"])
@@ -344,7 +378,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            [MBProgressHUD showError:@"请检查网络连接"];
+            self.timeOutView.hidden = NO;
         }
     }];
 }
@@ -438,6 +472,7 @@
         
         //更新常用预约人资料
         [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_member" params:params success:^(id responseObj) {
+            self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
             {
                 if ([[responseObj objectForKey:@"message"]isEqualToString:@"操作成功"])
@@ -453,7 +488,8 @@
         } failure:^(NSError *error) {
             if (error)
             {
-                //=---------------------------------
+                
+                self.timeOutView.hidden = NO;
             }
         }];
 

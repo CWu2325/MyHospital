@@ -15,8 +15,9 @@
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
 #import "PayWebVC.h"
+#import "TimeoutView.h"
 
-@interface AppointmentRecordVC ()<MyTableViewCellDelegate>
+@interface AppointmentRecordVC ()<MyTableViewCellDelegate,TimeOutDelegate>
 
 @property(nonatomic,strong)NSMutableArray *recordDatas;
 
@@ -26,6 +27,8 @@
 @property(nonatomic,strong)UIRefreshControl *refreshControl;
 
 @property(nonatomic,strong)NoNetworkView *noNetView;
+@property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 @end
 
 @implementation AppointmentRecordVC
@@ -38,6 +41,36 @@
     }
     return _noNetView;
 }
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
+
 
 
 -(NSMutableArray *)recordDatas
@@ -94,8 +127,8 @@
 {
     [super viewWillAppear:animated];
     
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         
@@ -123,7 +156,7 @@
 
     //获取预约记录列表
     [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/list" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             self.recordDatas = [JsonParser parseOrderListByDictionary:responseObj];
@@ -136,7 +169,8 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;        }
+            self.timeOutView.hidden = NO;
+        }
     }];
 }
 
@@ -179,7 +213,7 @@
     
     //支付
     [HttpTool get:@"http://14.29.84.4:6060/0.1/pay/unionpay_wap" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *htmldic = [responseObj objectForKey:@"data"];
@@ -194,7 +228,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 }

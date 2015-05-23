@@ -13,8 +13,9 @@
 #import "TEXTLabel.h"
 #import "NoNetworkView.h"
 #import "AppDelegate.h"
+#import "TimeoutView.h"
 
-@interface SelAreaVC ()<UITableViewDataSource,UITableViewDelegate>
+@interface SelAreaVC ()<UITableViewDataSource,UITableViewDelegate,TimeOutDelegate>
 
 @property(nonatomic,strong)UITableView *leftTableView;
 @property(nonatomic,strong)UITableView *rightTableView;
@@ -24,7 +25,8 @@
 @property(nonatomic,strong)NSMutableArray *rightArea;
 
 @property(nonatomic,strong)NoNetworkView *noNetView;
-
+@property(nonatomic)AppDelegate *appDlg;
+@property(nonatomic,strong)TimeoutView *timeOutView;
 
 
 @end
@@ -39,6 +41,36 @@
     }
     return _noNetView;
 }
+
+-(TimeoutView *)timeOutView
+{
+    if (!_timeOutView)
+    {
+        _timeOutView = [[TimeoutView alloc]initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT)];
+        _timeOutView.delegate = self;
+        [self.view addSubview:_timeOutView];
+    }
+    return _timeOutView;
+}
+
+/**
+ *  网络超时界面的代理事件
+ */
+-(void)tapTimeOutBtnAction
+{
+    if (self.appDlg.isReachable)
+    {
+        self.timeOutView.hidden = YES;
+        [self requestData];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"网络不给力，请稍后再试！"];
+        self.timeOutView.hidden = NO;
+    }
+}
+
+
 
 -(void)viewWillAppear:(BOOL)animated
 {
@@ -57,7 +89,7 @@
     
     //先请求数据
     [HttpTool get:@"http://14.29.84.4:6060/0.1/area/list" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             self.leftArea = [JsonParser parseAreaByDictionary:responseObj];
@@ -70,7 +102,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 
@@ -121,8 +153,8 @@
 -(void)judgeNetWork
 {
     //网络请求
-    AppDelegate *appDlg = [[UIApplication sharedApplication] delegate];
-    if (appDlg.isReachable)
+    self.appDlg = [[UIApplication sharedApplication] delegate];
+    if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
         [self requestData];
@@ -220,7 +252,7 @@
         
         //根据城市名称返回城市ID
         [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id responseObj) {
-            self.noNetView.hidden = YES;
+            self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
                 Area *a = [[Area alloc]init];
@@ -241,7 +273,7 @@
         } failure:^(NSError *error) {
             if (error)
             {
-                self.noNetView.hidden = NO;
+                self.timeOutView.hidden = NO;
             }
         }];
     }
@@ -260,7 +292,7 @@
     [params setObject:name forKey:@"areaName"];
     //根据城市名称返回城市ID
     [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
+        self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             NSDictionary *dataDic = [responseObj objectForKey:@"data"];
@@ -280,7 +312,7 @@
     } failure:^(NSError *error) {
         if (error)
         {
-            self.noNetView.hidden = NO;
+            self.timeOutView.hidden = NO;
         }
     }];
 }
@@ -382,7 +414,7 @@
         [ud synchronize];
         //先请求数据
         [HttpTool get:@"http://14.29.84.4:6060/0.1/area/list" params:params success:^(id responseObj) {
-            self.noNetView.hidden = YES;
+            self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
                 self.rightArea = [JsonParser parseAreaByDictionary:responseObj];
@@ -395,7 +427,7 @@
         } failure:^(NSError *error) {
             if (error)
             {
-                self.noNetView.hidden = NO;
+                self.timeOutView.hidden = NO;
             }
         }];
     }
