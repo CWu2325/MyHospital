@@ -174,8 +174,6 @@
     [params0 setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
     
     [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/dept" params:params0 success:^(id responseObj) {
-        if (responseObj)
-        {
             self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
@@ -219,7 +217,6 @@
             {
                 [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
             }
-        }
     } failure:^(NSError *error) {
         if (error)
         {
@@ -330,8 +327,6 @@
             [params1 setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
             
             [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/dept" params:params1 success:^(id responseObj) {
-                if (responseObj)
-                {
                     self.noNetworkView.hidden = YES;
                     if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
                     {
@@ -350,9 +345,9 @@
                     }
                     else
                     {
+                        self.rightTableView.hidden = YES;
                         [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
                     }
-                }
             } failure:^(NSError *error) {
                 if (error)
                 {

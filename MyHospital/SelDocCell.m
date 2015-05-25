@@ -8,6 +8,7 @@
 
 #import "SelDocCell.h"
 #import "TEXTLabel.h"
+#import "UIImageView+WebCache.h"
 
 @interface SelDocCell()
 
@@ -105,7 +106,11 @@
     
     
     //设置图像
-    [self.docHeaderIV setImageWithURL:[NSURL URLWithString:self.doctor.coverUrl]];
+    if (self.doctor.coverUrl != (NSString *)[NSNull null])
+    {
+        [self.docHeaderIV setImageWithURL:[NSURL URLWithString:self.doctor.coverUrl] placeholderImage:[UIImage imageNamed:@"default_avatar"] options:SDWebImageRetryFailed];
+    }
+    //[self.docHeaderIV setImageWithURL:[NSURL URLWithString:self.doctor.coverUrl]];
     
     //姓名
     self.nameLabel.text = self.doctor.doctorName;

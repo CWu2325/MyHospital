@@ -155,6 +155,7 @@
     //预约号
     self.orderIDLabel.text = self.orderList.orderId;
     self.orderIDLabel.size = [XyqsTools getSizeWithText:self.orderIDLabel.text andFont:self.orderIDLabel.font];
+    
     //预约状态
     switch (self.orderList.orderState)
     {
@@ -181,6 +182,11 @@
         case 5:
         {
             self.orderStatelabel.text = @"已就诊";
+        }
+            break;
+        case 6:
+        {
+            self.orderStatelabel.text = @"暂无";
         }
             break;
         case 7:
@@ -282,7 +288,6 @@
             self.selButton.hidden = YES;
         }
     }
-    
 }
 
 -(NSString *)getTimeByDate:(NSDate *)date
@@ -297,9 +302,5 @@
 {
     [self.delegate myTabVClick:self];
 }
-
-
-
-
 
 @end

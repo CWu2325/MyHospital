@@ -157,6 +157,9 @@
     //获取预约记录列表
     [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/list" params:params success:^(id responseObj) {
         self.timeOutView.hidden = YES;
+        
+        
+        
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
             self.recordDatas = [JsonParser parseOrderListByDictionary:responseObj];

@@ -140,7 +140,6 @@
     }
     else
     {
-        
         self.noNetworkView.hidden = NO;
     }
 }

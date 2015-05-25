@@ -8,6 +8,7 @@
 
 #import "AppointmentCell.h"
 #import "UIImageView+AFNetworking.h"
+#import "UIImageView+WebCache.h"
 
 @interface AppointmentCell()
 
@@ -65,8 +66,11 @@
 {
     [super layoutSubviews];
 
-    [self.hospitalIV setImageWithURL:[NSURL URLWithString:self.hospital.coverUrl]];
-    
+    if (self.hospital.coverUrl != (NSString *)[NSNull null])
+    {
+        [self.hospitalIV setImageWithURL:[NSURL URLWithString:self.hospital.coverUrl] placeholderImage:[UIImage imageNamed:@"sv01.jpg"] options:SDWebImageRetryFailed];
+    }
+ 
     self.hospitalNameLabel.text = self.hospital.name;
     self.hospitalNameLabel.size = [XyqsTools getSizeWithText:self.hospitalNameLabel.text andFont:self.hospitalNameLabel.font];
     self.hospitalNameLabel.x = self.hospitalIV.maxX + 10;
