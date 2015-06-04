@@ -12,6 +12,7 @@
 #import "ResetPasVC.h"
 #import "PersonalVC.h"
 #import "TabBarVC.h"
+#import "AppDelegate.h"
 
 
 @interface LoginViewController ()<UITextFieldDelegate,UIScrollViewDelegate>
@@ -20,6 +21,8 @@
 @property(nonatomic,strong)UITextField *useTelTF;
 @property(nonatomic,strong)UITextField *usePasTF;
 
+@property(nonatomic,strong)AppDelegate *appDlg;
+
 @end
 
 @implementation LoginViewController
@@ -27,6 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.appDlg = [UIApplication sharedApplication].delegate;
  
     
     self.title = @"就医无忧登录";
@@ -203,43 +207,52 @@
         self.useTelTF.text = @"";
         return;
     }
-
+    
     if (self.usePasTF.text.length == 0)
     {
         [MBProgressHUD showError:@"请输入密码"];
         return;
     }
+    
+    if (self.appDlg.isReachable)
+    {
+        
         //登录
-     NSDictionary *params = @{@"mobile":self.useTelTF.text,@"password":self.usePasTF.text};
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_login" params:params success:^(id responseObj) {
-        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
-        {
-            NSDictionary *dataDic = [responseObj objectForKey:@"data"];
-            NSDictionary *tokenDic = [dataDic objectForKey:@"token"];
-            //保存用户登录的手机号码
-            [[NSUserDefaults standardUserDefaults] setObject:self.useTelTF.text forKey:@"telNumber"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            NSString *token = [tokenDic objectForKey:@"token"];
-            if (token)
+        NSDictionary *params = @{@"mobile":self.useTelTF.text,@"password":self.usePasTF.text};
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_login" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
             {
-                
-                
-                [[NSUserDefaults standardUserDefaults]setObject:token forKey:@"token"];
-                [[NSUserDefaults standardUserDefaults]synchronize];
-                [self.delegate passvalue:self.useTelTF.text];
-                [self.navigationController popViewControllerAnimated:NO];
+                NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                NSDictionary *tokenDic = [dataDic objectForKey:@"token"];
+                //保存用户登录的手机号码
+                [[NSUserDefaults standardUserDefaults] setObject:self.useTelTF.text forKey:@"telNumber"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                NSString *token = [tokenDic objectForKey:@"token"];
+                if (token)
+                {
+                    
+                    
+                    [[NSUserDefaults standardUserDefaults]setObject:token forKey:@"token"];
+                    [[NSUserDefaults standardUserDefaults]synchronize];
+                    [self.delegate passvalue:self.useTelTF.text];
+                    [self.navigationController popViewControllerAnimated:NO];
+                }
             }
-        }
-        else
-        {
-            [MBProgressHUD showError:@"用户名或密码错误"];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
+            else
+            {
+                [MBProgressHUD showError:@"用户名或密码错误"];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
 }
 
 //跳转到注册界面

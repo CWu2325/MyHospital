@@ -23,12 +23,14 @@
     // 2.发送GET请求
     [mgr GET:url parameters:params
      success:^(AFHTTPRequestOperation *operation, id responseObj) {
+
          if (success)
          {
              NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:responseObj options:0 error:nil];
              success(dic);
          }
      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+
          if (failure)
          {
              failure(error);
@@ -57,6 +59,7 @@
               success(dic);
           }
       } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+
           if (failure)
           {
               failure(error);

@@ -93,6 +93,8 @@
     self.limit = 0;
     self.offset = 0;
 
+    //集成下拉刷新
+    //[self setupRefresh];
     
 }
 
@@ -131,12 +133,14 @@
     if (self.appDlg.isReachable)
     {
         self.noNetView.hidden = YES;
+        self.tableView.scrollEnabled = YES;
         
         [self requestData];
     }
     else
     {
         self.noNetView.hidden = NO;
+        self.tableView.scrollEnabled = NO;
         [self.view bringSubviewToFront:self.noNetView];
     }
 
@@ -153,16 +157,19 @@
     [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"]forKey:@"token"];
     [params setObject:@(self.limit) forKey:@"limit"];
     [params setObject:@(self.offset) forKey:@"offset"];
+    
+   // NSLog(@"%@",params);
 
     //获取预约记录列表
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/list" params:params success:^(id responseObj) {
         self.timeOutView.hidden = YES;
-        
-        
-        
+        [MBProgressHUD hideHUD];
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
+            
             self.recordDatas = [JsonParser parseOrderListByDictionary:responseObj];
+            self.tableView.scrollEnabled = YES;
             [self.tableView reloadData];
         }
         else
@@ -170,8 +177,10 @@
             [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
+            self.tableView.scrollEnabled = NO;
             self.timeOutView.hidden = NO;
         }
     }];

@@ -152,7 +152,7 @@
     
     
     //剩余个数
-    self.numLabel.text = [NSString stringWithFormat:@"%d/%d",5,12];
+    self.numLabel.text = [NSString stringWithFormat:@"%d/%d",self.doctor.remainCount,self.doctor.totalCount];
     self.numLabel.size = [XyqsTools getSizeWithText:self.numLabel.text andFont:self.numLabel.font];
     self.numLabel.x = WIDTH - 8 - self.numLabel.width;
     self.numLabel.y = self.hospital_deptsLabel.y;

@@ -97,7 +97,9 @@
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
     [params setObject:@(self.depts.roomID) forKey:@"deptId"];
     [params setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/doctor" params:params success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
         self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
@@ -123,6 +125,7 @@
         }
         
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.timeOutView.hidden = NO;

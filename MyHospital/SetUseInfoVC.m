@@ -17,7 +17,7 @@
 #define HMEncode(str) [str dataUsingEncoding:NSUTF8StringEncoding]
 
 
-@interface SetUseInfoVC ()<UITextFieldDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate>
+@interface SetUseInfoVC ()<UITextFieldDelegate,UIScrollViewDelegate,UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIActionSheetDelegate>
 @property(nonatomic,strong)UIImageView *userImageView;
 @property(nonatomic,strong)UITextField *nameTF;
 
@@ -29,6 +29,8 @@
 @property(nonatomic,strong)UITextField *sexTF;          //性别
 @property(nonatomic,strong)UIView *backView;        //承载的基础view
 @property(nonatomic,strong)NoNetworkView *noNetView;
+
+@property(nonatomic,strong)AppDelegate *appDlg;
 
 
 @end
@@ -50,6 +52,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.appDlg = [UIApplication sharedApplication].delegate;
+    
     //先初始化控件
     [self initUI];
 }
@@ -61,6 +66,15 @@
     
     [self handlePage];
  
+}
+
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    [self.nameTF resignFirstResponder];
+    [self.useTelTF resignFirstResponder];
+    [self.useSSCardTF resignFirstResponder];
+    [self.addressTF resignFirstResponder];
+    [self.useIDTF resignFirstResponder];
 }
 
 
@@ -440,31 +454,37 @@
         [params setObject:@(2)  forKey:@"sex"];
     }
     
-    //设置个人信心
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
-        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
-        {
-            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
-            [self.navigationController popViewControllerAnimated:NO];
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            self.noNetView.hidden = NO;
-        }
-    }];
+    if (self.appDlg.isReachable)
+    {
+        //设置个人信心
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+                [self.navigationController popViewControllerAnimated:NO];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
 }
 
 //查看或修改个人资料
 -(void)rightBarModified
 {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-
     //姓名
     if (self.nameTF.text.length == 0)
     {
@@ -536,25 +556,33 @@
     {
         [params setObject:@(2)  forKey:@"sex"];
     }
+
+    if (self.appDlg.isReachable)
+    {
+        //设置个人信心
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
+            self.noNetView.hidden = YES;
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+                [self.navigationController popToRootViewControllerAnimated:NO];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                self.noNetView.hidden = NO;
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
     
-    //设置个人信心
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_user" params:params success:^(id responseObj) {
-        self.noNetView.hidden = YES;
-        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
-        {
-            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
-            [self.navigationController popToRootViewControllerAnimated:NO];
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            self.noNetView.hidden = NO;
-        }
-    }];
 }
 
 #pragma mark - TExtfield的代理事件
@@ -591,26 +619,22 @@
 #pragma mark - Tap事件--头像的选择
 -(void)tapGR:(UITapGestureRecognizer *)tap
 {
-    UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"亲~请选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"手机相册",nil];
+    if (self.appDlg.isReachable)
+    {
+        UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"亲~请选择图片" delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"手机相册",nil];
+        
+        // [as showInView:self.view];
+        
+        [as showInView:[UIApplication sharedApplication].keyWindow];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
     
-   // [as showInView:self.view];
-    
-    [as showInView:[UIApplication sharedApplication].keyWindow];
     
     
 }
-
-//-(void)willPresentActionSheet:(UIActionSheet *)actionSheet
-//{
-//    for (UIView *subViwe in actionSheet.subviews)
-//    {
-//        if ([subViwe isKindOfClass:[UIButton class]])
-//        {
-//            UIButton *button = (UIButton*)subViwe;
-//            [button setTitleColor:LCWBottomColor forState:UIControlStateNormal];
-//        }
-//    }
-//}
 
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex

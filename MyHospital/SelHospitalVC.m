@@ -279,8 +279,6 @@
 {
    
     [HttpTool get:@"http://14.29.84.4:6060/0.1/area/getId" params:params success:^(id repsonseObj) {
-        if (repsonseObj)
-        {
             if ([[repsonseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
                 NSDictionary *dataDic = [repsonseObj objectForKey:@"data"];
@@ -288,7 +286,10 @@
                 
                 NSMutableDictionary *params2 = [NSMutableDictionary dictionary];
                 [params2 setObject:@(areaID) forKey:@"areaId"];
+                
+                [MBProgressHUD showMessage:@"正在加载..."];
                 [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/list" params:params2 success:^(id responseObj2) {
+                    [MBProgressHUD hideHUD];
                         self.timeOutView.hidden = YES;
                         if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
                         {
@@ -315,6 +316,7 @@
                             [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
                         }
                 } failure:^(NSError *error2) {
+                    [MBProgressHUD hideHUD];
                     if (error2)
                     {
                         self.timeOutView.hidden = NO;
@@ -325,7 +327,6 @@
             {
                 [MBProgressHUD showError:[repsonseObj objectForKey:@"message"]];
             }
-        }
     } failure:^(NSError *error) {
         if (error)
         {

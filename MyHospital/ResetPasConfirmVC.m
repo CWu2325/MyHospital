@@ -8,11 +8,14 @@
 
 #import "ResetPasConfirmVC.h"
 #import "HttpTool.h"
+#import "AppDelegate.h"
 
 @interface ResetPasConfirmVC ()
 
 @property(nonatomic,strong)UITextField *usePasTF;   //用户密码
 @property(nonatomic,strong)UITextField *usePasConfTF;   //再次输入密码
+
+@property(nonatomic,strong)AppDelegate *appDlg;
 
 
 @end
@@ -21,6 +24,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.appDlg = [UIApplication sharedApplication].delegate;
+    
     self.title = @"重置密码";
     
     self.navigationItem.rightBarButtonItem = nil;
@@ -139,31 +144,36 @@
         return;
     }
     
-    //确认修改
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:self.resetToken forKey:@"resetToken"];
-    [params setObject:self.usePasTF.text forKey:@"password"];
-    [params setObject:@"2" forKey:@"step"];
-    
-    //重置密码
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj) {
-        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
-        {
-            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
-
-  
+    if (self.appDlg.isReachable)
+    {
+        //确认修改
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        [params setObject:self.resetToken forKey:@"resetToken"];
+        [params setObject:self.usePasTF.text forKey:@"password"];
+        [params setObject:@"2" forKey:@"step"];
+        
+        //重置密码
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
 }
 
 

@@ -101,7 +101,9 @@
     [params setObject:[XyqsTools getToken] forKey:@"token"];
     [params setObject:@(self.orderList.orderListID) forKey:@"id"];
     //获取预约记录列表中的预约详情
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/orderrecord/detail" params:params success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
         self.noNetView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
@@ -122,6 +124,7 @@
             [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.noNetView.hidden = NO;

@@ -137,6 +137,7 @@
     if ([XyqsTools isLogin])
     {
         [params setObject:[[NSUserDefaults standardUserDefaults]objectForKey:@"token"] forKey:@"token"];
+
         [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
             self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
@@ -181,7 +182,9 @@
     }
     
     //获取医生详情的方法
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool post:@"http://14.29.84.4:6060/0.1/doctor/detail" params:params success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
         self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
@@ -206,6 +209,7 @@
             [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.timeOutView.hidden = NO;
@@ -246,7 +250,7 @@
     //关注按钮
     if (self.doctorDetail.followed == 0)
     {
-        [self.attentionBtn setTitle:@"关注" forState:UIControlStateNormal];
+        [self.attentionBtn setTitle:@"关  注" forState:UIControlStateNormal];
         self.attentionBtn.titleLabel.font = [UIFont systemFontOfSize:12];
         
         [self.attentionBtn setBackgroundColor:LCWBottomColor];

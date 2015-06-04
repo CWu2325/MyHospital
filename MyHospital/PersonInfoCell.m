@@ -37,9 +37,6 @@
         self.useTelLabel.textColor = [UIColor whiteColor];
         
         
-//        UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 90, WIDTH, 1)];
-//        view.backgroundColor = LCWDivisionLineColor;
-//        [self.contentView addSubview:view];
         
         [self.contentView addSubview:self.useImageView];
         [self.contentView addSubview:self.useNameLabel];

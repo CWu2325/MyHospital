@@ -357,6 +357,7 @@
         vc.member = self.members[indexPath.row];
         vc.title = @"预约人信息";
         vc.fromWhere = @"find";
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
         [self.navigationController pushViewController:vc animated:NO];
         
     }

@@ -119,6 +119,7 @@
     d.remainState = [[doctorDic objectForKey:@"remainState"] intValue];
     d.followed = [[doctorDic objectForKey:@"followed"] intValue];
     
+    
     NSArray *arr = [dic objectForKey:@"schedules"];
     NSMutableArray *schedules = [NSMutableArray array];
     for (NSDictionary *dic in arr)
@@ -174,6 +175,8 @@
         d.fee = [[dic objectForKey:@"fee"] floatValue];
         d.departmentName = [dic objectForKey:@"departmentName"];
         d.remainState = [[dic objectForKey:@"remainState"] intValue];
+        d.remainCount = [[dic objectForKey:@"remainCount"] intValue];
+        d.totalCount = [[dic objectForKey:@"totalCount"]intValue];
         d.followed = [[dic objectForKey:@"followed"] boolValue];
         [doctors addObject:d];
     }

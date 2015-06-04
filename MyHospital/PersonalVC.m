@@ -67,42 +67,80 @@
     }
     else
     {
-        if ([CacheDic getDicWithFileName:@"userinfo.txt"])
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        if ([ud objectForKey:@"User"])
         {
-            NSDictionary *dataDic = [CacheDic getDicWithFileName:@"userinfo.txt"];
-            self.user = [JsonParser parseUserByDictionary:dataDic];
+            NSData *userData = [ud objectForKey:@"User"];
+            NSDictionary *userDic = [NSJSONSerialization JSONObjectWithData:userData options:0 error:nil];
+            NSDictionary *data = [userDic objectForKey:@"data"];
+            
+            self.user = [JsonParser parseUserByDictionary:data];
             [self.tableView reloadData];
         }
         else
         {
             NSDictionary *params = @{@"token":[XyqsTools getToken]};
             //如果登录了，就获取个人账户资料，刷新本界面
-            [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
-                
-                
-                
-                if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
-                {
-                    //保存数据
-                    [CacheDic saveDicDataData:responseObj andFileName:@"userinfo.txt"];
-                    
-                    NSDictionary *dataDic = [responseObj objectForKey:@"data"];
-                    self.user = [JsonParser parseUserByDictionary:dataDic];
-                    [self.tableView reloadData];
-                }
-                else
-                {
-                    [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-                }
-            } failure:^(NSError *error) {
-                if (error)
-                {
-                    [MBProgressHUD showError:@"请检查您的网络"];
-                }
-            }];
+            
+            // 1.获得请求管理者
+            AFHTTPRequestOperationManager *mgr = [AFHTTPRequestOperationManager manager];
+            [mgr setResponseSerializer:[AFHTTPResponseSerializer serializer]];
+            [mgr.requestSerializer willChangeValueForKey:@"timeoutInterval"];
+            mgr.requestSerializer.timeoutInterval = 10.f;
+            [mgr.requestSerializer didChangeValueForKey:@"timeoutInterval"];
+            
+            NSString *url  = @"http://14.29.84.4:6060/0.1/user/userinfo";
+            
+            // 2.发送GET请求
+            [mgr GET:url parameters:params
+             success:^(AFHTTPRequestOperation *operation, id responseObj) {
+                 
+                 NSDictionary *userDic = [NSJSONSerialization JSONObjectWithData:responseObj options:0 error:nil];
+                 
+                 
+                 if ([[userDic objectForKey:@"returnCode"] isEqual:@(1001)])
+                 {
+                     [ud setObject:responseObj forKey:@"User"];
+                     [ud synchronize];
+                     
+                     NSDictionary *dataDic = [userDic objectForKey:@"data"];
+                     self.user = [JsonParser parseUserByDictionary:dataDic];
+                     [self.tableView reloadData];
+                 }
+                 else
+                 {
+                     [MBProgressHUD showError:[userDic  objectForKey:@"message"]];
+                 }
+             } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                 [MBProgressHUD showError:@"网络不给力，请重试"];
+             }];
+            
+            
+//            [HttpTool get:@"http://14.29.84.4:6060/0.1/user/userinfo" params:params success:^(id responseObj) {
+//                
+//                if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+//                {
+//                    //保存数据
+//                    [ud setObject:responseObj forKey:@"User"];
+//                    [ud synchronize];
+//                   // [CacheDic saveDicDataData:responseObj andFileName:@"userinfo.txt"];
+//                    
+//                    NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+//                    self.user = [JsonParser parseUserByDictionary:dataDic];
+//                    [self.tableView reloadData];
+//                }
+//                else
+//                {
+//                    [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+//                }
+//            } failure:^(NSError *error) {
+//                if (error)
+//                {
+//                    NSLog(@"登录-----------请检查您的网络");
+//                }
+//            }];
         }
         
-       
     }
 }
 

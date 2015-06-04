@@ -173,7 +173,9 @@
     [params0 setObject:@(0) forKey:@"deptId"];      //默认从0
     [params0 setObject:@(self.hospital.hospitalID) forKey:@"hpId"];
     
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/hospital/dept" params:params0 success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
             self.timeOutView.hidden = YES;
             if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
             {
@@ -210,7 +212,6 @@
                         [self tableView:self.leftTableView didSelectRowAtIndexPath:indexPath];
                         [self.leftTableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
                     }
-                    
                 }
             }
             else
@@ -218,6 +219,7 @@
                 [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
             }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.timeOutView.hidden = NO;

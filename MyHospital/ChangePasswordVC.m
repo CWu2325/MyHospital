@@ -8,12 +8,15 @@
 
 #import "ChangePasswordVC.h"
 #import "HttpTool.h"
+#import "AppDelegate.h"
 
 @interface ChangePasswordVC ()
 
 @property(nonatomic,strong)UITextField *oldPasTF;
 @property(nonatomic,strong)UITextField *changePasTF;
 @property(nonatomic,strong)UITextField *changeAgnTF;
+
+@property(nonatomic,strong)AppDelegate *appDlg;
 @end
 
 @implementation ChangePasswordVC
@@ -21,6 +24,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.appDlg = [UIApplication sharedApplication].delegate;
     self.title = @"修改密码";
     
     self.view.backgroundColor = LCWBackgroundColor;
@@ -138,60 +143,64 @@
 
 -(void)changePassword
 {
-    if (self.oldPasTF.text.length == 0)
+    if (self.appDlg.isReachable)
     {
-        [MBProgressHUD showError:@"请输入您的旧密码"];
-        return;
-    }
-    
-
-    
-    if (self.changePasTF.text.length == 0 || self.changeAgnTF.text.length == 0)
-    {
-        [MBProgressHUD showError:@"请输入新密码"];
-        return;
-    }
-    
-    if (self.changePasTF.text.length <6 ||self.changePasTF.text.length > 16)
-    {
-        [MBProgressHUD showError:@"亲~设置密码请在6 - 16位之间"];
-        return;
-    }
-    
-    
-    if (![self.changePasTF.text isEqualToString:self.changeAgnTF.text])
-    {
-        [MBProgressHUD showError:@"两次密码不一样，请从新输入"];
-        return;
-    }
-    
-    if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[a-zA-Z0-9]{6,16}$"] evaluateWithObject:self.changePasTF.text])
-    {
-        [MBProgressHUD showError:@"亲~密码必须是字母或数字"];
-        return ;
-    }
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
-    [params setObject:self.oldPasTF.text forKey:@"oldPass"];
-    [params setObject:self.changePasTF.text forKey:@"newPass"];
-    
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_pwd" params:params success:^(id responseObj) {
-        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+        if (self.oldPasTF.text.length == 0)
         {
-            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
-            [self.navigationController popViewControllerAnimated:NO];
+            [MBProgressHUD showError:@"请输入您的旧密码"];
+            return;
         }
-        else
+        if (self.changePasTF.text.length == 0 || self.changeAgnTF.text.length == 0)
         {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            [MBProgressHUD showError:@"请输入新密码"];
+            return;
         }
-    } failure:^(NSError *error) {
-        if (error)
+        
+        if (self.changePasTF.text.length <6 ||self.changePasTF.text.length > 16)
         {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
+            [MBProgressHUD showError:@"亲~设置密码请在6 - 16位之间"];
+            return;
         }
-    }];
+        
+        
+        if (![self.changePasTF.text isEqualToString:self.changeAgnTF.text])
+        {
+            [MBProgressHUD showError:@"两次密码不一样，请从新输入"];
+            return;
+        }
+        
+        if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[a-zA-Z0-9]{6,16}$"] evaluateWithObject:self.changePasTF.text])
+        {
+            [MBProgressHUD showError:@"亲~密码必须是字母或数字"];
+            return ;
+        }
+        
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"token"] forKey:@"token"];
+        [params setObject:self.oldPasTF.text forKey:@"oldPass"];
+        [params setObject:self.changePasTF.text forKey:@"newPass"];
+        
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/update_pwd" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+                [self.navigationController popViewControllerAnimated:NO];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
 }
 
 

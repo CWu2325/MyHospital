@@ -155,7 +155,9 @@
     [params setObject:@(10) forKey:@"limit"];
     [params setObject:@(0) forKey:@"offset"];
     //获取关注的医生列表
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/myfollow/doctor" params:params success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
         self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
@@ -171,6 +173,7 @@
             [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.timeOutView.hidden = NO;

@@ -11,6 +11,7 @@
 #import "PersonalVC.h"
 #import "LoginViewController.h"
 #import "ProtocolVC.h"
+#import "AppDelegate.h"
 
 @interface GetAuthcodeVC ()
 
@@ -22,12 +23,16 @@
 
 @property(nonatomic)BOOL isSelProtocol;     //是否选择同意协议
 
+@property(nonatomic,strong)AppDelegate *appDlg;
+
 @end
 
 @implementation GetAuthcodeVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.appDlg = [UIApplication sharedApplication].delegate;
     self.title = @"用户注册";
     [self initUI];
     self.isSelProtocol = YES;
@@ -181,42 +186,50 @@
 //获取验证码
 -(void)getAuthcode:(UIButton *)sender
 {
-    self.seconds = 60;
-    sender.tag = 2;
-    UILabel *label = [[UILabel alloc]initWithFrame:sender.frame];
-    label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
-    label.layer.cornerRadius = self.getAuthcodeBtn.layer.cornerRadius;
-    label.layer.backgroundColor = [UIColor lightGrayColor].CGColor;
-    label.textColor = [UIColor whiteColor];
-    label.font = sender.titleLabel.font;
-    label.textAlignment = NSTextAlignmentCenter;
-    [self.view addSubview:label];
-    sender.enabled = NO;
+    if (self.appDlg.isReachable)
+    {
+        self.seconds = 60;
+        sender.tag = 2;
+        UILabel *label = [[UILabel alloc]initWithFrame:sender.frame];
+        label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
+        label.layer.cornerRadius = self.getAuthcodeBtn.layer.cornerRadius;
+        label.layer.backgroundColor = [UIColor lightGrayColor].CGColor;
+        label.textColor = [UIColor whiteColor];
+        label.font = sender.titleLabel.font;
+        label.textAlignment = NSTextAlignmentCenter;
+        [self.view addSubview:label];
+        sender.enabled = NO;
+        
+        
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:label repeats:YES];
+        
+        
+        //请求服务器给验证码
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        [params setObject:self.person.mobile forKey:@"mobile"];
+        [params setObject:@(1) forKey:@"type"];     //注册的类型
+        [params setObject:@"true" forKey:@"test"];
+        [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
+            {
+                [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
+            }
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
     
-    
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:label repeats:YES];
-
-    
-    //请求服务器给验证码
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:self.person.mobile forKey:@"mobile"];
-    [params setObject:@(1) forKey:@"type"];     //注册的类型
-    [params setObject:@"true" forKey:@"test"];
-    [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj) {
-        if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
-        {
-            [MBProgressHUD showSuccess:[responseObj objectForKey:@"message"]];
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
 }
 
 //倒计时
@@ -261,33 +274,40 @@
         [MBProgressHUD showError:@"亲~你未同意条款哦"];
         return;
     }
-    
-    //注册功能
-    NSDictionary *params = @{@"mobile":self.person.mobile,@"password":self.person.password,@"code":self.AuthcodeTF.text};
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_regist" params:params success:^(id responseObj) {
-        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
-        {
-           // NSDictionary *dataDic = [responseObj objectForKey:@"data"];
-            //NSString *token = [dataDic objectForKey:@"token"];
-            [MBProgressHUD showSuccess:@"恭喜您已注册成功"];
-            for (UIViewController *controller in self.navigationController.viewControllers)
+    if (self.appDlg.isReachable)
+    {
+        //注册功能
+        NSDictionary *params = @{@"mobile":self.person.mobile,@"password":self.person.password,@"code":self.AuthcodeTF.text};
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/mobile_regist" params:params success:^(id responseObj) {
+            if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
             {
-                if ([controller isKindOfClass:[LoginViewController class]])
+                // NSDictionary *dataDic = [responseObj objectForKey:@"data"];
+                //NSString *token = [dataDic objectForKey:@"token"];
+                [MBProgressHUD showSuccess:@"恭喜您已注册成功"];
+                for (UIViewController *controller in self.navigationController.viewControllers)
                 {
-                    [self.navigationController popToViewController:controller animated:NO];
+                    if ([controller isKindOfClass:[LoginViewController class]])
+                    {
+                        [self.navigationController popToViewController:controller animated:NO];
+                    }
                 }
             }
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
+            else
+            {
+                [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
+    
 }
 
 

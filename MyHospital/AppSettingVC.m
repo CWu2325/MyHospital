@@ -88,14 +88,6 @@
             default:
                 break;
         }
-        
-        UISegmentedControl *segmentC = [[UISegmentedControl alloc]initWithItems:@[@"ON",@"OFF"]];
-        segmentC.frame = CGRectMake(0, 0, 60, 25);
-        segmentC.tintColor = LCWBottomColor;
-        segmentC.selectedSegmentIndex = 0;
-       // [segmentC addTarget:self action:@selector(segmentAction:) forControlEvents:UIControlEventValueChanged];
-        cell.accessoryView = segmentC;
-
     }
     else if (indexPath.section == 3)
     {
@@ -144,6 +136,7 @@
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     [ud removeObjectForKey:@"token"];
     [ud removeObjectForKey:@"telNumber"];
+    [ud removeObjectForKey:@"User"];
     [ud synchronize];
     [self.navigationController popToRootViewControllerAnimated:NO];
 }

@@ -149,7 +149,9 @@
     [params0 setObject:self.schedules.date forKey:@"orderDate"];
     
     //获取医生某日上午或下午的坐诊时段列表
+    [MBProgressHUD showMessage:@"正在加载..."];
     [HttpTool get:@"http://14.29.84.4:6060/0.1/order/time" params:params0 success:^(id responseObj) {
+        [MBProgressHUD hideHUD];
         self.timeOutView.hidden = YES;
         if ([[responseObj objectForKey:@"returnCode"] isEqual:@(1001)])
         {
@@ -167,6 +169,7 @@
             [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
         }
     } failure:^(NSError *error) {
+        [MBProgressHUD hideHUD];
         if (error)
         {
             self.timeOutView.hidden = NO;
@@ -284,12 +287,13 @@
     self.selSickBtn = selSickBtn;
     selSickBtn.tag = 1;
     selSickBtn.width = WIDTH;
-    selSickBtn.height = 44;
+    selSickBtn.height = 43;
     selSickBtn.x = 0;
-    selSickBtn.y = diviLine1.y;
+    selSickBtn.y = diviLine1.y + 1;
     [selSickBtn setTitle:self.sickName forState:UIControlStateNormal];
     [selSickBtn setImage:[UIImage imageNamed:@"arrow_up.png"] forState:UIControlStateNormal];
-    [selSickBtn setBackgroundImage:[UIImage imageWithColor:LCWBackgroundColor] forState:UIControlStateHighlighted];
+    [selSickBtn setBackgroundImage:[UIImage imageWithColor:LCWBackgroundColor] forState:UIControlStateNormal];
+    [selSickBtn setBackgroundImage:[UIImage imageWithColor:[UIColor lightGrayColor]] forState:UIControlStateHighlighted];
     [selSickBtn addTarget:self action:@selector(confirmAction:) forControlEvents:UIControlEventTouchUpInside];
     [baseSv addSubview:selSickBtn];
     
@@ -530,7 +534,7 @@
                     }
                     else
                     {
-                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                        [MBProgressHUD showError:@"预约失败"];
                     }
                 } failure:^(NSError *error) {
                     if (error)
@@ -613,12 +617,13 @@
                     }
                     else
                     {
-                        [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                       [MBProgressHUD showError:@"预约失败"];
                     }
                 } failure:^(NSError *error) {
                     if (error)
                     {
-                        self.timeOutView.hidden = NO;                    }
+                        self.timeOutView.hidden = NO;
+                    }
                 }];
 
             }
@@ -638,8 +643,6 @@
         {
             case 0:
             {
-                
-                /////
             }
                 break;
             case 1:

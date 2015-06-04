@@ -9,12 +9,15 @@
 #import "RegisterVc.h"
 #import "GetAuthcodeVC.h"
 #import "HttpTool.h"
+#import "AppDelegate.h"
 
 @interface RegisterVc ()
 
 @property(nonatomic,strong)UITextField *useTelTF;
 @property(nonatomic,strong)UITextField *usePasTF;
 @property(nonatomic,strong)UITextField *useAgainPasTF;
+
+@property(nonatomic,strong)AppDelegate *appDlg;
 
 @end
 
@@ -23,6 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.appDlg = [UIApplication sharedApplication].delegate;
     self.title = @"用户注册";
     
     self.view.backgroundColor = LCWBackgroundColor;
@@ -174,8 +178,6 @@
         [MBProgressHUD showError:@"亲~设置密码请在6 - 16位之间"];
         return;
     }
-
-   
     if (![self.useAgainPasTF.text isEqualToString:self.usePasTF.text])
     {
         [MBProgressHUD showError:@"两次密码不一样，请从新输入"];
@@ -188,31 +190,37 @@
         return ;
     }
     
-    //验证电话号码是否可用
-    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj)
+    if (self.appDlg.isReachable)
     {
-        if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
-        {
-            GetAuthcodeVC *vc = [[GetAuthcodeVC alloc]init];
-            Person *person = [[Person alloc]init];
-            person.mobile = self.useTelTF.text;
-            person.password = self.usePasTF.text;
-            vc.person = person;
-            [self.navigationController pushViewController:vc animated:NO];
-        }
-        else
-        {
-            [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
-            return ;
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
-
+        //验证电话号码是否可用
+        NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj)
+         {
+             if ([[responseObj objectForKey:@"returnCode"]isEqual: @(1001)])
+             {
+                 GetAuthcodeVC *vc = [[GetAuthcodeVC alloc]init];
+                 Person *person = [[Person alloc]init];
+                 person.mobile = self.useTelTF.text;
+                 person.password = self.usePasTF.text;
+                 vc.person = person;
+                 [self.navigationController pushViewController:vc animated:NO];
+             }
+             else
+             {
+                 [MBProgressHUD showError:[responseObj objectForKey:@"message"]];
+                 return ;
+             }
+         } failure:^(NSError *error) {
+             if (error)
+             {
+                 [MBProgressHUD showError:@"网络不给力，请重试"];
+             }
+         }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
 }
 
 

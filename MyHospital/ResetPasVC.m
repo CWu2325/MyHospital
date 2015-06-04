@@ -9,6 +9,7 @@
 #import "ResetPasVC.h"
 #import "ResetPasConfirmVC.h"
 #import "HttpTool.h"
+#import "AppDelegate.h"
 
 @interface ResetPasVC ()
 
@@ -19,6 +20,7 @@
 @property(nonatomic)int seconds;
 
 @property(nonatomic,strong)UIButton *getAuthcodeBtn;
+@property(nonatomic,strong)AppDelegate *appDlg;
 
 @end
 
@@ -26,6 +28,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.appDlg = [UIApplication sharedApplication].delegate;
     
     self.title = @"重置密码";
     self.view.backgroundColor = LCWBackgroundColor;
@@ -138,70 +142,79 @@
 //获取验证码
 -(void)getAuthcode:(UIButton *)sender
 {
-    if (self.useTelTF.text.length == 0)
+    if (self.appDlg.isReachable)
     {
-        [MBProgressHUD showError:@"请输入您的手机号码"];
-        return;
+        if (self.useTelTF.text.length == 0)
+        {
+            [MBProgressHUD showError:@"请输入您的手机号码"];
+            return;
+        }
+        
+        if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[1][3-8]+\\d{9}"] evaluateWithObject:self.useTelTF.text])
+        {
+            [MBProgressHUD showError:@"请输入正确的手机号"];
+            return;
+        }
+        
+        //验证电话号码是否可用
+        NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
+            if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
+            {
+                sender.tag = 2;
+                self.seconds = 60;
+                UILabel *label = [[UILabel alloc]initWithFrame:sender.frame];
+                label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
+                label.textColor = [UIColor whiteColor];
+                label.font = sender.titleLabel.font;
+                label.layer.cornerRadius = self.getAuthcodeBtn.layer.cornerRadius;
+                label.layer.backgroundColor = [UIColor lightGrayColor].CGColor;
+                label.textAlignment = NSTextAlignmentCenter;
+                [self.view addSubview:label];
+                sender.enabled = NO;
+                self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:label repeats:YES];
+                
+                
+                NSMutableDictionary *params = [NSMutableDictionary dictionary];
+                [params setObject:self.useTelTF.text forKey:@"mobile"];
+                [params setObject:@(2) forKey:@"type"];
+                [params setObject:@"true" forKey:@"test"];
+                
+                //发送验证码
+                [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj2) {
+                    if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        [MBProgressHUD showSuccess:[responseObj2 objectForKey:@"message"]];
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                    }
+                } failure:^(NSError *error) {
+                    if (error)
+                    {
+                        [MBProgressHUD showError:@"请检查您的网络连接"];
+                    }
+                }];
+            }
+            else
+            {
+                [MBProgressHUD showError:@"用户不存在"];
+                return ;
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
     }
     
-    if (![[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^[1][3-8]+\\d{9}"] evaluateWithObject:self.useTelTF.text])
-    {
-        [MBProgressHUD showError:@"请输入正确的手机号"];
-        return;
-    }
     
-    //验证电话号码是否可用
-    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
-        if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
-        {
-            sender.tag = 2;
-            self.seconds = 60;
-            UILabel *label = [[UILabel alloc]initWithFrame:sender.frame];
-            label.text = [NSString stringWithFormat:@"%d秒",self.seconds];
-            label.textColor = [UIColor whiteColor];
-            label.font = sender.titleLabel.font;
-            label.layer.cornerRadius = self.getAuthcodeBtn.layer.cornerRadius;
-            label.layer.backgroundColor = [UIColor lightGrayColor].CGColor;
-            label.textAlignment = NSTextAlignmentCenter;
-            [self.view addSubview:label];
-            sender.enabled = NO;
-            self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(changeTimeShow:) userInfo:label repeats:YES];
-            
-            
-            NSMutableDictionary *params = [NSMutableDictionary dictionary];
-            [params setObject:self.useTelTF.text forKey:@"mobile"];
-            [params setObject:@(2) forKey:@"type"];
-            [params setObject:@"true" forKey:@"test"];
-            
-            //发送验证码
-            [HttpTool get:@"http://14.29.84.4:6060/0.1/user/send_verifycode" params:params success:^(id responseObj2) {
-                if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
-                {
-                    [MBProgressHUD showSuccess:[responseObj2 objectForKey:@"message"]];
-                }
-                else
-                {
-                    [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
-                }
-            } failure:^(NSError *error) {
-                if (error)
-                {
-                    [MBProgressHUD showError:@"请检查您的网络连接"];
-                }
-            }];
-        }
-        else
-        {
-            [MBProgressHUD showError:@"用户不存在"];
-            return ;
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
 }
 
 //倒计时
@@ -257,53 +270,59 @@
         [MBProgressHUD showError:@"请输入正确长度的6位验证码"];
         return;
     }
+    if (self.appDlg.isReachable)
+    {
+        NSMutableDictionary *params = [NSMutableDictionary dictionary];
+        [params setObject:self.useTelTF.text forKey:@"mobile"];
+        [params setObject:self.rsgisterTF.text forKey:@"code"];
+        [params setObject:@"1" forKey:@"step"];
+        
+        
+        //验证电话号码是否可用
+        NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
+        [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
+            if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
+            {
+                [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj2) {
+                    
+                    
+                    if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
+                    {
+                        NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
+                        NSString *resetToken = [dataDic objectForKey:@"token"];
+                        //跳转
+                        ResetPasConfirmVC *vc = [[ResetPasConfirmVC alloc]init];
+                        vc.resetToken = resetToken;
+                        [self.navigationController pushViewController:vc animated:NO];
+                    }
+                    else
+                    {
+                        [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
+                    }
+                } failure:^(NSError *error2) {
+                    if (error2)
+                    {
+                        [MBProgressHUD showError:@"网络不给力，请重试"];
+                    }
+                }];
+            }
+            else
+            {
+                [MBProgressHUD showError:@"用户不存在"];
+                return ;
+            }
+        } failure:^(NSError *error) {
+            if (error)
+            {
+                [MBProgressHUD showError:@"网络不给力，请重试"];
+            }
+        }];
+    }
+    else
+    {
+        [MBProgressHUD showError:@"无网络连接，请联网后重试"];
+    }
     
-
-    NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    [params setObject:self.useTelTF.text forKey:@"mobile"];
-    [params setObject:self.rsgisterTF.text forKey:@"code"];
-    [params setObject:@"1" forKey:@"step"];
-    
-    
-    //验证电话号码是否可用
-    NSDictionary *params0 = @{@"mobile":self.useTelTF.text};
-    [HttpTool post:@"http://14.29.84.4:6060/0.1/user/verify_mobile" params:params0 success:^(id responseObj) {
-        if ([responseObj objectForKey:@"message"] != (NSString *)[NSNull null] && [[responseObj objectForKey:@"message"] isEqualToString:@"该号码已被注册"])
-        {
-            [HttpTool post:@"http://14.29.84.4:6060/0.1/user/reset_pwd" params:params success:^(id responseObj2) {
-
-                
-                if ([[responseObj2 objectForKey:@"returnCode"] isEqual:@(1001)])
-                {
-                    NSDictionary *dataDic = [responseObj2 objectForKey:@"data"];
-                    NSString *resetToken = [dataDic objectForKey:@"token"];
-                    //跳转
-                    ResetPasConfirmVC *vc = [[ResetPasConfirmVC alloc]init];
-                    vc.resetToken = resetToken;
-                    [self.navigationController pushViewController:vc animated:NO];
-                }
-                else
-                {
-                    [MBProgressHUD showError:[responseObj2 objectForKey:@"message"]];
-                }
-            } failure:^(NSError *error2) {
-                if (error2)
-                {
-                    [MBProgressHUD showError:@"请检查您的网络连接"];
-                }
-            }];
-        }
-        else
-        {
-            [MBProgressHUD showError:@"用户不存在"];
-            return ;
-        }
-    } failure:^(NSError *error) {
-        if (error)
-        {
-            [MBProgressHUD showError:@"请检查您的网络连接"];
-        }
-    }];
 
 }
 

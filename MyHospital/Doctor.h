@@ -27,4 +27,7 @@
 
 @property(nonatomic,strong)NSMutableArray *schedules;         //排版表
 
+@property(nonatomic)int totalCount;         //号源总数
+@property(nonatomic)int remainCount;        //号源剩余数
+
 @end
